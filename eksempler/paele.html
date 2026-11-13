@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enkeltpæles bæreevne · Geoteknik</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/laerebog.js"></script><script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/side.js"></script>
+</head>
+<body data-topic="paele">
+<a class="skip" href="#indhold">Gå til indhold</a>
+<header><div class="wrap"><a class="brand" href="../index.html">Geoteknik</a><small>Interaktive undervisningseksempler</small></div></header>
+
+<main id="indhold">
+<section class="exercise-head">
+<a href="../index.html">← Alle øvelser</a>
+<p class="tag">Geostatik og ramning</p>
+<h1>Enkeltpæles bæreevne</h1>
+<p>Opdel den geostatiske modstand i overflade og spids. Skift derefter til Den Danske Rammeformel og undersøg, hvordan nedsynkningen pr. slag påvirker den dynamiske modstand.</p>
+</section>
+<div class="workspace">
+<section class="panel" aria-labelledby="params">
+<h2 id="params">Indstillinger</h2>
+<div class="tabs" id="faner" role="group" aria-label="Beregningsvalg" hidden></div>
+<div id="indstillinger"></div>
+<button type="button" id="nulstil">Nulstil værdier</button>
+<noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
+</section>
+<section class="panel" aria-labelledby="figurtitel">
+<h2 id="figurtitel">Figur og resultater</h2>
+<canvas id="figur" role="img" aria-label="Enkeltpæles bæreevne" aria-describedby="figurtekst"></canvas>
+<div class="legend" id="kurver"></div>
+<p class="hint" id="figurtekst"></p>
+<div class="metrics" id="resultater"></div>
+<details id="dellag" hidden><summary>Vis beregningen for hvert dellag</summary><div class="data"><table id="datatabel"></table></div></details>
+</section>
+</div>
+<div class="notes">
+<section class="panel"><h2>Ligninger og symboler</h2>
+<div class="formula">Rs = As cᵤ m r · Rb = 9 cᵤ Ab · Rstat = Rs + Rb</div><p class="definition">Rs er overflademodstanden, Rb spidsmodstanden, As overfladearealet i leret, Ab spidsarealet, cᵤ den karakteristiske udrænede styrke, m materialefaktoren og r regenerationsfaktoren.</p>
+<div class="formula">s₀ = √(2ηhGL*/(AbE)) · R = ηhG/(s + ½s₀)</div><p class="definition">R er den dynamiske modstand. η er effektiviteten, h faldhøjden, G ramklodsens tyngde, s nedsynkning pr. slag, s₀ elastisk sammentrykning i modellens tilfælde med s = 0, og E pælens elasticitetsmodul. L* er pælelængden, dog middelværdien af længden og 20 gange sidelængden for korte pæle jf. s. 418.</p>
+</section>
+<section class="panel"><h2>Undersøg selv</h2><p>Halvér nedsynkningen pr. slag ved samme slagenergi. Hvorfor bliver den dynamiske modstand mindre end dobbelt så stor?</p>
+<details><summary>Se forklaringen</summary><p>Kun s halveres. Leddet ½s₀ i nævneren bevares og repræsenterer pælens elastiske sammentrykning i modellen.</p></details>
+<h3>Forudsætninger</h3><p>De to faner viser forskellige jordprofiler. Geostatikken gælder her en kvadratisk, rammet betonpæl i homogent vandmættet ler med spidsfaktor 9. Rammeeksemplet gælder en lodret betonpæl med spids i friktionsjord.</p>
+</section>
+</div>
+<section class="panel book">
+<h2>Læs videre i lærebogen</h2>
+<p>Geoteknik, 3. udgave · § 16.3, s. 416–419 · § 16.4, s. 422–429</p>
+<p id="bogstatus">Vælg din PDF af lærebogen for at åbne den på s. 416. Filen åbnes lokalt i browseren.</p>
+<p><a data-bogside="416" target="_blank" rel="noopener" hidden>Åbn lærebogen på s. 416 ↗</a> <a data-bogside="422" target="_blank" rel="noopener" hidden>Side 422 ↗</a></p>
+<label for="bogfil">Vælg lærebogens PDF</label>
+<input type="file" id="bogfil" accept="application/pdf,.pdf">
+</section>
+<nav class="nav" aria-label="Andre øvelser"><a href="baereevne.html">← Fundamenters bæreevne</a><a href="styrke.html">Jords forskydningsstyrke →</a></nav>
+</main>
+
+<footer><div class="wrap"><span>Fagligt grundlag · Geoteknik, 3. udgave</span><a href="../index.html">Alle øvelser</a></div></footer>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fundamenters sætninger · Geoteknik</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/laerebog.js"></script><script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/side.js"></script>
+</head>
+<body data-topic="saetninger">
+<a class="skip" href="#indhold">Gå til indhold</a>
+<header><div class="wrap"><a class="brand" href="../index.html">Geoteknik</a><small>Interaktive undervisningseksempler</small></div></header>
+
+<main id="indhold">
+<section class="exercise-head">
+<a href="../index.html">← Alle øvelser</a>
+<p class="tag">Trykspredning og dellag</p>
+<h1>Fundamenters sætninger</h1>
+<p>Se, hvordan lasten fra et rektangulært fundament spredes ned i jorden. Fordel den beregnede konsolideringssætning på dellag og se, hvor sætningen opstår.</p>
+</section>
+<div class="workspace">
+<section class="panel" aria-labelledby="params">
+<h2 id="params">Indstillinger</h2>
+<div class="tabs" id="faner" role="group" aria-label="Beregningsvalg" hidden></div>
+<div id="indstillinger"></div>
+<button type="button" id="nulstil">Nulstil værdier</button>
+<noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
+</section>
+<section class="panel" aria-labelledby="figurtitel">
+<h2 id="figurtitel">Figur og resultater</h2>
+<canvas id="figur" role="img" aria-label="Fundamenters sætninger" aria-describedby="figurtekst"></canvas>
+<div class="legend" id="kurver"></div>
+<p class="hint" id="figurtekst"></p>
+<div class="metrics" id="resultater"></div>
+<details id="dellag" hidden><summary>Vis beregningen for hvert dellag</summary><div class="data"><table id="datatabel"></table></div></details>
+</section>
+</div>
+<div class="notes">
+<section class="panel"><h2>Ligninger og symboler</h2>
+<div class="formula">Δσz = P/[(B + z)(L + z)]</div><p class="definition">P er den sætningsgivende last, B og L fundamentets bredde og længde, og z dybden under fundamentsunderkanten.</p>
+<div class="formula">δkonv ≈ Σ (Δσ′ᵢ/Kᵢ) ΔZᵢ</div><p class="definition">Δσ′ᵢ er spændingstilvæksten i midten af dellaget efter konsolidering, Kᵢ er dellagets konsolideringsmodul, og ΔZᵢ dets tykkelse.</p>
+</section>
+<section class="panel"><h2>Undersøg selv</h2><p>Behold lasten og øg fundamentbredden. Hvilket dellag får den største ændring i spændingstilvæksten?</p>
+<details><summary>Se forklaringen</summary><p>Ændringen er størst nær fundamentet. Med dybden får z en stadig større betydning for det areal, der fordeler lasten.</p></details>
+<h3>Forudsætninger</h3><p>Konventionel konsolideringssætning med trykspredning 1:2 og konstant K i hvert materiale. Dybden måles fra fundamentsunderkanten. P er den sætningsgivende last, som allerede er fastlagt. Initialsætning og krybning indgår ikke.</p>
+</section>
+</div>
+<section class="panel book">
+<h2>Læs videre i lærebogen</h2>
+<p>Geoteknik, 3. udgave · § 11.2, s. 281–285 · § 11.4, s. 290–295 · § 5.3, s. 146</p>
+<p id="bogstatus">Vælg din PDF af lærebogen for at åbne den på s. 281. Filen åbnes lokalt i browseren.</p>
+<p><a data-bogside="281" target="_blank" rel="noopener" hidden>Åbn lærebogen på s. 281 ↗</a> <a data-bogside="290" target="_blank" rel="noopener" hidden>Side 290 ↗</a> <a data-bogside="146" target="_blank" rel="noopener" hidden>Side 146 ↗</a></p>
+<label for="bogfil">Vælg lærebogens PDF</label>
+<input type="file" id="bogfil" accept="application/pdf,.pdf">
+</section>
+<nav class="nav" aria-label="Andre øvelser"><a href="styrke.html">← Jords forskydningsstyrke</a></nav>
+</main>
+
+<footer><div class="wrap"><span>Fagligt grundlag · Geoteknik, 3. udgave</span><a href="../index.html">Alle øvelser</a></div></footer>
+</body>
+</html>

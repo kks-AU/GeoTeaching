@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rankine-jordtryk · Geoteknik</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/laerebog.js"></script><script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/side.js"></script>
+</head>
+<body data-topic="rankine">
+<a class="skip" href="#indhold">Gå til indhold</a>
+<header><div class="wrap"><a class="brand" href="../index.html">Geoteknik</a><small>Interaktive undervisningseksempler</small></div></header>
+
+<main id="indhold">
+<section class="exercise-head">
+<a href="../index.html">← Alle øvelser</a>
+<p class="tag">Fra hvile til brud</p>
+<h1>Rankine-jordtryk</h1>
+<p>Træk væggen væk fra jorden, eller pres den ind mod jorden. Følg den vandrette spænding og se, hvornår Mohrs cirkel tangerer brudlinjen.</p>
+</section>
+<div class="workspace">
+<section class="panel" aria-labelledby="params">
+<h2 id="params">Indstillinger</h2>
+<div class="tabs" id="faner" role="group" aria-label="Beregningsvalg" hidden></div>
+<div id="indstillinger"></div>
+<button type="button" id="nulstil">Nulstil værdier</button>
+<noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
+</section>
+<section class="panel" aria-labelledby="figurtitel">
+<h2 id="figurtitel">Figur og resultater</h2>
+<canvas id="figur" role="img" aria-label="Rankine-jordtryk" aria-describedby="figurtekst"></canvas>
+<div class="legend" id="kurver"></div>
+<p class="hint" id="figurtekst"></p>
+<div class="metrics" id="resultater"></div>
+<details id="dellag" hidden><summary>Vis beregningen for hvert dellag</summary><div class="data"><table id="datatabel"></table></div></details>
+</section>
+</div>
+<div class="notes">
+<section class="panel"><h2>Ligninger og symboler</h2>
+<div class="formula">K₀ = 1 − sin φ · Kₐ = (1 − sin φ)/(1 + sin φ) · Kₚ = 1/Kₐ</div><p class="definition">K₀, Kₐ og Kₚ er koefficienterne for hviletryk, aktivt og passivt brud. φ er friktionsvinklen. I dette eksempel anvendes samme vinkel i de tre udtryk.</p>
+<div class="formula">σ′z = γz + p · e = σ′x = Kσ′z · τf = σ′ tan φ</div><p class="definition">e er jordtrykket. K er det aktuelle spændingsforhold. γ er rumvægten, z dybden, p terrænlasten og τf forskydningsstyrken ved normalspændingen σ′.</p>
+</section>
+<section class="panel"><h2>Undersøg selv</h2><p>Bevæg skyderen langsomt mod passivt brud. Hvornår bliver den vandrette spænding den største hovedspænding?</p>
+<details><summary>Se forklaringen</summary><p>Når σ′x bliver større end σ′z. Før skiftet skrumper cirklen til et punkt. Derefter vokser den igen og tangerer brudlinjen ved passivt brud.</p></details>
+<h3>Forudsætninger</h3><p>Lodret glat væg, vandret terræn og homogen normalkonsolideret friktionsjord uden poretryk. Skyderen interpolerer spændingen mellem hviletryk og brud som illustration.</p>
+</section>
+</div>
+<section class="panel book">
+<h2>Læs videre i lærebogen</h2>
+<p>Geoteknik, 3. udgave · §§ 12.2–12.3, s. 306–311 · § 7.2, s. 181–183</p>
+<p id="bogstatus">Vælg din PDF af lærebogen for at åbne den på s. 307. Filen åbnes lokalt i browseren.</p>
+<p><a data-bogside="307" target="_blank" rel="noopener" hidden>Åbn lærebogen på s. 307 ↗</a> <a data-bogside="306" target="_blank" rel="noopener" hidden>Side 306 ↗</a> <a data-bogside="181" target="_blank" rel="noopener" hidden>Side 181 ↗</a></p>
+<label for="bogfil">Vælg lærebogens PDF</label>
+<input type="file" id="bogfil" accept="application/pdf,.pdf">
+</section>
+<nav class="nav" aria-label="Andre øvelser"><a href="spaendinger.html">← Spændinger med dybden</a><a href="deformation.html">Endimensional deformation →</a></nav>
+</main>
+
+<footer><div class="wrap"><span>Fagligt grundlag · Geoteknik, 3. udgave</span><a href="../index.html">Alle øvelser</a></div></footer>
+</body>
+</html>

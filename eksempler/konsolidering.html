@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konsolidering over tid · Geoteknik</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/laerebog.js"></script><script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/side.js"></script>
+</head>
+<body data-topic="konsolidering">
+<a class="skip" href="#indhold">Gå til indhold</a>
+<header><div class="wrap"><a class="brand" href="../index.html">Geoteknik</a><small>Interaktive undervisningseksempler</small></div></header>
+
+<main id="indhold">
+<section class="exercise-head">
+<a href="../index.html">← Alle øvelser</a>
+<p class="tag">Dræn og poreovertryk</p>
+<h1>Konsolidering over tid</h1>
+<p>Følg poreovertrykket efter en pludselig belastning. Se, hvor hurtigt lasten overtages af kornskelettet, når lerlaget drænes fra én eller to sider.</p>
+</section>
+<div class="workspace">
+<section class="panel" aria-labelledby="params">
+<h2 id="params">Indstillinger</h2>
+<div class="tabs" id="faner" role="group" aria-label="Beregningsvalg" hidden></div>
+<div id="indstillinger"></div>
+<button type="button" id="nulstil">Nulstil værdier</button>
+<noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
+</section>
+<section class="panel" aria-labelledby="figurtitel">
+<h2 id="figurtitel">Figur og resultater</h2>
+<canvas id="figur" role="img" aria-label="Konsolidering over tid" aria-describedby="figurtekst"></canvas>
+<div class="legend" id="kurver"></div>
+<p class="hint" id="figurtekst"></p>
+<div class="metrics" id="resultater"></div>
+<details id="dellag" hidden><summary>Vis beregningen for hvert dellag</summary><div class="data"><table id="datatabel"></table></div></details>
+</section>
+</div>
+<div class="notes">
+<section class="panel"><h2>Ligninger og symboler</h2>
+<div class="formula">T = cₖ t/H² · cₖ = kK/γw</div><p class="definition">T er tidsfaktoren. cₖ er konsolideringskoefficienten, t tiden, k den hydrauliske ledningsevne, K konsolideringsmodulen og γw vandets rumvægt. H er den længste drænvej.</p>
+<div class="formula">Δu/p = (4/π) Σ [sin(nπx/2) exp(−n²π²T/4)/n], n = 1, 3, 5, …</div><p class="definition">p er lasttrinnet, Δu er poreovertrykket, og x er afstanden fra drænfladen divideret med H. Ved dobbelt dræn bruges afstanden til den nærmeste drænflade.</p>
+<div class="formula">δt = U δ∞ · δ∞ = pZ/K</div><p class="definition">U er konsolideringsgraden, δt sætningen til tiden t, δ∞ slutsætningen, og Z lagtykkelsen. U beregnes som 1 minus det relative poreovertryk i gennemsnit over laget.</p>
+</section>
+<section class="panel"><h2>Undersøg selv</h2><p>Skift fra ensidig til dobbeltsidig dræning med samme lagtykkelse. Hvorfor ændres tiden til 50 % konsolidering?</p>
+<details><summary>Se forklaringen</summary><p>Drænvejen halveres. Ved samme tidsfaktor er tiden proportional med drænvejens kvadrat og bliver derfor en fjerdedel.</p></details>
+<h3>Forudsætninger</h3><p>Ensformig spændingstilvækst, konstant konsolideringskoefficient og konstant konsolideringsmodul. Kurven viser primær konsolidering.</p>
+</section>
+</div>
+<section class="panel book">
+<h2>Læs videre i lærebogen</h2>
+<p>Geoteknik, 3. udgave · §§ 6.2–6.3, s. 162–167</p>
+<p id="bogstatus">Vælg din PDF af lærebogen for at åbne den på s. 162. Filen åbnes lokalt i browseren.</p>
+<p><a data-bogside="162" target="_blank" rel="noopener" hidden>Åbn lærebogen på s. 162 ↗</a> <a data-bogside="164" target="_blank" rel="noopener" hidden>Side 164 ↗</a></p>
+<label for="bogfil">Vælg lærebogens PDF</label>
+<input type="file" id="bogfil" accept="application/pdf,.pdf">
+</section>
+<nav class="nav" aria-label="Andre øvelser"><a href="deformation.html">← Endimensional deformation</a><a href="baereevne.html">Fundamenters bæreevne →</a></nav>
+</main>
+
+<footer><div class="wrap"><span>Fagligt grundlag · Geoteknik, 3. udgave</span><a href="../index.html">Alle øvelser</a></div></footer>
+</body>
+</html>

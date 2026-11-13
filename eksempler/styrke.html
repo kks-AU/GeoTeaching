@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jords forskydningsstyrke · Geoteknik</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/laerebog.js"></script><script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/side.js"></script>
+</head>
+<body data-topic="styrke">
+<a class="skip" href="#indhold">Gå til indhold</a>
+<header><div class="wrap"><a class="brand" href="../index.html">Geoteknik</a><small>Interaktive undervisningseksempler</small></div></header>
+
+<main id="indhold">
+<section class="exercise-head">
+<a href="../index.html">← Alle øvelser</a>
+<p class="tag">Fra forsøg til brudlinje</p>
+<h1>Jords forskydningsstyrke</h1>
+<p>Brug to idealiserede brudmålinger fra en skæreboks til at finde en brudlinje. Sammenhold linjen med en triaksialprøves Mohr-cirkel ved samme sæt effektive styrkeparametre.</p>
+</section>
+<div class="workspace">
+<section class="panel" aria-labelledby="params">
+<h2 id="params">Indstillinger</h2>
+<div class="tabs" id="faner" role="group" aria-label="Beregningsvalg" hidden></div>
+<div id="indstillinger"></div>
+<button type="button" id="nulstil">Nulstil værdier</button>
+<noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
+</section>
+<section class="panel" aria-labelledby="figurtitel">
+<h2 id="figurtitel">Figur og resultater</h2>
+<canvas id="figur" role="img" aria-label="Jords forskydningsstyrke" aria-describedby="figurtekst"></canvas>
+<div class="legend" id="kurver"></div>
+<p class="hint" id="figurtekst"></p>
+<div class="metrics" id="resultater"></div>
+<details id="dellag" hidden><summary>Vis beregningen for hvert dellag</summary><div class="data"><table id="datatabel"></table></div></details>
+</section>
+</div>
+<div class="notes">
+<section class="panel"><h2>Ligninger og symboler</h2>
+<div class="formula">τf = c′ + σ′f tan φ′</div><p class="definition">τf er forskydningsspændingen ved brud. σ′f er den effektive normalspænding på brudplanet, c′ er effektiv kohæsion, og φ′ er effektiv friktionsvinkel. I et udrænet styrkeforsøg med ler beskrives styrken i totalspændinger ved τf = cᵤ.</p>
+<div class="formula">M = (σ′₁ + σ′₃)/2 · r = (σ′₁ − σ′₃)/2</div><p class="definition">M er cirklens centrum på normalspændingsaksen, r dens radius, og σ′₁ og σ′₃ de største og mindste effektive hovedspændinger. Brud nås ved tangering.</p>
+</section>
+<section class="panel"><h2>Undersøg selv</h2><p>Hæv begge skæreboksmålinger med det samme antal kPa. Hvad sker der med friktionsvinklen og kohæsionen?</p>
+<details><summary>Se forklaringen</summary><p>Hældningen og friktionsvinklen bevares. Skæringen med τ-aksen flytter sig op med det samme antal kPa.</p></details>
+<h3>Forudsætninger</h3><p>De to skæreboksforsøg er drænede med effektive normalspændinger på 50 og 150 kPa. Triaksialforsøget vises med effektive hovedspændinger. Målingerne er konstrueret til øvelsen.</p>
+</section>
+</div>
+<section class="panel book">
+<h2>Læs videre i lærebogen</h2>
+<p>Geoteknik, 3. udgave · §§ 7.1–7.4, s. 179–188</p>
+<p id="bogstatus">Vælg din PDF af lærebogen for at åbne den på s. 179. Filen åbnes lokalt i browseren.</p>
+<p><a data-bogside="179" target="_blank" rel="noopener" hidden>Åbn lærebogen på s. 179 ↗</a></p>
+<label for="bogfil">Vælg lærebogens PDF</label>
+<input type="file" id="bogfil" accept="application/pdf,.pdf">
+</section>
+<nav class="nav" aria-label="Andre øvelser"><a href="paele.html">← Enkeltpæles bæreevne</a><a href="saetninger.html">Fundamenters sætninger →</a></nav>
+</main>
+
+<footer><div class="wrap"><span>Fagligt grundlag · Geoteknik, 3. udgave</span><a href="../index.html">Alle øvelser</a></div></footer>
+</body>
+</html>

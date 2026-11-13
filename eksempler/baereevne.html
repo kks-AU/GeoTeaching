@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fundamenters bæreevne · Geoteknik</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script defer src="../assets/laerebog.js"></script><script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/side.js"></script>
+</head>
+<body data-topic="baereevne">
+<a class="skip" href="#indhold">Gå til indhold</a>
+<header><div class="wrap"><a class="brand" href="../index.html">Geoteknik</a><small>Interaktive undervisningseksempler</small></div></header>
+
+<main id="indhold">
+<section class="exercise-head">
+<a href="../index.html">← Alle øvelser</a>
+<p class="tag">Stribefundament</p>
+<h1>Fundamenters bæreevne</h1>
+<p>Ændr fundamentets bredde eller jordens styrke. Søjlerne viser, hvor meget jordens rumvægt, overlejring og kohæsion hver bidrager med.</p>
+</section>
+<div class="workspace">
+<section class="panel" aria-labelledby="params">
+<h2 id="params">Indstillinger</h2>
+<div class="tabs" id="faner" role="group" aria-label="Beregningsvalg" hidden></div>
+<div id="indstillinger"></div>
+<button type="button" id="nulstil">Nulstil værdier</button>
+<noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
+</section>
+<section class="panel" aria-labelledby="figurtitel">
+<h2 id="figurtitel">Figur og resultater</h2>
+<canvas id="figur" role="img" aria-label="Fundamenters bæreevne" aria-describedby="figurtekst"></canvas>
+<div class="legend" id="kurver"></div>
+<p class="hint" id="figurtekst"></p>
+<div class="metrics" id="resultater"></div>
+<details id="dellag" hidden><summary>Vis beregningen for hvert dellag</summary><div class="data"><table id="datatabel"></table></div></details>
+</section>
+</div>
+<div class="notes">
+<section class="panel"><h2>Ligninger og symboler</h2>
+<div class="formula">R = ½ γb²Nγ + qbNq + cbNc</div><p class="definition">R er lodret brudbæreevne pr. meter, b fundamentbredden, γ rumvægten, q overlejringstrykket ved fundamentsunderkanten og c kohæsionen.</p>
+<div class="formula">Nq = exp(π tan φ) (1 + sin φ)/(1 − sin φ) · Nc = (Nq − 1)/tan φ</div><p class="definition">φ er friktionsvinklen. Nq og Nc er bæreevnefaktorer for overlejring og kohæsion.</p>
+<div class="formula">Nγ = ¼ [(Nq − 1) cos φ]³ᐟ²</div><p class="definition">Nγ er bæreevnefaktoren for rumvægt. Ved φ = 0 fås Nγ = 0, Nq = 1 og Nc = π + 2.</p>
+</section>
+<section class="panel"><h2>Undersøg selv</h2><p>Fordobl bredden ved uændrede jordparametre. Hvilket bidrag vokser med en faktor fire?</p>
+<details><summary>Se forklaringen</summary><p>Rumvægtsbidraget er proportionalt med b². Overlejrings- og kohæsionsbidraget er proportionale med b.</p></details>
+<h3>Forudsætninger</h3><p>Centrisk lodret belastet stribefundament. Beregningen viser brudbæreevne pr. løbende meter for grundtilfældet i § 10.2. Ved drænet beregning indtastes effektive værdier. Ved φ = 0 kan c og q repræsentere udrænet styrke og totalt overlejringstryk.</p>
+</section>
+</div>
+<section class="panel book">
+<h2>Læs videre i lærebogen</h2>
+<p>Geoteknik, 3. udgave · § 10.2, s. 255–257</p>
+<p id="bogstatus">Vælg din PDF af lærebogen for at åbne den på s. 255. Filen åbnes lokalt i browseren.</p>
+<p><a data-bogside="255" target="_blank" rel="noopener" hidden>Åbn lærebogen på s. 255 ↗</a></p>
+<label for="bogfil">Vælg lærebogens PDF</label>
+<input type="file" id="bogfil" accept="application/pdf,.pdf">
+</section>
+<nav class="nav" aria-label="Andre øvelser"><a href="konsolidering.html">← Konsolidering over tid</a><a href="paele.html">Enkeltpæles bæreevne →</a></nav>
+</main>
+
+<footer><div class="wrap"><span>Fagligt grundlag · Geoteknik, 3. udgave</span><a href="../index.html">Alle øvelser</a></div></footer>
+</body>
+</html>
