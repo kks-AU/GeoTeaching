@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Konsolidering over tid · Geoteknik</title>
 <link rel="stylesheet" href="../assets/style.css">
-<script defer src="../assets/laerebog.js"></script><script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/side.js"></script>
+<script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/skitser.js"></script><script defer src="../assets/side.js"></script>
 </head>
 <body data-topic="konsolidering">
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -27,7 +27,33 @@
 <noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
 </section>
 <section class="panel" aria-labelledby="figurtitel">
-<h2 id="figurtitel">Figur og resultater</h2>
+<h2 id="figurtitel">Principskitse og resultater</h2>
+<figure class="skitse">
+  <canvas id="skitse" role="img" aria-label="Principskitse" aria-describedby="skitsetekst"></canvas>
+  <figcaption>
+    <p class="hint" id="skitsetekst"></p>
+    <details class="symboler" open>
+      <summary>Symboler og enheder</summary>
+      <dl>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>T</mi></math></dt><dd>dimensionsløs tidsfaktor</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>c</mi><mi>k</mi></msub></math></dt><dd>konsolideringskoefficient (m²/døgn)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>t</mi></math></dt><dd>tid efter belastning (døgn)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>H</mi></math></dt><dd>længste drænvej (m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>k</mi></math></dt><dd>hydraulisk ledningsevne (m/døgn)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>K</mi></math></dt><dd>konsolideringsmodul (omregnes fra MPa til kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>γ</mi><mi mathvariant="normal">w</mi></msub></math></dt><dd>vandets rumvægt (kN/m³)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>Δ</mi><mi>u</mi></math></dt><dd>poreovertryk (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>p</mi></math></dt><dd>påført lasttrin (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math></dt><dd>afstand til nærmeste drænflade divideret med H</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>n</mi></math></dt><dd>summen tages over de ulige tal 1, 3, 5, …</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>U</mi></math></dt><dd>konsolideringsgrad, lig 1 minus det relative poreovertryk i gennemsnit</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>Z</mi></math></dt><dd>lagtykkelse (m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>δ</mi><mi>t</mi></msub></math></dt><dd>sætning til tiden t (m i formlen, vist i mm)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>δ</mi><mn>∞</mn></msub></math></dt><dd>slutsætning (m i formlen, vist i mm)</dd></div>
+      </dl>
+    </details>
+  </figcaption>
+</figure>
 <canvas id="figur" role="img" aria-label="Konsolidering over tid" aria-describedby="figurtekst"></canvas>
 <div class="legend" id="kurver"></div>
 <p class="hint" id="figurtekst"></p>
@@ -36,10 +62,12 @@
 </section>
 </div>
 <div class="notes">
-<section class="panel"><h2>Ligninger og symboler</h2>
-<div class="formula">T = cₖ t/H² · cₖ = kK/γw</div><p class="definition">T er tidsfaktoren. cₖ er konsolideringskoefficienten, t tiden, k den hydrauliske ledningsevne, K konsolideringsmodulen og γw vandets rumvægt. H er den længste drænvej.</p>
-<div class="formula">Δu/p = (4/π) Σ [sin(nπx/2) exp(−n²π²T/4)/n], n = 1, 3, 5, …</div><p class="definition">p er lasttrinnet, Δu er poreovertrykket, og x er afstanden fra drænfladen divideret med H. Ved dobbelt dræn bruges afstanden til den nærmeste drænflade.</p>
-<div class="formula">δt = U δ∞ · δ∞ = pZ/K</div><p class="definition">U er konsolideringsgraden, δt sætningen til tiden t, δ∞ slutsætningen, og Z lagtykkelsen. U beregnes som 1 minus det relative poreovertryk i gennemsnit over laget.</p>
+<section class="panel"><h2>Ligninger</h2>
+<div class="equation"><p>Tidsfaktor</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>T</mi><mo>=</mo><mfrac><mrow><msub><mi>c</mi><mi>k</mi></msub><mi>t</mi></mrow><mrow><msup><mi>H</mi><mn>2</mn></msup></mrow></mfrac></math></div>
+<div class="equation"><p>Konsolideringskoefficient</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>c</mi><mi>k</mi></msub><mo>=</mo><mfrac><mrow><mi>k</mi><mi>K</mi></mrow><mrow><msub><mi>γ</mi><mi mathvariant="normal">w</mi></msub></mrow></mfrac></math></div>
+<div class="equation"><p>Relativt poreovertryk</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mfrac><mrow><mi>Δ</mi><mi>u</mi></mrow><mrow><mi>p</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>4</mn></mrow><mrow><mi>π</mi></mrow></mfrac><msub><mo>∑</mo><mi>n</mi></msub><mfrac><mrow><mi mathvariant="normal">sin</mi><mo>(</mo><mfrac><mrow><mi>n</mi><mi>π</mi><mi>x</mi></mrow><mrow><mn>2</mn></mrow></mfrac><mo>)</mo><mi mathvariant="normal">exp</mi><mo>(</mo><mo>−</mo><mfrac><mrow><msup><mi>n</mi><mn>2</mn></msup><msup><mi>π</mi><mn>2</mn></msup><mi>T</mi></mrow><mrow><mn>4</mn></mrow></mfrac><mo>)</mo></mrow><mrow><mi>n</mi></mrow></mfrac></math></div>
+<div class="equation"><p>Slutsætning</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>δ</mi><mn>∞</mn></msub><mo>=</mo><mfrac><mrow><mi>p</mi><mi>Z</mi></mrow><mrow><mi>K</mi></mrow></mfrac></math></div>
+<div class="equation"><p>Sætning til tiden t</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>δ</mi><mi>t</mi></msub><mo>=</mo><mi>U</mi><msub><mi>δ</mi><mn>∞</mn></msub></math></div>
 </section>
 <section class="panel"><h2>Undersøg selv</h2><p>Skift fra ensidig til dobbeltsidig dræning med samme lagtykkelse. Hvorfor ændres tiden til 50 % konsolidering?</p>
 <details><summary>Se forklaringen</summary><p>Drænvejen halveres. Ved samme tidsfaktor er tiden proportional med drænvejens kvadrat og bliver derfor en fjerdedel.</p></details>
@@ -48,11 +76,8 @@
 </div>
 <section class="panel book">
 <h2>Læs videre i lærebogen</h2>
-<p>Geoteknik, 3. udgave · §§ 6.2–6.3, s. 162–167</p>
-<p id="bogstatus">Vælg din PDF af lærebogen for at åbne den på s. 162. Filen åbnes lokalt i browseren.</p>
-<p><a data-bogside="162" target="_blank" rel="noopener" hidden>Åbn lærebogen på s. 162 ↗</a> <a data-bogside="164" target="_blank" rel="noopener" hidden>Side 164 ↗</a></p>
-<label for="bogfil">Vælg lærebogens PDF</label>
-<input type="file" id="bogfil" accept="application/pdf,.pdf">
+<p>Geoteknik, 3. udgave</p>
+<p>Kapitel 6 · Konsolideringens tidsforløb, §§ 6.2–6.3, s. 162–167. Kapitel 5 · Jords deformationer, § 5.3, s. 146.</p>
 </section>
 <nav class="nav" aria-label="Andre øvelser"><a href="deformation.html">← Endimensional deformation</a><a href="baereevne.html">Fundamenters bæreevne →</a></nav>
 </main>

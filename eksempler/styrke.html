@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jords forskydningsstyrke · Geoteknik</title>
 <link rel="stylesheet" href="../assets/style.css">
-<script defer src="../assets/laerebog.js"></script><script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/side.js"></script>
+<script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/skitser.js"></script><script defer src="../assets/side.js"></script>
 </head>
 <body data-topic="styrke">
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -27,7 +27,27 @@
 <noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
 </section>
 <section class="panel" aria-labelledby="figurtitel">
-<h2 id="figurtitel">Figur og resultater</h2>
+<h2 id="figurtitel">Principskitse og resultater</h2>
+<figure class="skitse">
+  <canvas id="skitse" role="img" aria-label="Principskitse" aria-describedby="skitsetekst"></canvas>
+  <figcaption>
+    <p class="hint" id="skitsetekst"></p>
+    <details class="symboler" open>
+      <summary>Symboler og enheder</summary>
+      <dl>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>τ</mi><mi>f</mi></msub></math></dt><dd>forskydningsspænding ved brud (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>f</mi></msub></math></dt><dd>effektiv normalspænding på brudplanet (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>c</mi><mo>′</mo></msup></math></dt><dd>effektiv kohæsion (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>φ</mi><mo>′</mo></msup></math></dt><dd>effektiv friktionsvinkel (°)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>c</mi><mi>u</mi></msub></math></dt><dd>udrænet forskydningsstyrke (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>M</mi></math></dt><dd>cirklens centrum på normalspændingsaksen (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>r</mi></math></dt><dd>cirklens radius (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mn>1</mn></msub></math></dt><dd>største effektive hovedspænding (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mn>3</mn></msub></math></dt><dd>mindste effektive hovedspænding (kPa)</dd></div>
+      </dl>
+    </details>
+  </figcaption>
+</figure>
 <canvas id="figur" role="img" aria-label="Jords forskydningsstyrke" aria-describedby="figurtekst"></canvas>
 <div class="legend" id="kurver"></div>
 <p class="hint" id="figurtekst"></p>
@@ -36,9 +56,11 @@
 </section>
 </div>
 <div class="notes">
-<section class="panel"><h2>Ligninger og symboler</h2>
-<div class="formula">τf = c′ + σ′f tan φ′</div><p class="definition">τf er forskydningsspændingen ved brud. σ′f er den effektive normalspænding på brudplanet, c′ er effektiv kohæsion, og φ′ er effektiv friktionsvinkel. I et udrænet styrkeforsøg med ler beskrives styrken i totalspændinger ved τf = cᵤ.</p>
-<div class="formula">M = (σ′₁ + σ′₃)/2 · r = (σ′₁ − σ′₃)/2</div><p class="definition">M er cirklens centrum på normalspændingsaksen, r dens radius, og σ′₁ og σ′₃ de største og mindste effektive hovedspændinger. Brud nås ved tangering.</p>
+<section class="panel"><h2>Ligninger</h2>
+<div class="equation"><p>Drænet Mohr–Coulomb-brudlinje</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>τ</mi><mi>f</mi></msub><mo>=</mo><msup><mi>c</mi><mo>′</mo></msup><mo>+</mo><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>f</mi></msub><mi mathvariant="normal">tan</mi><msup><mi>φ</mi><mo>′</mo></msup></math></div>
+<div class="equation"><p>Udrænet styrke i ler, totalspændinger</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>τ</mi><mi>f</mi></msub><mo>=</mo><msub><mi>c</mi><mi>u</mi></msub></math></div>
+<div class="equation"><p>Mohr-cirklens centrum</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>M</mi><mo>=</mo><mfrac><mrow><msub><msup><mi>σ</mi><mo>′</mo></msup><mn>1</mn></msub><mo>+</mo><msub><msup><mi>σ</mi><mo>′</mo></msup><mn>3</mn></msub></mrow><mrow><mn>2</mn></mrow></mfrac></math></div>
+<div class="equation"><p>Mohr-cirklens radius</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>r</mi><mo>=</mo><mfrac><mrow><msub><msup><mi>σ</mi><mo>′</mo></msup><mn>1</mn></msub><mo>−</mo><msub><msup><mi>σ</mi><mo>′</mo></msup><mn>3</mn></msub></mrow><mrow><mn>2</mn></mrow></mfrac></math></div>
 </section>
 <section class="panel"><h2>Undersøg selv</h2><p>Hæv begge skæreboksmålinger med det samme antal kPa. Hvad sker der med friktionsvinklen og kohæsionen?</p>
 <details><summary>Se forklaringen</summary><p>Hældningen og friktionsvinklen bevares. Skæringen med τ-aksen flytter sig op med det samme antal kPa.</p></details>
@@ -47,11 +69,8 @@
 </div>
 <section class="panel book">
 <h2>Læs videre i lærebogen</h2>
-<p>Geoteknik, 3. udgave · §§ 7.1–7.4, s. 179–188</p>
-<p id="bogstatus">Vælg din PDF af lærebogen for at åbne den på s. 179. Filen åbnes lokalt i browseren.</p>
-<p><a data-bogside="179" target="_blank" rel="noopener" hidden>Åbn lærebogen på s. 179 ↗</a></p>
-<label for="bogfil">Vælg lærebogens PDF</label>
-<input type="file" id="bogfil" accept="application/pdf,.pdf">
+<p>Geoteknik, 3. udgave</p>
+<p>Kapitel 7 · Jords styrke, §§ 7.1–7.4, s. 179–188.</p>
 </section>
 <nav class="nav" aria-label="Andre øvelser"><a href="paele.html">← Enkeltpæles bæreevne</a><a href="saetninger.html">Fundamenters sætninger →</a></nav>
 </main>

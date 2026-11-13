@@ -13,25 +13,7 @@ if(!topic){
   const values={...defaults};
   const tabs=find('faner');
   const inputs=find('indstillinger');
-  let fileUrl;
-  const pdfLinks=document.querySelectorAll('[data-bogside]');
-
-  function bookLink(url){
-    pdfLinks.forEach(link=>{
-      link.href=`${url.split('#')[0]}#page=${link.dataset.bogside}`;
-      link.hidden=false;
-    });
-    find('bogstatus').textContent='';
-  }
-
-  if(typeof laerebogUrl==='string' && laerebogUrl.trim()) bookLink(laerebogUrl);
-  find('bogfil').addEventListener('change',event=>{
-    const file=event.target.files[0];
-    if(!file) return;
-    if(fileUrl) URL.revokeObjectURL(fileUrl);
-    fileUrl=URL.createObjectURL(file);
-    bookLink(fileUrl);
-  });
+  const sketch=find('skitse');
 
   function format(value,unit,digits){
     return typeof value==='number'?`${tal(value,digits)}${unit?' '+unit:''}`:value;
@@ -40,6 +22,7 @@ if(!topic){
   function render(){
     if(!canvas.clientWidth) return;
     const result=model.draw(figur(canvas),values,mode);
+    find('skitsetekst').textContent=skitser[topic](figur(sketch),values,mode,result);
     find('figurtekst').textContent=result.caption;
     find('resultater').innerHTML=result.metrics.map(([label,value,unit,digits])=>
       `<div class="metric">${label}<strong>${format(value,unit,digits)}</strong></div>`).join('');

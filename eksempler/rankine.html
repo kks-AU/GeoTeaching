@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rankine-jordtryk · Geoteknik</title>
 <link rel="stylesheet" href="../assets/style.css">
-<script defer src="../assets/laerebog.js"></script><script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/side.js"></script>
+<script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/skitser.js"></script><script defer src="../assets/side.js"></script>
 </head>
 <body data-topic="rankine">
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -27,7 +27,31 @@
 <noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
 </section>
 <section class="panel" aria-labelledby="figurtitel">
-<h2 id="figurtitel">Figur og resultater</h2>
+<h2 id="figurtitel">Principskitse og resultater</h2>
+<figure class="skitse">
+  <canvas id="skitse" role="img" aria-label="Principskitse" aria-describedby="skitsetekst"></canvas>
+  <figcaption>
+    <p class="hint" id="skitsetekst"></p>
+    <details class="symboler" open>
+      <summary>Symboler og enheder</summary>
+      <dl>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>K</mi><mn>0</mn></msub></math></dt><dd>hviletrykskoefficient</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>K</mi><mi>a</mi></msub></math></dt><dd>aktiv jordtrykskoefficient</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>K</mi><mi>p</mi></msub></math></dt><dd>passiv jordtrykskoefficient</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>K</mi></math></dt><dd>aktuelt forhold mellem vandret og lodret spænding</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>φ</mi></math></dt><dd>friktionsvinkel (°), samme værdi i de tre udtryk</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>z</mi></msub></math></dt><dd>lodret effektiv spænding (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>x</mi></msub></math></dt><dd>vandret effektiv spænding (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>e</mi></math></dt><dd>jordtryk på væggen i den valgte dybde (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>γ</mi></math></dt><dd>jordens rumvægt (kN/m³)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>z</mi></math></dt><dd>dybde under terræn (m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>p</mi></math></dt><dd>terrænlast (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>σ</mi><mo>′</mo></msup></math></dt><dd>effektiv normalspænding (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>τ</mi><mi>f</mi></msub></math></dt><dd>forskydningsspænding ved brud (kPa)</dd></div>
+      </dl>
+    </details>
+  </figcaption>
+</figure>
 <canvas id="figur" role="img" aria-label="Rankine-jordtryk" aria-describedby="figurtekst"></canvas>
 <div class="legend" id="kurver"></div>
 <p class="hint" id="figurtekst"></p>
@@ -36,9 +60,13 @@
 </section>
 </div>
 <div class="notes">
-<section class="panel"><h2>Ligninger og symboler</h2>
-<div class="formula">K₀ = 1 − sin φ · Kₐ = (1 − sin φ)/(1 + sin φ) · Kₚ = 1/Kₐ</div><p class="definition">K₀, Kₐ og Kₚ er koefficienterne for hviletryk, aktivt og passivt brud. φ er friktionsvinklen. I dette eksempel anvendes samme vinkel i de tre udtryk.</p>
-<div class="formula">σ′z = γz + p · e = σ′x = Kσ′z · τf = σ′ tan φ</div><p class="definition">e er jordtrykket. K er det aktuelle spændingsforhold. γ er rumvægten, z dybden, p terrænlasten og τf forskydningsstyrken ved normalspændingen σ′.</p>
+<section class="panel"><h2>Ligninger</h2>
+<div class="equation"><p>Hviletryk</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>K</mi><mn>0</mn></msub><mo>≈</mo><mn>1</mn><mo>−</mo><mi mathvariant="normal">sin</mi><mi>φ</mi></math></div>
+<div class="equation"><p>Aktiv jordtrykskoefficient</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>K</mi><mi>a</mi></msub><mo>=</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi mathvariant="normal">sin</mi><mi>φ</mi></mrow><mrow><mn>1</mn><mo>+</mo><mi mathvariant="normal">sin</mi><mi>φ</mi></mrow></mfrac></math></div>
+<div class="equation"><p>Passiv jordtrykskoefficient</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>K</mi><mi>p</mi></msub><mo>=</mo><mfrac><mrow><mn>1</mn></mrow><mrow><msub><mi>K</mi><mi>a</mi></msub></mrow></mfrac></math></div>
+<div class="equation"><p>Lodret effektiv spænding</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>z</mi></msub><mo>=</mo><mi>γ</mi><mi>z</mi><mo>+</mo><mi>p</mi></math></div>
+<div class="equation"><p>Jordtryk mod væggen</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>e</mi><mo>=</mo><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>x</mi></msub><mo>=</mo><mi>K</mi><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>z</mi></msub></math></div>
+<div class="equation"><p>Brudlinje for friktionsjord</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>τ</mi><mi>f</mi></msub><mo>=</mo><msup><mi>σ</mi><mo>′</mo></msup><mi mathvariant="normal">tan</mi><mi>φ</mi></math></div>
 </section>
 <section class="panel"><h2>Undersøg selv</h2><p>Bevæg skyderen langsomt mod passivt brud. Hvornår bliver den vandrette spænding den største hovedspænding?</p>
 <details><summary>Se forklaringen</summary><p>Når σ′x bliver større end σ′z. Før skiftet skrumper cirklen til et punkt. Derefter vokser den igen og tangerer brudlinjen ved passivt brud.</p></details>
@@ -47,11 +75,8 @@
 </div>
 <section class="panel book">
 <h2>Læs videre i lærebogen</h2>
-<p>Geoteknik, 3. udgave · §§ 12.2–12.3, s. 306–311 · § 7.2, s. 181–183</p>
-<p id="bogstatus">Vælg din PDF af lærebogen for at åbne den på s. 307. Filen åbnes lokalt i browseren.</p>
-<p><a data-bogside="307" target="_blank" rel="noopener" hidden>Åbn lærebogen på s. 307 ↗</a> <a data-bogside="306" target="_blank" rel="noopener" hidden>Side 306 ↗</a> <a data-bogside="181" target="_blank" rel="noopener" hidden>Side 181 ↗</a></p>
-<label for="bogfil">Vælg lærebogens PDF</label>
-<input type="file" id="bogfil" accept="application/pdf,.pdf">
+<p>Geoteknik, 3. udgave</p>
+<p>Kapitel 12 · Jordtryk, §§ 12.2–12.3, s. 306–311. Kapitel 7 · Jords styrke, § 7.2, s. 181–183.</p>
 </section>
 <nav class="nav" aria-label="Andre øvelser"><a href="spaendinger.html">← Spændinger med dybden</a><a href="deformation.html">Endimensional deformation →</a></nav>
 </main>

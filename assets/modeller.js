@@ -124,7 +124,7 @@ konsolidering:{
     g.plot(values,farve.blue);
     g.plot(values.map(([u,z])=>[v.p-u,z]),farve.green);
     return {metrics:[['Tidsfaktor T',T,'',4],['Konsolideringsgrad',100*U,'%'],['Sætning nu',U*v.p*v.depth/v.mod,'mm'],['Slutsætning',v.p*v.depth/v.mod,'mm'],['Tid til ca. 50 %',.197*H**2/v.cv,'døgn']],
-      legend:[['Poreovertryk Δu',farve.blue],['Effektiv spændingstilvækst Δσ′',farve.green]],
+      profile:values, legend:[['Poreovertryk Δu',farve.blue],['Effektiv spændingstilvækst Δσ′',farve.green]],
       caption:'Blå lagflader viser dræn. Til tiden 0 bæres lasttrinnet af poreovertrykket i lagets indre.'};
   }
 },
@@ -141,9 +141,13 @@ baereevne:{
     const nq=Math.exp(Math.PI*Math.tan(phi))*(1+s)/(1-s);
     const nc=phi?(nq-1)/Math.tan(phi):Math.PI+2;
     const ng=.25*((nq-1)*Math.cos(phi))**1.5;
-    const parts=[['Rumvægt',.5*v.g*v.b**2*ng,farve.green],['Overlejring',v.q*v.b*nq,farve.blue],['Kohæsion',v.c*v.b*nc,farve.orange]];
+    const parts=[
+      ['Rγ · Bidrag fra jordens egenvægt',.5*v.g*v.b**2*ng,farve.green],
+      ['Rq · Bidrag fra overlejringstryk',v.q*v.b*nq,farve.blue],
+      ['Rc · Bidrag fra kohæsion',v.c*v.b*nc,farve.orange]
+    ];
     soejler(f,parts,'kN/m');
-    return {metrics:[['Brudbæreevne R',parts.reduce((sum,p)=>sum+p[1],0),'kN/m'],['Nγ',ng],['Nq',nq],['Nc',nc]],caption:'De tre bidrag lægges sammen. Søjleskalaen tilpasses automatisk.'};
+    return {metrics:[['Brudbæreevne R',parts.reduce((sum,p)=>sum+p[1],0),'kN/m'],['Nγ',ng],['Nq',nq],['Nc',nc],...parts.map(([label,value])=>[label,value,'kN/m'])],caption:'Hver søjle viser et bidrag til den lodrette brudbæreevne pr. løbende meter fundament. Søjlerne har fælles skala.'};
   }
 },
 paele:{

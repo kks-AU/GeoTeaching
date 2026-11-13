@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fundamenters bæreevne · Geoteknik</title>
 <link rel="stylesheet" href="../assets/style.css">
-<script defer src="../assets/laerebog.js"></script><script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/side.js"></script>
+<script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/skitser.js"></script><script defer src="../assets/side.js"></script>
 </head>
 <body data-topic="baereevne">
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -16,7 +16,7 @@
 <a href="../index.html">← Alle øvelser</a>
 <p class="tag">Stribefundament</p>
 <h1>Fundamenters bæreevne</h1>
-<p>Ændr fundamentets bredde eller jordens styrke. Søjlerne viser, hvor meget jordens rumvægt, overlejring og kohæsion hver bidrager med.</p>
+<p>Ændr fundamentets bredde eller jordens styrke. Søjlerne viser tre beregnede bidrag i kN/m. Summen er den lodrette last pr. løbende meter, som jorden kan bære ved brud for det viste stribefundament.</p>
 </section>
 <div class="workspace">
 <section class="panel" aria-labelledby="params">
@@ -27,7 +27,30 @@
 <noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
 </section>
 <section class="panel" aria-labelledby="figurtitel">
-<h2 id="figurtitel">Figur og resultater</h2>
+<h2 id="figurtitel">Principskitse og resultater</h2>
+<figure class="skitse">
+  <canvas id="skitse" role="img" aria-label="Principskitse" aria-describedby="skitsetekst"></canvas>
+  <figcaption>
+    <p class="hint" id="skitsetekst"></p>
+    <details class="symboler" open>
+      <summary>Symboler og enheder</summary>
+      <dl>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>R</mi></math></dt><dd>lodret brudbæreevne (kN/m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>R</mi><mi>γ</mi></msub></math></dt><dd>bidrag fra jordens egenvægt (kN/m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>R</mi><mi>q</mi></msub></math></dt><dd>bidrag fra overlejringstrykket (kN/m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>R</mi><mi>c</mi></msub></math></dt><dd>bidrag fra kohæsionen (kN/m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>b</mi></math></dt><dd>fundamentbredde (m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>γ</mi></math></dt><dd>jordens rumvægt i bæreevneformlen (kN/m³)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>q</mi></math></dt><dd>overlejringstryk ved fundamentsunderkanten (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>c</mi></math></dt><dd>kohæsion (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>φ</mi></math></dt><dd>friktionsvinkel (°)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>N</mi><mi>γ</mi></msub></math></dt><dd>dimensionsløs faktor for rumvægt</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>N</mi><mi>q</mi></msub></math></dt><dd>dimensionsløs faktor for overlejring</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>N</mi><mi>c</mi></msub></math></dt><dd>dimensionsløs faktor for kohæsion</dd></div>
+      </dl>
+    </details>
+  </figcaption>
+</figure>
 <canvas id="figur" role="img" aria-label="Fundamenters bæreevne" aria-describedby="figurtekst"></canvas>
 <div class="legend" id="kurver"></div>
 <p class="hint" id="figurtekst"></p>
@@ -36,23 +59,31 @@
 </section>
 </div>
 <div class="notes">
-<section class="panel"><h2>Ligninger og symboler</h2>
-<div class="formula">R = ½ γb²Nγ + qbNq + cbNc</div><p class="definition">R er lodret brudbæreevne pr. meter, b fundamentbredden, γ rumvægten, q overlejringstrykket ved fundamentsunderkanten og c kohæsionen.</p>
-<div class="formula">Nq = exp(π tan φ) (1 + sin φ)/(1 − sin φ) · Nc = (Nq − 1)/tan φ</div><p class="definition">φ er friktionsvinklen. Nq og Nc er bæreevnefaktorer for overlejring og kohæsion.</p>
-<div class="formula">Nγ = ¼ [(Nq − 1) cos φ]³ᐟ²</div><p class="definition">Nγ er bæreevnefaktoren for rumvægt. Ved φ = 0 fås Nγ = 0, Nq = 1 og Nc = π + 2.</p>
+<section class="panel"><h2>Ligninger</h2>
+<div class="equation"><p>Brudbæreevne pr. løbende meter</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>R</mi><mo>=</mo><msub><mi>R</mi><mi>γ</mi></msub><mo>+</mo><msub><mi>R</mi><mi>q</mi></msub><mo>+</mo><msub><mi>R</mi><mi>c</mi></msub></math></div>
+<div class="equation"><p>Bidrag fra jordens egenvægt</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>R</mi><mi>γ</mi></msub><mo>=</mo><mfrac><mrow><mn>1</mn></mrow><mrow><mn>2</mn></mrow></mfrac><mi>γ</mi><msup><mi>b</mi><mn>2</mn></msup><msub><mi>N</mi><mi>γ</mi></msub></math></div>
+<div class="equation"><p>Bidrag fra overlejringstrykket</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>R</mi><mi>q</mi></msub><mo>=</mo><mi>q</mi><mi>b</mi><msub><mi>N</mi><mi>q</mi></msub></math></div>
+<div class="equation"><p>Bidrag fra kohæsionen</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>R</mi><mi>c</mi></msub><mo>=</mo><mi>c</mi><mi>b</mi><msub><mi>N</mi><mi>c</mi></msub></math></div>
+<div class="equation"><p>Bæreevnefaktor for overlejring</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>N</mi><mi>q</mi></msub><mo>=</mo><mi mathvariant="normal">exp</mi><mo>(</mo><mi>π</mi><mi mathvariant="normal">tan</mi><mi>φ</mi><mo>)</mo><mfrac><mrow><mn>1</mn><mo>+</mo><mi mathvariant="normal">sin</mi><mi>φ</mi></mrow><mrow><mn>1</mn><mo>−</mo><mi mathvariant="normal">sin</mi><mi>φ</mi></mrow></mfrac></math></div>
+<div class="equation"><p>Bæreevnefaktor for kohæsion</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>N</mi><mi>c</mi></msub><mo>=</mo><mfrac><mrow><msub><mi>N</mi><mi>q</mi></msub><mo>−</mo><mn>1</mn></mrow><mrow><mi mathvariant="normal">tan</mi><mi>φ</mi></mrow></mfrac></math></div>
+<div class="equation"><p>Bæreevnefaktor for rumvægt</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>N</mi><mi>γ</mi></msub><mo>=</mo><mfrac><mrow><mn>1</mn></mrow><mrow><mn>4</mn></mrow></mfrac><msup><mrow><mo>[</mo><mo>(</mo><msub><mi>N</mi><mi>q</mi></msub><mo>−</mo><mn>1</mn><mo>)</mo><mi mathvariant="normal">cos</mi><mi>φ</mi><mo>]</mo></mrow><mrow><mfrac><mrow><mn>3</mn></mrow><mrow><mn>2</mn></mrow></mfrac></mrow></msup></math></div>
+<div class="equation"><p>Ved friktionsvinkel nul</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>N</mi><mi>γ</mi></msub><mo>=</mo><mn>0</mn><mo>,</mo><msub><mi>N</mi><mi>q</mi></msub><mo>=</mo><mn>1</mn><mo>,</mo><msub><mi>N</mi><mi>c</mi></msub><mo>=</mo><mi>π</mi><mo>+</mo><mn>2</mn></math></div>
 </section>
 <section class="panel"><h2>Undersøg selv</h2><p>Fordobl bredden ved uændrede jordparametre. Hvilket bidrag vokser med en faktor fire?</p>
 <details><summary>Se forklaringen</summary><p>Rumvægtsbidraget er proportionalt med b². Overlejrings- og kohæsionsbidraget er proportionale med b.</p></details>
+<h3>Hvad viser søjlerne?</h3>
+<ul class="bids">
+<li><strong>Jordens egenvægt.</strong> Når fundamentet presses ned, må jord under og ved siden af det flytte sig. Jordens egenvægt bidrager til modstanden. Leddet er proportionalt med rumvægten og med bredden i anden potens.</li>
+<li><strong>Overlejringstryk.</strong> Jord og eventuel last over niveauet for fundamentets underside giver et tryk på jorden uden for fundamentet. Trykket holder den omgivende jord nede, når fundamentet presses ned. Det indtastes i kPa og omregnes i formlen til et bidrag i kN/m.</li>
+<li><strong>Kohæsion.</strong> Kohæsionen er den del af forskydningsstyrken, der er til stede ved nul normalspænding i den valgte spændingsanalyse. Den giver modstand langs brudfladen.</li>
+</ul>
 <h3>Forudsætninger</h3><p>Centrisk lodret belastet stribefundament. Beregningen viser brudbæreevne pr. løbende meter for grundtilfældet i § 10.2. Ved drænet beregning indtastes effektive værdier. Ved φ = 0 kan c og q repræsentere udrænet styrke og totalt overlejringstryk.</p>
 </section>
 </div>
 <section class="panel book">
 <h2>Læs videre i lærebogen</h2>
-<p>Geoteknik, 3. udgave · § 10.2, s. 255–257</p>
-<p id="bogstatus">Vælg din PDF af lærebogen for at åbne den på s. 255. Filen åbnes lokalt i browseren.</p>
-<p><a data-bogside="255" target="_blank" rel="noopener" hidden>Åbn lærebogen på s. 255 ↗</a></p>
-<label for="bogfil">Vælg lærebogens PDF</label>
-<input type="file" id="bogfil" accept="application/pdf,.pdf">
+<p>Geoteknik, 3. udgave</p>
+<p>Kapitel 10 · Fundamenters bæreevne, § 10.2, s. 255–257.</p>
 </section>
 <nav class="nav" aria-label="Andre øvelser"><a href="konsolidering.html">← Konsolidering over tid</a><a href="paele.html">Enkeltpæles bæreevne →</a></nav>
 </main>

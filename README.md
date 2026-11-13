@@ -10,4 +10,4 @@ Læg `index.html`, `eksempler/`, `assets/` og `.nojekyll` i roden af GitHub-repo
 
 ## Kapitelhenvisninger
 
-Øvelserne følger sidetallene i den vedlagte PDF af *Geoteknik*, 3. udgave. Studerende kan vælge deres egen PDF på en øvelsesside. Kapitelopslaget går derefter direkte til den angivne side. PDF'en overføres ikke til en server. Hvis lærebogen er tilgængelig på en godkendt webadresse, kan adressen angives i `assets/laerebog.js` for at aktivere direkte opslag på alle øvelsessider.
+Hver øvelse henviser til relevante kapitler, afsnit og sider i *Geoteknik*, 3. udgave.

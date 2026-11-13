@@ -37,7 +37,15 @@ function figur(canvas) {
     ctx.fillStyle=color;
     ctx.fill();
   }
-  return {w,h,line,label,rect,dot};
+  function polygon(points,color) {
+    ctx.beginPath();
+    ctx.moveTo(...points[0]);
+    points.slice(1).forEach(point=>ctx.lineTo(...point));
+    ctx.closePath();
+    ctx.fillStyle=color;
+    ctx.fill();
+  }
+  return {w,h,line,label,rect,dot,polygon};
 }
 
 function diagram(f,{xMax,yMax,xLabel,yLabel,down=false,profile=false,equal=false}) {
@@ -82,9 +90,9 @@ function soejler(f,items,unit) {
   items.forEach(([name,val,color],i)=>{
     const y=25+i*(Math.min(88,(f.h-25)/items.length));
     f.label(left,y,name);
-    f.label(f.w-16,y,`${tal(val)} ${unit}`,'#213d37','right');
     f.rect(left,y+10,width,26,'#e9ede4');
-    f.rect(left,y+10,width*val/max,26,color);
+    f.rect(left,y+10,(width-84)*val/max,26,color);
+    f.label(f.w-22,y+28,`${tal(val)} ${unit}`,'#213d37','right');
   });
 }
 

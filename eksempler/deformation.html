@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Endimensional deformation · Geoteknik</title>
 <link rel="stylesheet" href="../assets/style.css">
-<script defer src="../assets/laerebog.js"></script><script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/side.js"></script>
+<script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/skitser.js"></script><script defer src="../assets/side.js"></script>
 </head>
 <body data-topic="deformation">
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -27,7 +27,26 @@
 <noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
 </section>
 <section class="panel" aria-labelledby="figurtitel">
-<h2 id="figurtitel">Figur og resultater</h2>
+<h2 id="figurtitel">Principskitse og resultater</h2>
+<figure class="skitse">
+  <canvas id="skitse" role="img" aria-label="Principskitse" aria-describedby="skitsetekst"></canvas>
+  <figcaption>
+    <p class="hint" id="skitsetekst"></p>
+    <details class="symboler" open>
+      <summary>Symboler og enheder</summary>
+      <dl>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>f</mi></msub></math></dt><dd>effektiv spænding før lasttrinnet (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>e</mi></msub></math></dt><dd>effektiv spænding efter lasttrinnet (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>Δ</mi><msup><mi>σ</mi><mo>′</mo></msup></math></dt><dd>effektiv spændingstilvækst (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>ε</mi><mi>z</mi></msub></math></dt><dd>lodret tøjning (dimensionsløs)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>Q</mi></math></dt><dd>tøjningsindeks for normalkonsolideret ler (dimensionsløst)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>K</mi></math></dt><dd>konsolideringsmodul (omregnes fra MPa til kPa i formlen)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>Z</mi></math></dt><dd>oprindelig lagtykkelse (m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>δ</mi></math></dt><dd>sætning (m i formlen, vist i mm)</dd></div>
+      </dl>
+    </details>
+  </figcaption>
+</figure>
 <canvas id="figur" role="img" aria-label="Endimensional deformation" aria-describedby="figurtekst"></canvas>
 <div class="legend" id="kurver"></div>
 <p class="hint" id="figurtekst"></p>
@@ -36,9 +55,11 @@
 </section>
 </div>
 <div class="notes">
-<section class="panel"><h2>Ligninger og symboler</h2>
-<div class="formula">εz = Q log₁₀(σ′e/σ′f) · εz = Δσ′/K</div><p class="definition">εz er lodret tøjning. Q er tøjningsindekset for normalkonsolideret ler. σ′f og σ′e er effektiv spænding før og efter belastning. K er konsolideringsmodulen.</p>
-<div class="formula">σ′e = σ′f + Δσ′ · δ = Z εz</div><p class="definition">Δσ′ er den effektive spændingstilvækst. Z er lagtykkelsen, og δ er sætningen.</p>
+<section class="panel"><h2>Ligninger</h2>
+<div class="equation"><p>Effektiv spænding efter lasttrinnet</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>e</mi></msub><mo>=</mo><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>f</mi></msub><mo>+</mo><mi>Δ</mi><msup><mi>σ</mi><mo>′</mo></msup></math></div>
+<div class="equation"><p>Tøjning langs stamkurven</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>ε</mi><mi>z</mi></msub><mo>=</mo><mi>Q</mi><msub><mi mathvariant="normal">log</mi><mrow><mn>10</mn></mrow></msub><mo>(</mo><mfrac><mrow><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>e</mi></msub></mrow><mrow><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>f</mi></msub></mrow></mfrac><mo>)</mo></math></div>
+<div class="equation"><p>Tøjning ved konstant modul</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>ε</mi><mi>z</mi></msub><mo>=</mo><mfrac><mrow><mi>Δ</mi><msup><mi>σ</mi><mo>′</mo></msup></mrow><mrow><mi>K</mi></mrow></mfrac></math></div>
+<div class="equation"><p>Lerlagets sætning</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>δ</mi><mo>=</mo><mi>Z</mi><msub><mi>ε</mi><mi>z</mi></msub></math></div>
 </section>
 <section class="panel"><h2>Undersøg selv</h2><p>Fordobl startspændingen og behold spændingstilvæksten. Hvilken af de to modeller giver nu mindre tøjning end før?</p>
 <details><summary>Se forklaringen</summary><p>Stamkurven giver mindre tøjning, fordi forholdet σ′e/σ′f falder. Ved fastholdt K er tøjningen fortsat Δσ′/K.</p></details>
@@ -47,11 +68,8 @@
 </div>
 <section class="panel book">
 <h2>Læs videre i lærebogen</h2>
-<p>Geoteknik, 3. udgave · §§ 5.2–5.4, s. 141–149</p>
-<p id="bogstatus">Vælg din PDF af lærebogen for at åbne den på s. 141. Filen åbnes lokalt i browseren.</p>
-<p><a data-bogside="141" target="_blank" rel="noopener" hidden>Åbn lærebogen på s. 141 ↗</a></p>
-<label for="bogfil">Vælg lærebogens PDF</label>
-<input type="file" id="bogfil" accept="application/pdf,.pdf">
+<p>Geoteknik, 3. udgave</p>
+<p>Kapitel 5 · Jords deformationer, §§ 5.2–5.4, s. 141–149.</p>
 </section>
 <nav class="nav" aria-label="Andre øvelser"><a href="rankine.html">← Rankine-jordtryk</a><a href="konsolidering.html">Konsolidering over tid →</a></nav>
 </main>

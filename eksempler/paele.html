@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Enkeltpæles bæreevne · Geoteknik</title>
 <link rel="stylesheet" href="../assets/style.css">
-<script defer src="../assets/laerebog.js"></script><script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/side.js"></script>
+<script defer src="../assets/figurer.js"></script><script defer src="../assets/modeller.js"></script><script defer src="../assets/skitser.js"></script><script defer src="../assets/side.js"></script>
 </head>
 <body data-topic="paele">
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -27,7 +27,35 @@
 <noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
 </section>
 <section class="panel" aria-labelledby="figurtitel">
-<h2 id="figurtitel">Figur og resultater</h2>
+<h2 id="figurtitel">Principskitse og resultater</h2>
+<figure class="skitse">
+  <canvas id="skitse" role="img" aria-label="Principskitse" aria-describedby="skitsetekst"></canvas>
+  <figcaption>
+    <p class="hint" id="skitsetekst"></p>
+    <details class="symboler" open>
+      <summary>Symboler og enheder</summary>
+      <dl>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>R</mi><mi>s</mi></msub></math></dt><dd>overflademodstand (kN)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>R</mi><mi>b</mi></msub></math></dt><dd>spidsmodstand (kN)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>R</mi><mrow><mi mathvariant="normal">stat</mi></mrow></msub></math></dt><dd>samlet geostatisk modstand (kN)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>A</mi><mi>s</mi></msub></math></dt><dd>pæleskaftets overfladeareal i ler (m²)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>A</mi><mi>b</mi></msub></math></dt><dd>pælespidsens tværsnitsareal (m²)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>c</mi><mi>u</mi></msub></math></dt><dd>karakteristisk udrænet forskydningsstyrke (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>m</mi></math></dt><dd>materialefaktor</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>r</mi></math></dt><dd>regenerationsfaktor</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>R</mi></math></dt><dd>dynamisk modstand (kN)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>η</mi></math></dt><dd>rammeeffektivitet</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>h</mi></math></dt><dd>ramklodsens faldhøjde (m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>G</mi></math></dt><dd>ramklodsens tyngde (kN)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>s</mi></math></dt><dd>blivende nedsynkning pr. slag (m i formlen, indtastes i mm)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>s</mi><mn>0</mn></msub></math></dt><dd>elastisk sammentrykning for modellens tilfælde med s = 0 (m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>E</mi></math></dt><dd>elasticitetsmodul for pælen (20 GPa for beton i rammeformlen)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>L</mi></math></dt><dd>faktisk pælelængde (m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>L</mi><mo>*</mo></msup></math></dt><dd>pælelængden i rammeformlen (m). For en pæl kortere end 20 sidelængder bruges middelværdien af den faktiske længde og 20 sidelængder</dd></div>
+      </dl>
+    </details>
+  </figcaption>
+</figure>
 <canvas id="figur" role="img" aria-label="Enkeltpæles bæreevne" aria-describedby="figurtekst"></canvas>
 <div class="legend" id="kurver"></div>
 <p class="hint" id="figurtekst"></p>
@@ -36,9 +64,12 @@
 </section>
 </div>
 <div class="notes">
-<section class="panel"><h2>Ligninger og symboler</h2>
-<div class="formula">Rs = As cᵤ m r · Rb = 9 cᵤ Ab · Rstat = Rs + Rb</div><p class="definition">Rs er overflademodstanden, Rb spidsmodstanden, As overfladearealet i leret, Ab spidsarealet, cᵤ den karakteristiske udrænede styrke, m materialefaktoren og r regenerationsfaktoren.</p>
-<div class="formula">s₀ = √(2ηhGL*/(AbE)) · R = ηhG/(s + ½s₀)</div><p class="definition">R er den dynamiske modstand. η er effektiviteten, h faldhøjden, G ramklodsens tyngde, s nedsynkning pr. slag, s₀ elastisk sammentrykning i modellens tilfælde med s = 0, og E pælens elasticitetsmodul. L* er pælelængden, dog middelværdien af længden og 20 gange sidelængden for korte pæle jf. s. 418.</p>
+<section class="panel"><h2>Ligninger</h2>
+<div class="equation"><p>Overflademodstand i ler</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>R</mi><mi>s</mi></msub><mo>=</mo><msub><mi>A</mi><mi>s</mi></msub><msub><mi>c</mi><mi>u</mi></msub><mi>m</mi><mi>r</mi></math></div>
+<div class="equation"><p>Spidsmodstand i ler</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>R</mi><mi>b</mi></msub><mo>=</mo><mn>9</mn><msub><mi>c</mi><mi>u</mi></msub><msub><mi>A</mi><mi>b</mi></msub></math></div>
+<div class="equation"><p>Geostatisk modstand i ler</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>R</mi><mrow><mi mathvariant="normal">stat</mi></mrow></msub><mo>=</mo><msub><mi>R</mi><mi>s</mi></msub><mo>+</mo><msub><mi>R</mi><mi>b</mi></msub></math></div>
+<div class="equation"><p>Elastisk sammentrykning i rammeformlen</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>s</mi><mn>0</mn></msub><mo>=</mo><msqrt><mrow><mfrac><mrow><mn>2</mn><mi>η</mi><mi>h</mi><mi>G</mi><msup><mi>L</mi><mo>*</mo></msup></mrow><mrow><msub><mi>A</mi><mi>b</mi></msub><mi>E</mi></mrow></mfrac></mrow></msqrt></math></div>
+<div class="equation"><p>Dynamisk modstand ved ramning</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>R</mi><mo>=</mo><mfrac><mrow><mi>η</mi><mi>h</mi><mi>G</mi></mrow><mrow><mi>s</mi><mo>+</mo><mfrac><mrow><mn>1</mn></mrow><mrow><mn>2</mn></mrow></mfrac><msub><mi>s</mi><mn>0</mn></msub></mrow></mfrac></math></div>
 </section>
 <section class="panel"><h2>Undersøg selv</h2><p>Halvér nedsynkningen pr. slag ved samme slagenergi. Hvorfor bliver den dynamiske modstand mindre end dobbelt så stor?</p>
 <details><summary>Se forklaringen</summary><p>Kun s halveres. Leddet ½s₀ i nævneren bevares og repræsenterer pælens elastiske sammentrykning i modellen.</p></details>
@@ -47,11 +78,8 @@
 </div>
 <section class="panel book">
 <h2>Læs videre i lærebogen</h2>
-<p>Geoteknik, 3. udgave · § 16.3, s. 416–419 · § 16.4, s. 422–429</p>
-<p id="bogstatus">Vælg din PDF af lærebogen for at åbne den på s. 416. Filen åbnes lokalt i browseren.</p>
-<p><a data-bogside="416" target="_blank" rel="noopener" hidden>Åbn lærebogen på s. 416 ↗</a> <a data-bogside="422" target="_blank" rel="noopener" hidden>Side 422 ↗</a></p>
-<label for="bogfil">Vælg lærebogens PDF</label>
-<input type="file" id="bogfil" accept="application/pdf,.pdf">
+<p>Geoteknik, 3. udgave</p>
+<p>Kapitel 16 · Enkeltpæles bæreevne, § 16.3, s. 416–419 og § 16.4, s. 422–429.</p>
 </section>
 <nav class="nav" aria-label="Andre øvelser"><a href="baereevne.html">← Fundamenters bæreevne</a><a href="styrke.html">Jords forskydningsstyrke →</a></nav>
 </main>
