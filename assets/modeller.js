@@ -5,17 +5,6 @@ function lerToejning(stress,start,pc,K,Q){
   return reload+Q*Math.log10(Math.max(stress,pc)/pc);
 }
 
-function logSpændingTicks(min,max){
-  const ticks=[];
-  for(let decade=Math.floor(Math.log10(min));decade<=Math.ceil(Math.log10(max));decade++){
-    for(const m of [1,2,5]){
-      const value=m*10**decade;
-      if(value>=min && value<=max) ticks.push(value);
-    }
-  }
-  return ticks;
-}
-
 const models = {
 spaendinger:{
   controls:[
@@ -54,9 +43,8 @@ spaendinger:{
       ? [breaks.filter(z=>z<=kvs).map(z=>[z,stresses(z,false)]),
          breaks.filter(z=>z>=kvs).map(z=>[z,stresses(z)])]
       : [breaks.map(z=>[z,stresses(z)])];
-    const left=-10*(v.water-kvs);
-    const right=Math.ceil(Math.max(...sections.flat().flatMap(([,s])=>s))/40)*40;
-    const g=diagram(f,{xMin:left,xMax:right,yMax:12,xLabel:'Spænding (kPa)',yLabel:'Dybde (m)',down:true,profile:true});
+    const left=-120, right=480;
+    const g=diagram(f,{xMin:left,xMax:right,ticks:[-100,0,100,200,300,400],yMax:12,xLabel:'Spænding (kPa)',yLabel:'Dybde (m)',down:true,profile:true});
     jordprofil(f,g,[[0,v.layer,farve.soil],[v.layer,12,farve.clay]],v.water,12);
     if(kvs<v.water){
       f.rect(5,g.y(kvs),29,g.y(v.water)-g.y(kvs),'#5da9c960');
@@ -86,7 +74,7 @@ rankine:{
     const k=k0+Math.abs(v.motion)/100*((v.motion<0?ka:kp)-k0);
     const vertical=v.gamma*v.z+v.p, horizontal=k*vertical;
     if(mode){
-      const g=diagram(f,{xMax:kp*vertical,yMax:v.z,xLabel:'Vandret spænding (kPa)',yLabel:'Dybde langs væggen (m)',down:true,profile:true});
+      const g=diagram(f,{xMax:1800,yMax:10,xLabel:'Vandret spænding (kPa)',yLabel:'Dybde langs væggen (m)',down:true,profile:true});
       jordprofil(f,g,[[0,v.z,farve.soil]],null,v.z);
       const wall=5+5*v.motion/100;
       f.line([[wall,g.y(0)],[wall,g.y(v.z)]],farve.gray,3);
@@ -96,7 +84,7 @@ rankine:{
       g.plot([[k*v.p,0],[horizontal,v.z]],farve.green);
       g.dot(horizontal,v.z,farve.green);
     }else{
-      mohr(f,{phi,c:0,hi:Math.max(vertical,horizontal),lo:Math.min(vertical,horizontal),extra:1.12*kp*vertical});
+      mohr(f,{phi,c:0,hi:Math.max(vertical,horizontal),lo:Math.min(vertical,horizontal),xMax:1800,yMax:900});
     }
     const status=v.motion===-100?'Aktivt brud':v.motion===100?'Passivt brud':v.motion===0?'Hviletryk':v.motion<0?'Mod aktivt brud':'Mod passivt brud';
     return {metrics:[['Tilstand',status],['Lodret σ′z',vertical,kpa],['Vandret σ′x',horizontal,kpa],['K',k,'',3]],
@@ -118,9 +106,9 @@ deformation:{
   draw(f,v,mode){
     const end=v.start+v.inc, pc=v.start*v.ocr, K=v.mod*1000, Q=v.q/100;
     const strain=(stress,threshold)=>100*lerToejning(stress,v.start,threshold,K,Q);
-    const xMax=Math.ceil(Math.max(end*1.22,pc*1.13,v.start*1.7)/10)*10;
-    const g=diagram(f,{xMin:mode?v.start:0,xMax,yMax:Math.max(.5,strain(xMax,v.start),strain(xMax,pc))*1.1,
-      scaleX:mode?Math.log10:undefined,ticks:mode?logSpændingTicks(v.start,xMax):null,
+    const xMax=2000;
+    const g=diagram(f,{xMin:mode?10:0,xMax,yMax:85,
+      scaleX:mode?Math.log10:undefined,ticks:mode?[10,50,100,500,1000,2000]:null,
       xLabel:mode?'Effektiv spænding σ′ (kPa) · log₁₀':'Effektiv spænding σ′ (kPa) · lineær',
       yLabel:'Lodret tøjning εz (%)',down:true});
     const segment=(a,b,threshold,color,dash)=>g.plot(punkter(90,t=>{
@@ -170,12 +158,14 @@ konsolidering:{
   },
   drawTime(f,result){
     const {time,t100,strain,curves}=result.timeData;
-    const end=Math.max(3*t100,time*1.05);
-    const g=diagram(f,{xMax:end,yMax:strain(end)[2]*1.12,xLabel:'Tid t (døgn)',yLabel:'Lodret tøjning (%)',down:true});
-    const times=[...new Set([...punkter(120,r=>end*r*r),t100,time])].sort((a,b)=>a-b);
-    g.plot([[t100,0],[t100,strain(end)[2]]],farve.gray,[4,4]);
+    const end=1e6, maxStrain=60;
+    const g=diagram(f,{xMax:end,yMax:maxStrain,scaleX:t=>Math.log10(1+t),ticks:[0,10,100,1000,10000,100000],
+      xLabel:'Tid t (døgn) · log₁₀(1 + t)',yLabel:'Lodret tøjning (%)',down:true});
+    const readings=[...new Set([...punkter(160,r=>Math.expm1(r*Math.log1p(end))),t100,time])].sort((a,b)=>a-b)
+      .map(t=>[t,strain(t)]);
+    g.plot([[t100,0],[t100,maxStrain]],farve.gray,[4,4]);
     curves.forEach(([,color,dash],i)=>{
-      g.plot(times.map(t=>[t,strain(t)[i]]),color,dash);
+      g.plot(readings.map(([t,y])=>[t,y[i]]),color,dash);
       g.dot(time,strain(time)[i],color);
     });
     f.label(g.x(t100)+5,g.y(0)+15,'t₁₀₀',farve.gray);
@@ -206,7 +196,7 @@ konsolidering:{
     const [primaryNow,creepNow,totalNow]=strain(v.time);
     const curves=[['Primær tøjning',farve.green,[5,4]],['Krybetøjning',farve.orange],['Samlet tøjning',farve.blue]];
 
-    const g=diagram(f,{xMax:v.p,yMax:v.depth,xLabel:'Spændingstilvækst (kPa)',yLabel:'Dybde i lerlaget (m)',down:true,profile:true});
+    const g=diagram(f,{xMax:150,yMax:10,xLabel:'Spændingstilvækst (kPa)',yLabel:'Dybde i lerlaget (m)',down:true,profile:true});
     jordprofil(f,g,[[0,v.depth,farve.clay]],null,v.depth);
     f.line([[5,g.y(0)],[34,g.y(0)]],farve.blue,4);
     f.line([[5,g.y(v.depth)],[34,g.y(v.depth)]],mode?farve.blue:farve.gray,4);
@@ -253,7 +243,7 @@ baereevne:{
       ['Rc · Bidrag fra kohæsion',area*v.c*nc*sc,farve.orange]
     ];
     const unit=mode?'kN':'kN/m';
-    soejler(f,parts,unit);
+    soejler(f,parts,unit,mode?520000:110000);
     const dimensions=[['Excentricitet eᵦ',eb,'m',3],['Effektivt mål i bredderetningen',width,'m',3]];
     if(mode) dimensions.push(['Excentricitet eₗ',el,'m',3],['Effektivt mål i længderetningen',length,'m',3],['Effektivt areal A′',area,'m²',3],['sγ',sg,'',3],['sq',sq,'',3],['sc',sc,'',3]);
     return {footing:{eb,el,width,length},metrics:[['Brudbæreevne R',parts.reduce((sum,p)=>sum+p[1],0),unit],
@@ -284,7 +274,7 @@ paele:{
       const s0=Math.sqrt(2*energy*length/(area*E));
       const s=0.2/v.blows;
       const resistance=energy/(s+s0/2);
-      soejler(f,[['Blivende nedsynkning s',s*1000,farve.green],['Elastisk led ½s₀',s0*500,farve.blue]],'mm');
+      soejler(f,[['Blivende nedsynkning s',s*1000,farve.green],['Elastisk led ½s₀',s0*500,farve.blue]],'mm',30);
       return {penetration:s*1000,
         table:{heads:['Måleserie','Slag','Nedsynkning (mm)','s (mm/slag)','G (kN)','h (m)','Gh (kNm/slag)','ηGh (kNm/slag)'],
           rows:[['Afsluttende serie',v.blows,200,s*1000,v.g,v.h,v.g*v.h,energy]]},
@@ -292,7 +282,7 @@ paele:{
         caption:'Søjlerne viser de to længder i nævneren i rammeformlen. Modulet E for beton er 20 GPa som angivet på s. 418.'};
     }
     const shaft=4*v.b*v.l*v.cu*v.m*v.r, base=9*v.cu*area;
-    soejler(f,[['Overflademodstand langs skaftet',shaft,farve.green],['Spidsmodstand',base,farve.orange]],'kN');
+    soejler(f,[['Overflademodstand langs skaftet',shaft,farve.green],['Spidsmodstand',base,farve.orange]],'kN',4600);
     return {metrics:[['Statisk modstand',shaft+base,'kN'],['Overfladeareal',4*v.b*v.l,'m²'],['Spidsareal',area,'m²',3]],
       caption:'Overflade- og spidsmodstanden summeres for den aksialt trykbelastede pæl.'};
   }
@@ -312,7 +302,7 @@ styrke:{
     const phi=Math.atan(slope), sin=Math.sin(phi);
     const fail=2*(v.s3*sin+c*Math.cos(phi))/(1-sin);
     const hi=v.s3+fail*v.load/100;
-    mohr(f,{phi,c,hi,lo:v.s3,points:[[50,v.tau1],[150,v.tau2]],extra:Math.max(180,1.13*(v.s3+fail))});
+    mohr(f,{phi,c,hi,lo:v.s3,points:[[50,v.tau1],[150,v.tau2]],xMax:1500,yMax:750});
     return {metrics:[['Effektiv kohæsion c′',c,kpa],['Friktionsvinkel φ′',phi*180/Math.PI,'°'],['Deviator ved brud',fail,kpa],['Aktuel σ′₁',hi,kpa]],
       legend:[['Skæreboksens brudpunkter',farve.blue],['Triaksialprøvens Mohr-cirkel',farve.green],['Fælles brudlinje',farve.orange]],
       caption:'De blå punkter viser τf ved henholdsvis σ′ₙ = 50 og 150 kPa på den vandrette akse. De fastlægger brudlinjen. Sæt deviatorandelen til 100 % for at se triaksialcirklen tangere linjen.'};
@@ -331,7 +321,7 @@ saetninger:{
   ],
   draw(f,v){
     const pressure=z=>v.p/((v.b+z)*(v.l+z)), Z=v.z1+v.z2;
-    const g=diagram(f,{xMax:pressure(0),yMax:Z,xLabel:'Spændingstilvækst Δσz (kPa)',yLabel:'Dybde under fundamentet (m)',down:true,profile:true});
+    const g=diagram(f,{xMax:8000,yMax:Z,xLabel:'Spændingstilvækst Δσz (kPa)',yLabel:'Dybde under fundamentet (m)',down:true,profile:true});
     jordprofil(f,g,[[0,v.z1,farve.soil],[v.z1,Z,farve.clay]],null,Z);
     g.plot(punkter(80,t=>[pressure(t*Z),t*Z]),farve.green);
     const rows=[];

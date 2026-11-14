@@ -173,8 +173,8 @@ function drawSoil({delta,z,phi,horizontal,vertical,q,zWater,theta}){
 }
 function drawCircle({phi,K,vertical,horizontal,theta,mode}){
   const l=46,r=335,t=16,b=206,mid=(t+b)/2;
-  const maxP=Math.max(1,K.passive*vertical), ratio=Math.tan(rad(phi));
-  const scale=Math.min((r-l-12)/(1.1*maxP),(b-t-17)/(maxP-vertical));
+  const ratio=Math.tan(rad(phi));
+  const scale=Math.min((r-l-12)/650,(b-t-17)/550);
   const X=s=>l+s*scale,Y=s=>mid-s*scale;
   const xEnd=Math.min((r-l)/scale,(mid-t)/scale/ratio);
   const circle=(h,stroke,width,opacity)=>{
@@ -208,7 +208,7 @@ function niceStep(raw){
 }
 function drawPressure({delta,K,vertical,horizontal,u,total,z}){
   const l=49,r=333,t=25,b=167;
-  const max=Math.max(1,K.passive*vertical+u), step=niceStep(max/4), ceiling=Math.ceil(max/step)*step;
+  const step=150, ceiling=750;
   const X=d=>l+(d-travelMin)*(r-l)/(travelMax-travelMin), Y=p=>b-(b-t)*p/ceiling;
   const pts=limits.map(item=>({...item,p:K[item.key]*vertical}));
   let grid='';

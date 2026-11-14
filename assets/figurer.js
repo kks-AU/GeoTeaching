@@ -63,7 +63,7 @@ function diagram(f,{xMin=0,xMax,yMax,xLabel,yLabel,down=false,profile=false,equa
   }
   for(const a of ticks??punkter(4,t=>xMin+(xMax-xMin)*t)){
     f.line([[x(a),y(0)],[x(a),y(yMax)]],'#e0e6da',1);
-    f.label(x(a),bottom+18,tal(a,2),'#52645e','center');
+    f.label(x(a),bottom+18,tal(a,4),'#52645e','center');
   }
   if(xMin<0) f.line([[x(0),y(0)],[x(0),y(yMax)]],'#61736e',1,[3,3]);
   f.line([[left,y(yMax)],[left,y(0)],[x(xMax),y(0)]],'#61736e',1);
@@ -73,12 +73,12 @@ function diagram(f,{xMin=0,xMax,yMax,xLabel,yLabel,down=false,profile=false,equa
     dot:(a,b,color)=>f.dot(x(a),y(b),color)};
 }
 
-function mohr(f,{phi,c,hi,lo,points=[],extra=0}) {
+function mohr(f,{phi,c,hi,lo,points=[],xMax,yMax}) {
   const m=(hi+lo)/2, r=(hi-lo)/2;
-  const max=Math.max(60,hi*1.14,extra);
-  const g=diagram(f,{xMax:max,yMax:Math.max(max*.43,r*1.2,c+max*Math.tan(phi)+8),
+  const g=diagram(f,{xMax,yMax,
     xLabel:'Effektiv normalspænding σ′ (kPa)',yLabel:'Forskydningsspænding τ (kPa)',equal:true});
-  g.plot([[0,c],[max,c+max*Math.tan(phi)]],farve.orange);
+  const end=Math.min(xMax,phi?(yMax-c)/Math.tan(phi):xMax);
+  g.plot([[0,c],[end,c+end*Math.tan(phi)]],farve.orange);
   g.plot(punkter(120,t=>[m+r*Math.cos(Math.PI*t),r*Math.sin(Math.PI*t)]),farve.green);
   g.dot(hi,0,farve.green);
   g.dot(lo,0,farve.green);
@@ -88,16 +88,17 @@ function mohr(f,{phi,c,hi,lo,points=[],extra=0}) {
   }
 }
 
-function soejler(f,items,unit) {
-  const max=Math.max(1,...items.map(item=>item[1]))*1.1;
+function soejler(f,items,unit,max) {
   const left=16, width=f.w-32;
   items.forEach(([name,val,color],i)=>{
     const y=25+i*(Math.min(88,(f.h-25)/items.length));
     f.label(left,y,name);
-    f.rect(left,y+10,width,26,'#e9ede4');
+    f.rect(left,y+10,width-84,26,'#e9ede4');
     f.rect(left,y+10,(width-84)*val/max,26,color);
     f.label(f.w-22,y+28,`${tal(val)} ${unit}`,'#213d37','right');
   });
+  f.label(left,f.h-12,'0');
+  f.label(f.w-100,f.h-12,`${tal(max)} ${unit}`,'#213d37','right');
 }
 
 function jordprofil(f,g,lag,water,max) {

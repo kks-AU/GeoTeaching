@@ -42,23 +42,24 @@ function renderForsog(){
   const {from,to,before,after,primary,H,timeScale,t100,slope,eps,strain}=data;
   const minT=timeScale*.001, maxT=timeScale*200;
   const time=minT*(maxT/minT)**(Number(inputs[3].value)/100);
-  const timeTicks=logSpændingTicks(minT,maxT).filter((_,i)=>i%3===0);
+  const xMin=.0001, xMax=10000;
+  const timeTicks=[.0001,.01,1,100,10000];
   const late1=t100*2, late2=late1*Number(inputs[4].value);
   const measuredU=100*(Math.min(after,eps(time))-before)/primary;
   find('tykkelsevaerdi').textContent=tal(Z)+' mm';
   find('aflaesningvaerdi').textContent=tal(time,2)+' min';
   inputs[3].setAttribute('aria-valuetext',tal(time,2)+' minutter');
   const endpoints=Array.from({length:6},(_,i)=>sample.start*2**i);
-  const plot=diagram(figur(aendringer[0]),{xMin:minT,xMax:maxT,yMax:Math.max(.5,100*(eps(maxT)-before)*1.1),
+  const plot=diagram(figur(aendringer[0]),{xMin,xMax,yMax:10,
     ticks:timeTicks,scaleX:Math.log10,xLabel:'Tid t (min) · log₁₀',yLabel:'Tøjning i lasttrinnet (%)',down:true});
   const strainOnStep=t=>100*(eps(t)-before);
-  plot.plot(punkter(160,r=>{const t=minT*(maxT/minT)**r;return [t,strainOnStep(t)];}),farve.green);
-  plot.plot([[minT,50*primary],[maxT,50*primary]],farve.orange,[4,4]);
-  plot.plot([[minT,100*primary],[maxT,100*primary]],farve.gray,[4,4]);
+  plot.plot(punkter(160,r=>{const t=xMin*(xMax/xMin)**r;return [t,strainOnStep(t)];}),farve.green);
+  plot.plot([[xMin,50*primary],[xMax,50*primary]],farve.orange,[4,4]);
+  plot.plot([[xMin,100*primary],[xMax,100*primary]],farve.gray,[4,4]);
   plot.plot([[time,0],[time,strainOnStep(time)]],farve.blue,[3,3]);
   plot.dot(time,strainOnStep(time),farve.blue);
   [late1,late2].forEach(t=>plot.dot(t,strainOnStep(t),farve.orange));
-  const work=diagram(figur(aendringer[1]),{xMin:25,xMax:800,yMax:100*strain(800)*1.12,
+  const work=diagram(figur(aendringer[1]),{xMin:25,xMax:800,yMax:25,
     ticks:[25,50,100,200,400,800],scaleX:Math.log10,xLabel:'Effektiv spænding σ′ (kPa) · log₁₀',yLabel:'Primær tøjning (%)',down:true});
   work.plot(punkter(140,r=>{const s=25*32**r;return [s,100*strain(s)];}),farve.green);
   endpoints.forEach(s=>work.dot(s,100*strain(s),farve.gray));
