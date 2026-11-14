@@ -107,7 +107,7 @@ const skitser = {
     return `Stive sider holder bredden fast. Den stiplede linje viser prøvens overkant før lasttrinnet. For laget på ${tal(v.depth)} m giver den normalkonsoliderede reference δ = ${tal(result.comparison[0])} mm. Den valgte spændingshistorie giver δ = ${tal(result.comparison[1])} mm.`;
   },
   konsolidering(f,v,mode,result){
-    const x=19, right=f.w-83, top=63, bottom=f.h-40;
+    const x=19, right=f.w-83, top=78, bottom=f.h-40;
     const layerHeight=57+(bottom-top-57)*v.depth/10;
     const end=top+layerHeight;
     lag(f,x,top,right-x,layerHeight,clay);
@@ -121,7 +121,11 @@ const skitser = {
     f.label(x,end+23,mode?'Dræn i bund':'Tæt bund');
     f.label(right-4,top-15,'Dræn øverst',water,'right');
     f.label(x,18,`t = ${tal(v.time)} døgn`);
-    f.label(right,18,`p = ${tal(v.p)} kPa`,load,'right');
+    f.label(right,18,`Terrænlast p = ${tal(v.p)} kPa`,load,'right');
+    for(const fraction of [.31,.54,.77]){
+      const px=x+(right-x)*fraction;
+      pil(f,px,57-(8+21*v.p/150),px,63,load,3.5,10);
+    }
     const H=v.depth/(mode+1);
     lodretMaal(f,right+9,top,end,'Z');
     lodretMaal(f,right+37,top,top+layerHeight/(mode+1),'H',water);
@@ -134,7 +138,7 @@ const skitser = {
         pil(f,px,end-25,px,end+16,'#084a78',4,12);
       }
     }
-    return `Mørkere blåt betyder større poreovertryk Δu i forhold til lasttrinnet p. Pilene markerer drænretningen og vises i hele tidsforløbet. Den længste drænvej H er ${tal(H)} m ved ${mode?'dobbeltsidig':'ensidig'} dræning.`;
+    return `Mørkere blåt betyder større poreovertryk Δu i forhold til terrænlasten p. Orange pile viser terrænlasten. Blå pile viser drænretningen. Den længste drænvej H er ${tal(H)} m ved ${mode?'dobbeltsidig':'ensidig'} dræning.`;
   },
   baereevne(f,v){
     const x=f.w/2, b=(f.w-54)*(.16+.46*v.b/5), top=91, bottom=f.h-28, edge=16;

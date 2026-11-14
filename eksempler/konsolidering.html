@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Konsolidering over tid · Geoteknik</title>
+<title>1D-konsolidering og deformation over tid · Geoteknik</title>
 <link rel="stylesheet" href="../assets/style.css?v=4">
-<script defer src="../assets/figurer.js?v=2"></script><script defer src="../assets/modeller.js?v=2"></script><script defer src="../assets/skitser.js?v=4"></script><script defer src="../assets/side.js?v=2"></script>
+<script defer src="../assets/figurer.js?v=2"></script><script defer src="../assets/modeller.js?v=5"></script><script defer src="../assets/skitser.js?v=5"></script><script defer src="../assets/side.js?v=5"></script>
 </head>
 <body data-topic="konsolidering">
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -15,8 +15,8 @@
 <section class="exercise-head">
 <a href="../index.html">← Alle øvelser</a>
 <p class="tag">Dræn og poreovertryk</p>
-<h1>Konsolidering over tid</h1>
-<p>Følg poreovertrykket efter en pludselig belastning. Se, hvor hurtigt lasten overtages af kornskelettet, når lerlaget drænes fra én eller to sider.</p>
+<h1>1D-konsolidering og deformation over tid</h1>
+<p>Følg poreovertryk, primær tøjning og krybetøjning efter en pludselig terrænlast. Se, hvor hurtigt lasten overtages af kornskelettet, når lerlaget drænes fra én eller to sider.</p>
 </section>
 <p><a class="button" href="konsolideringsforsog.html">Se tidskurven fra et ødometerforsøg →</a></p>
 <div class="workspace">
@@ -44,35 +44,55 @@
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>K</mi></math></dt><dd>konsolideringsmodul (omregnes fra MPa til kPa)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>γ</mi><mi mathvariant="normal">w</mi></msub></math></dt><dd>vandets rumvægt (kN/m³)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>Δ</mi><mi>u</mi></math></dt><dd>poreovertryk (kPa)</dd></div>
-        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>p</mi></math></dt><dd>påført lasttrin (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>p</mi></math></dt><dd>påført terrænlast (kPa)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math></dt><dd>afstand til nærmeste drænflade divideret med H</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>n</mi></math></dt><dd>summen tages over de ulige tal 1, 3, 5, …</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>U</mi></math></dt><dd>konsolideringsgrad, lig 1 minus det relative poreovertryk i gennemsnit</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>Z</mi></math></dt><dd>lagtykkelse (m)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>δ</mi><mi>t</mi></msub></math></dt><dd>sætning til tiden t (m i formlen, vist i mm)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>δ</mi><mn>∞</mn></msub></math></dt><dd>slutsætning (m i formlen, vist i mm)</dd></div>
+        <div><dt>εprim,∞</dt><dd>primær sluttøjning beregnet fra arbejdskurven</dd></div>
+        <div><dt>εcr</dt><dd>krybetøjning fra t₁₀₀</dd></div>
+        <div><dt>εs</dt><dd>tøjning pr. tidsdekade på krybegrenen</dd></div>
+        <div><dt>Qₛ</dt><dd>maksimal krybehældning pr. tidsdekade, nået ved forbelastningsspændingen i modellen</dd></div>
+        <div><dt>t₁₀₀</dt><dd>tid til afslutning af primær konsolidering i modellen (døgn)</dd></div>
+        <div><dt>δsamlet</dt><dd>summen af primær sætning og krybesætning (m i formlen, vist i mm)</dd></div>
+        <div><dt>OCR</dt><dd>forbelastningsspænding divideret med effektiv startspænding</dd></div>
+        <div><dt>σ′f</dt><dd>effektiv startspænding (kPa)</dd></div>
+        <div><dt>σ′pc</dt><dd>forbelastningsspænding (kPa)</dd></div>
+        <div><dt>Q</dt><dd>stamkurvens primære tøjning pr. spændingsdekade</dd></div>
       </dl>
     </details>
   </figcaption>
 </figure>
-<canvas id="figur" role="img" aria-label="Konsolidering over tid" aria-describedby="figurtekst"></canvas>
+<canvas id="figur" role="img" aria-label="1D-konsolidering og deformation over tid" aria-describedby="figurtekst"></canvas>
 <div class="legend" id="kurver"></div>
 <p class="hint" id="figurtekst"></p>
 <div class="metrics" id="resultater"></div>
 <details id="dellag" hidden><summary>Vis beregningen for hvert dellag</summary><div class="data"><table id="datatabel"></table></div></details>
 </section>
 </div>
+<section class="panel book">
+<h2>Tøjning over tid</h2>
+<canvas id="toejningsfigur" role="img" aria-label="Primær tøjning, krybetøjning og samlet tøjning over tid" aria-describedby="tidstekst"></canvas>
+<div class="legend"><span><i style="--series:#216958"></i>Primær tøjning (stiplet)</span><span><i style="--series:#a64a25"></i>Krybetøjning</span><span><i style="--series:#14649a"></i>Samlet tøjning</span></div>
+<p id="tidstekst" class="hint">Punkterne viser den valgte tid. Når tiden er mindre end t₁₀₀, falder den samlede kurve sammen med den primære. Den stiplede lodrette linje markerer krybningens start i modellen.</p>
+</section>
 <div class="notes">
 <section class="panel"><h2>Ligninger</h2>
 <div class="equation"><p>Tidsfaktor</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>T</mi><mo>=</mo><mfrac><mrow><msub><mi>c</mi><mi>k</mi></msub><mi>t</mi></mrow><mrow><msup><mi>H</mi><mn>2</mn></msup></mrow></mfrac></math></div>
 <div class="equation"><p>Konsolideringskoefficient</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>c</mi><mi>k</mi></msub><mo>=</mo><mfrac><mrow><mi>k</mi><mi>K</mi></mrow><mrow><msub><mi>γ</mi><mi mathvariant="normal">w</mi></msub></mrow></mfrac></math></div>
 <div class="equation"><p>Relativt poreovertryk</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mfrac><mrow><mi>Δ</mi><mi>u</mi></mrow><mrow><mi>p</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>4</mn></mrow><mrow><mi>π</mi></mrow></mfrac><msub><mo>∑</mo><mi>n</mi></msub><mfrac><mrow><mi mathvariant="normal">sin</mi><mo>(</mo><mfrac><mrow><mi>n</mi><mi>π</mi><mi>x</mi></mrow><mrow><mn>2</mn></mrow></mfrac><mo>)</mo><mi mathvariant="normal">exp</mi><mo>(</mo><mo>−</mo><mfrac><mrow><msup><mi>n</mi><mn>2</mn></msup><msup><mi>π</mi><mn>2</mn></msup><mi>T</mi></mrow><mrow><mn>4</mn></mrow></mfrac><mo>)</mo></mrow><mrow><mi>n</mi></mrow></mfrac></math></div>
-<div class="equation"><p>Slutsætning</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>δ</mi><mn>∞</mn></msub><mo>=</mo><mfrac><mrow><mi>p</mi><mi>Z</mi></mrow><mrow><mi>K</mi></mrow></mfrac></math></div>
-<div class="equation"><p>Sætning til tiden t</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>δ</mi><mi>t</mi></msub><mo>=</mo><mi>U</mi><msub><mi>δ</mi><mn>∞</mn></msub></math></div>
+<div class="equation"><p>Primær slutsætning</p><math display="block"><msub><mi>δ</mi><mtext>∞</mtext></msub><mo>=</mo><mi>Z</mi><msub><mi>ε</mi><mtext>prim,∞</mtext></msub></math></div>
+<div class="equation"><p>Primær sætning til tiden t</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>δ</mi><mi>t</mi></msub><mo>=</mo><mfrac><mrow><mi>U</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mrow><mi>U</mi><mo>(</mo><msub><mi>t</mi><mn>100</mn></msub><mo>)</mo></mrow></mfrac><msub><mi>δ</mi><mn>∞</mn></msub><mo>,</mo><mi>t</mi><mo>≤</mo><msub><mi>t</mi><mn>100</mn></msub></math></div>
+<div class="equation"><p>Krybetøjning efter primær konsolidering</p><math display="block"><msub><mi>ε</mi><mtext>cr</mtext></msub><mo>=</mo><msub><mi>ε</mi><mtext>s</mtext></msub><msub><mi mathvariant="normal">log</mi><mn>10</mn></msub><mo>(</mo><mfrac><mi>t</mi><msub><mi>t</mi><mtext>100</mtext></msub></mfrac><mo>)</mo><mo>,</mo><mi>t</mi><mo>&gt;</mo><msub><mi>t</mi><mtext>100</mtext></msub></math></div>
+<div class="equation"><p>Samlet sætning</p><math display="block"><msub><mi>δ</mi><mtext>samlet</mtext></msub><mo>=</mo><msub><mi>δ</mi><mtext>t</mtext></msub><mo>+</mo><mi>Z</mi><msub><mi>ε</mi><mtext>cr</mtext></msub></math></div>
 </section>
 <section class="panel"><h2>Undersøg selv</h2><p>Skift fra ensidig til dobbeltsidig dræning med samme lagtykkelse. Hvorfor ændres tiden til 50 % konsolidering?</p>
 <details><summary>Se forklaringen</summary><p>Drænvejen halveres. Ved samme tidsfaktor er tiden proportional med drænvejens kvadrat og bliver derfor en fjerdedel.</p></details>
-<h3>Forudsætninger</h3><p>Ensformig spændingstilvækst, konstant konsolideringskoefficient og konstant konsolideringsmodul. Kurven viser primær konsolidering.</p>
+<h3>Forudsætninger</h3><p>Ensformig og pludselig terrænlast, ét homogent lerlag og konstant konsolideringskoefficient. Primær sluttøjning beregnes med arbejdskurven fra 1D-deformationsøvelsen. Normalkonsolideret ler følger stamkurven. Forkonsolideret ler genbelastes med konstant K frem til forbelastningsspændingen og følger derefter stamkurven.</p>
+<p>Modellen sætter t₁₀₀ ved T = 2 og skalerer den primære tøjningskurve til 100 % her. Derefter holdes den primære tøjning på slutværdien. Krybetøjningen sættes til nul frem til t₁₀₀. Derefter bruges den valgte krybehældning ved slutspænding under forbelastningsspændingen og Qₛ ved eller over den.</p>
+<p><a href="deformation.html">Se arbejdskurven og ligningerne for 1D-deformation</a>.</p>
 </section>
 </div>
 <section class="motivbilleder" aria-label="Anvendelse og forsøgsudstyr">
@@ -81,7 +101,7 @@
 <section class="panel book">
 <h2>Læs videre i lærebogen</h2>
 <p>Geoteknik, 3. udgave</p>
-<p>Kapitel 6 · Konsolideringens tidsforløb, §§ 6.2–6.3, s. 162–167. Kapitel 5 · Jords deformationer, § 5.3, s. 146.</p>
+<p>Kapitel 6 · Konsolideringens tidsforløb, §§ 6.2–6.3, s. 162–167. Kapitel 5 · Jords deformationer, §§ 5.2–5.4, s. 141–149, og § 5.6, s. 153–154.</p>
 </section>
 <nav class="nav" aria-label="Andre øvelser"><a href="deformation.html">← Endimensional deformation</a><a href="baereevne.html">Fundamenters bæreevne →</a></nav>
 </main>

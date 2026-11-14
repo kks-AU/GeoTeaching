@@ -151,21 +151,61 @@ konsolidering:{
     input('time','Tid efter belastning',40,0,1000,1,'døgn'),
     input('depth','Lagtykkelse Z',4,1,10,.1,metre),
     input('cv','Konsolideringskoefficient cₖ',.025,.002,.15,.001,'m²/døgn'),
-    input('p','Lasttrin p',50,5,150,1,kpa),
-    input('mod','Konsolideringsmodul K',4,1,20,.1,'MPa')
+    input('p','Terrænlast p',50,5,150,1,kpa),
+    {id:'historik',label:'Lerlagets spændingshistorie',value:0,options:['Normalkonsolideret','Forkonsolideret']},
+    input('start','Effektiv startspænding σ′f',50,10,200,5,kpa),
+    input('ocr','Overkonsolideringsgrad OCR',2,1.1,10,.1,''),
+    input('mod','Genbelastningsmodul K',12,5,100,.5,'MPa'),
+    input('q','Tøjningsindeks Q',18,2,35,.5,'%'),
+    input('qs','Krybeindeks Qₛ',.5,0,2,.05,'%'),
+    input('creepBelow','Krybehældning under forbelastningen',.05,0,2,.05,'%')
   ],
+  bounds:{creepBelow:v=>({max:v.qs}),time:(v,mode)=>({max:Math.max(1000,Math.ceil(20*(v.depth/(mode+1))**2/v.cv))})},
+  updateValues(v,mode){
+    v.creepBelow=Math.min(v.creepBelow,v.qs);
+    v.time=Math.min(v.time,this.bounds.time(v,mode).max);
+  },
+  visibleControl(id,v){
+    return !['ocr','mod','creepBelow'].includes(id)||v.historik===1;
+  },
+  drawTime(f,result){
+    const {time,t100,strain,curves}=result.timeData;
+    const end=Math.max(3*t100,time*1.05);
+    const g=diagram(f,{xMax:end,yMax:strain(end)[2]*1.12,xLabel:'Tid t (døgn)',yLabel:'Lodret tøjning (%)',down:true});
+    const times=[...new Set([...punkter(120,r=>end*r*r),t100,time])].sort((a,b)=>a-b);
+    g.plot([[t100,0],[t100,strain(end)[2]]],farve.gray,[4,4]);
+    curves.forEach(([,color,dash],i)=>{
+      g.plot(times.map(t=>[t,strain(t)[i]]),color,dash);
+      g.dot(time,strain(time)[i],color);
+    });
+    f.label(g.x(t100)+5,g.y(0)+15,'t₁₀₀',farve.gray);
+  },
+  extraFigure:'toejningsfigur',
   draw(f,v,mode){
     const H=v.depth/(mode+1), T=v.cv*v.time/H**2;
-    function residual(x,average=false){
-      if(T===0) return 1;
+    function residual(x,average=false,timeFactor=T){
+      if(timeFactor===0) return 1;
       let sum=0;
       for(let n=1;n<401;n+=2){
         const a=n*Math.PI/2;
-        sum+=Math.exp(-a*a*T)*(average?1/a:Math.sin(a*x))/n;
+        sum+=Math.exp(-a*a*timeFactor)*(average?1/a:Math.sin(a*x))/n;
       }
       return Math.max(0,Math.min(1,4*sum/Math.PI));
     }
     const U=1-residual(0,true);
+    const pc=v.start*(v.historik?v.ocr:1), end=v.start+v.p;
+    const primary=lerToejning(end,v.start,pc,v.mod*1000,v.q/100);
+    const t100=2*H**2/v.cv;
+    const slope=(end>=pc?v.qs:v.creepBelow)/100;
+    const primaryAtEnd=1-residual(0,true,2);
+    const strain=t=>{
+      const first=100*primary*(t>=t100?1:(1-residual(0,true,v.cv*t/H**2))/primaryAtEnd);
+      const creep=t>t100?100*slope*Math.log10(t/t100):0;
+      return [first,creep,first+creep];
+    };
+    const [primaryNow,creepNow,totalNow]=strain(v.time);
+    const curves=[['Primær tøjning',farve.green,[5,4]],['Krybetøjning',farve.orange],['Samlet tøjning',farve.blue]];
+
     const g=diagram(f,{xMax:v.p,yMax:v.depth,xLabel:'Spændingstilvækst (kPa)',yLabel:'Dybde i lerlaget (m)',down:true,profile:true});
     jordprofil(f,g,[[0,v.depth,farve.clay]],null,v.depth);
     f.line([[5,g.y(0)],[34,g.y(0)]],farve.blue,4);
@@ -176,8 +216,9 @@ konsolidering:{
     });
     g.plot(values,farve.blue);
     g.plot(values.map(([u,z])=>[v.p-u,z]),farve.green);
-    return {metrics:[['Tidsfaktor T',T,'',4],['Konsolideringsgrad',100*U,'%'],['Sætning nu',U*v.p*v.depth/v.mod,'mm'],['Slutsætning',v.p*v.depth/v.mod,'mm'],['Tid til ca. 50 %',.197*H**2/v.cv,'døgn']],
-      profile:values, legend:[['Poreovertryk Δu',farve.blue],['Effektiv spændingstilvækst Δσ′',farve.green]],
+    return {metrics:[['Tidsfaktor T',T,'',4],['Konsolideringsgrad',100*U,'%'],['Forbelastningsspænding σ′pc',pc,kpa],['Primær tøjning',primaryNow,'%',3],
+        ['Krybetøjning',creepNow,'%',3],['Samlet sætning',totalNow*v.depth*10,'mm'],['Krybning starter ved t₁₀₀',t100,'døgn'],['Tid til ca. 50 %',.197*H**2/v.cv,'døgn']],
+      timeData:{time:v.time,t100,strain,curves}, profile:values, legend:[['Poreovertryk Δu',farve.blue],['Effektiv spændingstilvækst Δσ′',farve.green]],
       caption:'Blå lagflader viser dræn. Til tiden 0 bæres lasttrinnet af poreovertrykket i lagets indre.'};
   }
 },
