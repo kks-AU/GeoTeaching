@@ -5,36 +5,54 @@ spaendinger:{
   controls:[
     input('p','Terrænlast',20,0,100,1,kpa),
     input('water','Grundvandsspejlets dybde',2,0,12,.1,metre),
+    input('hc','Kapillær stighøjde h꜀',0,0,12,.1,metre),
     input('layer','Laggrænsens dybde',5,.5,11.5,.1,metre),
-    input('g1','Lag 1 · γ over GVS',17,12,23,.5,weight),
-    input('gm1','Lag 1 · γ under GVS',20,17,25,.5,weight),
-    input('g2','Lag 2 · γ over GVS',19,12,23,.5,weight),
-    input('gm2','Lag 2 · γ under GVS',22,17,25,.5,weight),
+    input('g1','Lag 1 · γ over KVS',17,12,23,.5,weight),
+    input('gm1','Lag 1 · γₘ i vandmættet jord',20,17,25,.5,weight),
+    input('g2','Lag 2 · γ over KVS',19,12,23,.5,weight),
+    input('gm2','Lag 2 · γₘ i vandmættet jord',22,17,25,.5,weight),
     input('z','Aflæsningsdybde',8,0,12,.1,metre)
   ],
+  bounds:{
+    g1:v=>({max:Math.min(23,v.gm1-.5)}),
+    gm1:v=>({min:Math.max(17,v.g1+.5)}),
+    g2:v=>({max:Math.min(23,v.gm2-.5)}),
+    gm2:v=>({min:Math.max(17,v.g2+.5)})
+  },
   draw(f,v){
-    const breaks=[0,v.water,v.layer,12].sort((a,b)=>a-b);
-    const stresses=z=>{
+    const kvs=Math.max(0,v.water-v.hc);
+    const breaks=[...new Set([0,kvs,v.water,v.layer,12])].sort((a,b)=>a-b);
+    const stresses=(z,saturated=z>=kvs)=>{
       let total=v.p;
       for(let i=1;i<breaks.length;i++){
         const start=breaks[i-1], end=Math.min(z,breaks[i]);
         if(end<=start) continue;
-        const gamma=start<v.layer?(start<v.water?v.g1:v.gm1):(start<v.water?v.g2:v.gm2);
+        const gamma=start<v.layer?(start<kvs?v.g1:v.gm1):(start<kvs?v.g2:v.gm2);
         total+=(end-start)*gamma;
       }
-      const u=10*Math.max(0,z-v.water);
+      const u=saturated?10*(z-v.water):0;
       return [total,u,total-u];
     };
-    const g=diagram(f,{xMax:Math.ceil(stresses(12)[0]/40)*40,yMax:12,xLabel:'Spænding (kPa)',yLabel:'Dybde (m)',down:true,profile:true});
-    jordprofil(f,g,[[0,v.layer,farve.soil],[v.layer,12,farve.clay]],v.water,12);
     const series=[['Totalspænding σz',farve.orange],['Poretryk u',farve.blue],['Effektiv spænding σ′z',farve.green]];
-    g.plot([[0,v.z],[stresses(12)[0],v.z]],farve.gray,[3,4]);
+    const sections=kvs>0 && kvs<12
+      ? [breaks.filter(z=>z<=kvs).map(z=>[z,stresses(z,false)]),
+         breaks.filter(z=>z>=kvs).map(z=>[z,stresses(z)])]
+      : [breaks.map(z=>[z,stresses(z)])];
+    const left=-10*(v.water-kvs);
+    const right=Math.ceil(Math.max(...sections.flat().flatMap(([,s])=>s))/40)*40;
+    const g=diagram(f,{xMin:left,xMax:right,yMax:12,xLabel:'Spænding (kPa)',yLabel:'Dybde (m)',down:true,profile:true});
+    jordprofil(f,g,[[0,v.layer,farve.soil],[v.layer,12,farve.clay]],v.water,12);
+    if(kvs<v.water){
+      f.rect(5,g.y(kvs),29,g.y(v.water)-g.y(kvs),'#5da9c960');
+      f.line([[5,g.y(kvs)],[34,g.y(kvs)]],farve.blue,1,[3,3]);
+    }
+    g.plot([[left,v.z],[right,v.z]],farve.gray,[3,4]);
     series.forEach(([,color],i)=>{
-      g.plot(breaks.map(z=>[stresses(z)[i],z]),color);
+      sections.forEach(section=>g.plot(section.map(([z,s])=>[s[i],z]),color));
       g.dot(stresses(v.z)[i],v.z,color);
     });
-    return {metrics:series.map(([label],i)=>[label,stresses(v.z)[i],kpa]),legend:series,
-      caption:'Jordprofil til venstre. Punkterne på kurverne viser værdier i den valgte aflæsningsdybde.'};
+    return {metrics:[...series.map(([label],i)=>[label,stresses(v.z)[i],kpa]),['Kapillarvandsspejlets dybde',kvs,metre]],legend:series,kvs,
+      caption:'Punkterne viser værdierne i den valgte dybde. Ved KVS aflæses poretrykket på den vandmættede side.'};
   }
 },
 rankine:{

@@ -48,20 +48,22 @@ function figur(canvas) {
   return {w,h,line,label,rect,dot,polygon};
 }
 
-function diagram(f,{xMax,yMax,xLabel,yLabel,down=false,profile=false,equal=false}) {
+function diagram(f,{xMin=0,xMax,yMax,xLabel,yLabel,down=false,profile=false,equal=false}) {
   const left=profile?86:56, top=30, bottom=f.h-44;
   const width=f.w-left-15, height=bottom-top;
-  const unit=Math.min(width/xMax,height/yMax);
-  const xs=equal?unit:width/xMax, ys=equal?unit:height/yMax;
-  const x=v=>left+v*xs;
+  const span=xMax-xMin;
+  const unit=Math.min(width/span,height/yMax);
+  const xs=equal?unit:width/span, ys=equal?unit:height/yMax;
+  const x=v=>left+(v-xMin)*xs;
   const y=v=>down?top+v*ys:bottom-v*ys;
   for(let i=0;i<=4;i++){
-    const a=xMax*i/4, b=yMax*i/4;
+    const a=xMin+span*i/4, b=yMax*i/4;
     f.line([[x(a),y(0)],[x(a),y(yMax)]],'#e0e6da',1);
-    f.line([[x(0),y(b)],[x(xMax),y(b)]],'#e0e6da',1);
+    f.line([[x(xMin),y(b)],[x(xMax),y(b)]],'#e0e6da',1);
     f.label(x(a),bottom+18,tal(a,2),'#52645e','center');
     f.label(left-7,y(b)+4,tal(b,2),'#52645e','right');
   }
+  if(xMin<0) f.line([[x(0),y(0)],[x(0),y(yMax)]],'#61736e',1,[3,3]);
   f.line([[left,y(yMax)],[left,y(0)],[x(xMax),y(0)]],'#61736e',1);
   f.label(left,17,yLabel);
   f.label(f.w-14,f.h-5,xLabel,'#213d37','right');

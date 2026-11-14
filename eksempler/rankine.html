@@ -5,72 +5,91 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rankine-jordtryk · Geoteknik</title>
 <link rel="stylesheet" href="../assets/style.css?v=2">
-<script defer src="../assets/figurer.js?v=2"></script><script defer src="../assets/modeller.js?v=2"></script><script defer src="../assets/skitser.js?v=2"></script><script defer src="../assets/side.js?v=2"></script>
+<link rel="stylesheet" href="../assets/rankine.css?v=3">
+<script defer src="../assets/rankine.js?v=3"></script>
 </head>
 <body data-topic="rankine">
 <a class="skip" href="#indhold">Gå til indhold</a>
 <header><div class="wrap"><a class="brand" href="../index.html">Geoteknik</a><small>Interaktive undervisningseksempler</small></div></header>
 
-<main id="indhold">
-<section class="exercise-head">
+<main id="indhold" class="rankine-main">
 <a href="../index.html">← Alle øvelser</a>
-<p class="tag">Fra hvile til brud</p>
-<h1>Rankine-jordtryk</h1>
-<p>Træk væggen væk fra jorden, eller pres den ind mod jorden. Følg den vandrette spænding og se, hvornår Mohrs cirkel tangerer brudlinjen.</p>
-</section>
-<div class="workspace">
-<section class="panel" aria-labelledby="params">
-<h2 id="params">Indstillinger</h2>
-<div class="tabs" id="faner" role="group" aria-label="Beregningsvalg" hidden></div>
-<div id="indstillinger"></div>
-<button type="button" id="nulstil">Nulstil værdier</button>
-<noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
-</section>
-<section class="panel" aria-labelledby="figurtitel">
-<h2 id="figurtitel">Principskitse og resultater</h2>
-<figure class="skitse">
-  <canvas id="skitse" role="img" aria-label="Principskitse" aria-describedby="skitsetekst"></canvas>
-  <figcaption>
-    <p class="hint" id="skitsetekst"></p>
-    <details class="symboler">
+<section class="rankine-title"><p>RANKINE-JORDTRYK</p><h1>Fra vægbevægelse til spænding og brud</h1></section>
+<div class="controls combined-controls">
+  <label class="travel"><span>Væggens flytning <strong id="travelValue"></strong></span>
+    <input id="travel" type="range" min="-6" max="60" step=".1" value="0">
+    <span class="ends"><span>Væk fra jorden</span><span>Ind i jorden</span></span>
+  </label>
+  <label><span>Dybde <strong id="depthValue"></strong></span><input id="depth" aria-label="Dybde i meter under terræn" type="range" min=".1" max="3" step=".1" value="1.5"></label>
+  <label><span>Friktionsvinkel φ′ <strong id="phiValue"></strong></span><input id="phi" aria-label="Friktionsvinkel φ′ i grader" type="range" min="25" max="42" step="1" value="30"></label>
+  <label><span>Rumvægt over vand γ <strong id="gammaValue"></strong></span><input id="gamma" aria-label="Jordens rumvægt i kilonewton pr. kubikmeter" type="range" min="12" max="25" step=".5" value="18"></label>
+  <label><span>Terrænlast q <strong id="qValue"></strong></span><input id="surcharge" aria-label="Jævnt fordelt overlejringstryk i kilopascal" type="range" min="0" max="50" step="1" value="0"></label>
+  <label><span>Vandspejl <strong id="waterValue"></strong></span><input id="water" aria-label="Vandspejlets dybde i meter under terræn" type="range" min="0" max="3" step=".1" value="3"></label>
+  <label><span>Mættet rumvægt γₘ <strong id="satValue"></strong></span><input id="saturated" aria-label="Mættet rumvægt i kilonewton pr. kubikmeter" type="range" min="12" max="28" step=".5" value="20"></label>
+</div>
+<div class="choices" role="group" aria-label="Gå til en jordtrykstilstand">
+  <button type="button" data-delta="-3" aria-pressed="false">Aktivt · −3 mm</button>
+  <button type="button" data-delta="0" aria-pressed="true">Hviletryk</button>
+  <button type="button" data-delta="30" aria-pressed="false">Passivt · +30 mm</button>
+</div>
+<div id="readout" class="readout" aria-live="polite"></div>
+<div class="panes combined-panes">
+  <figure><figcaption>Væg og jordelement i samme dybde</figcaption><svg id="soil" viewBox="0 0 355 255" role="img" aria-label="Væg, jordelement og spændinger"></svg></figure>
+  <figure><figcaption>Mohrs cirkel · effektive spændinger</figcaption><svg id="circle" viewBox="0 0 355 255" role="img" aria-label="Mohrs cirkel og brudlinjer"></svg></figure>
+  <figure><figcaption>Vandret tryk i valgt dybde</figcaption><svg id="pressure" viewBox="0 0 355 255" role="img" aria-label="Vandret jordtryk mod vægflytning med aktiv, hvile og passiv markeret"></svg></figure>
+</div>
+<p id="stressBreakdown" class="note"></p>
+<p id="explain" class="note" aria-live="polite"></p>
+<p class="note foot">Rankine med glat lodret væg, vandret terræn, c′ = 0, jævnt fordelt terrænlast og ensidigt hydrostatisk vandtryk. Kapillaritet er udeladt i denne øvelse. Vandspejlets dybde måles fra terræn. For væghøjden H = 3 m nås den aktive grænse ved −3 mm (H/1000 væk fra jorden) og den passive ved +30 mm (H/100 ind i jorden). De viste brudflytninger er eksempler. Den glatte overgang fra hviletryk til brud er en illustrativ interpolation. Modellen fastholder grænsetrykket efter brudflytningen. Partiklerne bevæger sig skematisk langs brudplanet med aftagende forskydning væk fra væggen.</p>
+<details class="symboler">
       <summary>Symboler og enheder</summary>
       <dl>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>K</mi><mn>0</mn></msub></math></dt><dd>hviletrykskoefficient</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>K</mi><mi>a</mi></msub></math></dt><dd>aktiv jordtrykskoefficient</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>K</mi><mi>p</mi></msub></math></dt><dd>passiv jordtrykskoefficient</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>K</mi></math></dt><dd>aktuelt forhold mellem vandret og lodret spænding</dd></div>
-        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>φ</mi></math></dt><dd>friktionsvinkel (°), samme værdi i de tre udtryk</dd></div>
-        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>z</mi></msub></math></dt><dd>lodret effektiv spænding (kPa)</dd></div>
-        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>x</mi></msub></math></dt><dd>vandret effektiv spænding (kPa)</dd></div>
-        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>e</mi></math></dt><dd>jordtryk på væggen i den valgte dybde (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>φ</mi><mo>′</mo></msup></math></dt><dd>friktionsvinkel (°), samme værdi i de tre udtryk i denne illustration</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>v</mi></msub></math></dt><dd>lodret effektiv spænding (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>h</mi></msub></math></dt><dd>vandret effektiv spænding (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>e</mi></math></dt><dd>effektivt jordtryk på væggen i den valgte dybde (kPa)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>γ</mi></math></dt><dd>jordens rumvægt (kN/m³)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>z</mi></math></dt><dd>dybde under terræn (m)</dd></div>
-        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>p</mi></math></dt><dd>terrænlast (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>q</mi></math></dt><dd>terrænlast (kPa)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>σ</mi><mo>′</mo></msup></math></dt><dd>effektiv normalspænding (kPa)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>τ</mi><mi>f</mi></msub></math></dt><dd>forskydningsspænding ved brud (kPa)</dd></div>
-      </dl>
+      <div><dt><math><mi>u</mi></math></dt><dd>porevandstryk ved væggen (kPa)</dd></div>
+<div><dt><math><msub><mi>σ</mi><mi>h</mi></msub></math></dt><dd>samlet vandret tryk, inklusive vandtryk (kPa)</dd></div>
+<div><dt><math><msub><mi>γ</mi><mi>m</mi></msub></math></dt><dd>vandmættet rumvægt (kN/m³)</dd></div>
+<div><dt><math><msub><mi>γ</mi><mi>w</mi></msub></math></dt><dd>vandets rumvægt, 10 kN/m³</dd></div>
+<div><dt><math><msup><mi>γ</mi><mo>′</mo></msup></math></dt><dd>reduceret rumvægt under GVS (kN/m³)</dd></div>
+<div><dt><math><msub><mi>z</mi><mtext>GVS</mtext></msub></math></dt><dd>grundvandsspejlets dybde målt fra terræn (m)</dd></div>
+<div><dt><math><msub><mi>z</mi><mi>w</mi></msub></math></dt><dd>aflæsningspunktets dybde under grundvandsspejlet, ellers 0 (m)</dd></div>
+<div><dt><math><mi>θ</mi></math></dt><dd>brudplanets vinkel med vandret (°)</dd></div>
+<div><dt><math><mi>H</mi></math></dt><dd>væghøjden, 3 m i øvelsen</dd></div>
+<div><dt><math><mi>P</mi></math></dt><dd>polen i Mohrs cirkel. Her falder den sammen med punktet for den vandrette effektive spænding.</dd></div>
+<div><dt><math><mi>τ</mi></math></dt><dd>forskydningsspænding (kPa)</dd></div>
+<div><dt><math><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>n</mi></msub></math></dt><dd>effektiv normalspænding på det betragtede plan (kPa)</dd></div>
+<div><dt><math><msup><mi>c</mi><mo>′</mo></msup></math></dt><dd>effektiv kohæsion, sat til 0 (kPa)</dd></div>
+<div><dt><math><msubsup><mi>σ</mi><mn>1</mn><mo>′</mo></msubsup></math></dt><dd>største effektive hovedspænding (kPa)</dd></div>
+<div><dt><math><msubsup><mi>σ</mi><mn>3</mn><mo>′</mo></msubsup></math></dt><dd>mindste effektive hovedspænding (kPa)</dd></div>
+</dl>
     </details>
-  </figcaption>
-</figure>
-<canvas id="figur" role="img" aria-label="Rankine-jordtryk" aria-describedby="figurtekst"></canvas>
-<div class="legend" id="kurver"></div>
-<p class="hint" id="figurtekst"></p>
-<div class="metrics" id="resultater"></div>
-<details id="dellag" hidden><summary>Vis beregningen for hvert dellag</summary><div class="data"><table id="datatabel"></table></div></details>
-</section>
-</div>
 <div class="notes">
 <section class="panel"><h2>Ligninger</h2>
-<div class="equation"><p>Hviletryk</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>K</mi><mn>0</mn></msub><mo>≈</mo><mn>1</mn><mo>−</mo><mi mathvariant="normal">sin</mi><mi>φ</mi></math></div>
-<div class="equation"><p>Aktiv jordtrykskoefficient</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>K</mi><mi>a</mi></msub><mo>=</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi mathvariant="normal">sin</mi><mi>φ</mi></mrow><mrow><mn>1</mn><mo>+</mo><mi mathvariant="normal">sin</mi><mi>φ</mi></mrow></mfrac></math></div>
+<div class="equation"><p>Hviletryk</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>K</mi><mn>0</mn></msub><mo>≈</mo><mn>1</mn><mo>−</mo><mi mathvariant="normal">sin</mi><msup><mi>φ</mi><mo>′</mo></msup></math></div>
+<div class="equation"><p>Aktiv jordtrykskoefficient</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>K</mi><mi>a</mi></msub><mo>=</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi mathvariant="normal">sin</mi><msup><mi>φ</mi><mo>′</mo></msup></mrow><mrow><mn>1</mn><mo>+</mo><mi mathvariant="normal">sin</mi><msup><mi>φ</mi><mo>′</mo></msup></mrow></mfrac></math></div>
 <div class="equation"><p>Passiv jordtrykskoefficient</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>K</mi><mi>p</mi></msub><mo>=</mo><mfrac><mrow><mn>1</mn></mrow><mrow><msub><mi>K</mi><mi>a</mi></msub></mrow></mfrac></math></div>
-<div class="equation"><p>Lodret effektiv spænding</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>z</mi></msub><mo>=</mo><mi>γ</mi><mi>z</mi><mo>+</mo><mi>p</mi></math></div>
-<div class="equation"><p>Jordtryk mod væggen</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>e</mi><mo>=</mo><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>x</mi></msub><mo>=</mo><mi>K</mi><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>z</mi></msub></math></div>
-<div class="equation"><p>Brudlinje for friktionsjord</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>τ</mi><mi>f</mi></msub><mo>=</mo><msup><mi>σ</mi><mo>′</mo></msup><mi mathvariant="normal">tan</mi><mi>φ</mi></math></div>
+<div class="equation"><p>Lodret effektiv spænding</p><math display="block"><msubsup><mi>σ</mi><mi>v</mi><mo>′</mo></msubsup><mo>=</mo><mi>γ</mi><mi mathvariant="normal">min</mi><mo>(</mo><mi>z</mi><mo>,</mo><msub><mi>z</mi><mtext>GVS</mtext></msub><mo>)</mo><mo>+</mo><msup><mi>γ</mi><mo>′</mo></msup><msub><mi>z</mi><mi>w</mi></msub><mo>+</mo><mi>q</mi></math></div>
+<div class="equation"><p>Dybde under grundvandsspejlet</p><math display="block"><msub><mi>z</mi><mi>w</mi></msub><mo>=</mo><mi mathvariant="normal">max</mi><mo>(</mo><mn>0</mn><mo>,</mo><mi>z</mi><mo>−</mo><msub><mi>z</mi><mtext>GVS</mtext></msub><mo>)</mo></math></div>
+<div class="equation"><p>Reduceret rumvægt under grundvandsspejlet</p><math display="block"><msup><mi>γ</mi><mo>′</mo></msup><mo>=</mo><msub><mi>γ</mi><mi>m</mi></msub><mo>−</mo><msub><mi>γ</mi><mi>w</mi></msub></math></div>
+<div class="equation"><p>Jordtryk mod væggen</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>e</mi><mo>=</mo><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>h</mi></msub><mo>=</mo><mi>K</mi><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>v</mi></msub></math></div>
+<div class="equation"><p>Hydrostatisk vandtryk</p><math display="block"><mi>u</mi><mo>=</mo><msub><mi>γ</mi><mi>w</mi></msub><msub><mi>z</mi><mi>w</mi></msub></math></div>
+<div class="equation"><p>Samlet vandret tryk mod væggen</p><math display="block"><msub><mi>σ</mi><mi>h</mi></msub><mo>=</mo><msubsup><mi>σ</mi><mi>h</mi><mo>′</mo></msubsup><mo>+</mo><mi>u</mi></math></div>
+<div class="equation"><p>Brudlinje for friktionsjord</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>τ</mi><mi>f</mi></msub><mo>=</mo><msup><mi>σ</mi><mo>′</mo></msup><mi mathvariant="normal">tan</mi><msup><mi>φ</mi><mo>′</mo></msup></math></div>
 </section>
 <section class="panel"><h2>Undersøg selv</h2><p>Bevæg skyderen langsomt mod passivt brud. Hvornår bliver den vandrette spænding den største hovedspænding?</p>
 <details><summary>Se forklaringen</summary><p>Når σ′x bliver større end σ′z. Før skiftet skrumper cirklen til et punkt. Derefter vokser den igen og tangerer brudlinjen ved passivt brud.</p></details>
-<h3>Forudsætninger</h3><p>Lodret glat væg, vandret terræn og homogen normalkonsolideret friktionsjord uden poretryk. Skyderen interpolerer spændingen mellem hviletryk og brud som illustration.</p>
+<h3>Forudsætninger</h3><p>Lodret glat væg, vandret terræn og homogen normalkonsolideret friktionsjord med hydrostatisk poretryk. Skyderen interpolerer spændingen mellem hviletryk og brud som illustration.</p>
 </section>
 </div>
 <section class="panel book">

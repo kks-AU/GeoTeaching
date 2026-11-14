@@ -43,24 +43,29 @@ function terrænlast(f,left,right,y,rel,label) {
 }
 
 const skitser = {
-  spaendinger(f,v){
+  spaendinger(f,v,mode,{kvs}){
     const x=18, end=f.w-69, top=58, bottom=f.h-23;
     const y=z=>top+(bottom-top)*z/12;
     lag(f,x,top,end-x,y(v.layer)-top,earth);
     lag(f,x,y(v.layer),end-x,bottom-y(v.layer),clay);
+    f.rect(x,y(kvs),end-x,y(v.water)-y(kvs),'#5da9c966');
     f.rect(x,y(v.water),end-x,bottom-y(v.water),'#5da9c93c');
     f.line([[x,top],[end,top]],steel,2);
     f.line([[x,y(v.layer)],[end,y(v.layer)]],'#876c50',1);
     f.line([[x,y(v.water)],[end,y(v.water)]],water,2,[6,4]);
     f.label(end+6,y(v.water)+4,'GVS',water);
+    if(kvs<v.water){
+      f.line([[x,y(kvs)],[end,y(kvs)]],water,1,[2,4]);
+      f.label(end+6,y(kvs)+(y(v.water)-y(kvs)<17?-8:4),'KVS',water);
+    }
     f.line([[x,y(v.z)],[end,y(v.z)]],farve.green,2,[2,4]);
     f.dot(end,y(v.z),farve.green,4);
-    const close=Math.abs(y(v.z)-y(v.water))<18;
-    f.label(end+6,y(v.z)+(close?18:4),'z',farve.green);
+    f.label(end+48,y(v.z)+4,'z',farve.green);
     if(y(v.layer)-top>26) f.label(x+12,(top+y(v.layer))/2+4,'Lag 1');
     if(bottom-y(v.layer)>26) f.label(x+12,(bottom+y(v.layer))/2+4,'Lag 2');
     terrænlast(f,x+12,end-12,top,v.p/100,`Terrænlast p = ${tal(v.p)} kPa`);
-    return `Den blå linje markerer grundvandsspejlet i ${tal(v.water)} m dybde. Den grønne linje viser det snit i ${tal(v.z)} m dybde, hvor σz, u og σ′z aflæses.`;
+    const zone=kvs<v.water?` Kapillarzonen ligger mellem KVS i ${tal(kvs)} m og GVS i ${tal(v.water)} m dybde. Her er jorden vandmættet og poretrykket negativt over GVS.`:' KVS og GVS falder sammen.';
+    return `Den grønne linje markerer aflæsningsdybden z = ${tal(v.z)} m.${zone}`;
   },
   rankine(f,v,mode,result){
     const wall=f.w*.27+v.motion*.18, top=68, bottom=f.h-27, end=f.w-18;

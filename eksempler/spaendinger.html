@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Spændinger med dybden · Geoteknik</title>
 <link rel="stylesheet" href="../assets/style.css?v=2">
-<script defer src="../assets/figurer.js?v=2"></script><script defer src="../assets/modeller.js?v=2"></script><script defer src="../assets/skitser.js?v=2"></script><script defer src="../assets/side.js?v=2"></script>
+<script defer src="../assets/figurer.js?v=3"></script><script defer src="../assets/modeller.js?v=3"></script><script defer src="../assets/skitser.js?v=3"></script><script defer src="../assets/side.js?v=3"></script>
 </head>
 <body data-topic="spaendinger">
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -16,13 +16,14 @@
 <a href="../index.html">← Alle øvelser</a>
 <p class="tag">Jord og vand</p>
 <h1>Spændinger med dybden</h1>
-<p>Følg terrænlasten og jordens egenvægt ned gennem to jordlag. Flyt grundvandsspejlet og se, hvordan trykket fordeles mellem porevandet og kornskelettet.</p>
+<p>Følg terrænlasten og jordens egenvægt ned gennem to jordlag. Flyt grundvandsspejlet og ændr den kapillære stighøjde for at se, hvordan poretrykket påvirker kornskelettet.</p>
 </section>
 <div class="workspace">
 <section class="panel" aria-labelledby="params">
 <h2 id="params">Indstillinger</h2>
 <div class="tabs" id="faner" role="group" aria-label="Beregningsvalg" hidden></div>
 <div id="indstillinger"></div>
+<p class="hint">I hvert lag skal den vandmættede rumvægt være større end rumvægten i den umættede zone. Skyderne begrænser hinanden med mindst 0,5 kN/m³ forskel.</p>
 <button type="button" id="nulstil">Nulstil værdier</button>
 <noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
 </section>
@@ -43,8 +44,17 @@
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>z</mi><mrow><mi mathvariant="normal">GVS</mi></mrow></msub></math></dt><dd>grundvandsspejlets dybde (m). GVS markerer selve spejlet i skitsen.</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>γ</mi><mi>i</mi></msub></math></dt><dd>jordens rumvægt i delinterval i (kN/m³)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>Δ</mi><msub><mi>z</mi><mi>i</mi></msub></math></dt><dd>tykkelsen af delinterval i over aflæsningspunktet (m)</dd></div>
-        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>i</mi></math></dt><dd>indeks for delinterval mellem terræn, laggrænser, grundvandsspejl og aflæsningsdybde</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>i</mi></math></dt><dd>indeks for delinterval mellem terræn, laggrænser, KVS og aflæsningsdybde</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>γ</mi><mi mathvariant="normal">w</mi></msub></math></dt><dd>vandets rumvægt, sat til 10 kN/m³</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>h</mi><mi>c</mi></msub></math></dt><dd>kapillær stighøjde (m), målt op fra GVS i et frit jordprofil</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>z</mi><mi mathvariant="normal">KVS</mi></msub></math></dt><dd>dybden til kapillarvandsspejlet (m). KVS markerer toppen af den vandmættede zone.</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>γ</mi><mi>m</mi></msub></math></dt><dd>vandmættet rumvægt i kapillarzonen og under GVS (kN/m³)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>γ</mi></math></dt><dd>jordens rumvægt (kN/m³). Skyderen for γ over KVS gælder den umættede zone.</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>d</mi><mi>s</mi></msub></math></dt><dd>kornmaterialets relative densitet i forhold til vand (dimensionsløs)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>e</mi></math></dt><dd>poretal, forholdet mellem porevolumen og kornvolumen (dimensionsløst)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>S</mi><mi>w</mi></msub></math></dt><dd>mætningsgrad, andel af porevolumen fyldt med vand (0 til 1)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>w</mi></math></dt><dd>vandindhold, vandets vægt divideret med kornenes vægt (som decimaltal i formlen)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>d</mi><mn>10</mn></msub></math></dt><dd>kornstørrelsen ved 10 % gennemfald på kornkurven</dd></div>
       </dl>
     </details>
   </figcaption>
@@ -59,18 +69,30 @@
 <div class="notes">
 <section class="panel"><h2>Ligninger</h2>
 <div class="equation"><p>Totalspænding</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>σ</mi><mi>z</mi></msub><mo>=</mo><mi>p</mi><mo>+</mo><msub><mo>∑</mo><mrow><mi>i</mi></mrow></msub><msub><mi>γ</mi><mi>i</mi></msub><mi>Δ</mi><msub><mi>z</mi><mi>i</mi></msub></math></div>
-<div class="equation"><p>Poretryk</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>u</mi><mo>=</mo><msub><mi>γ</mi><mi mathvariant="normal">w</mi></msub><mi mathvariant="normal">max</mi><mo>(</mo><mn>0</mn><mo>,</mo><mi>z</mi><mo>−</mo><msub><mi>z</mi><mrow><mi mathvariant="normal">GVS</mi></mrow></msub><mo>)</mo></math></div>
+<div class="equation"><p>Kapillarvandsspejlets dybde</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>z</mi><mi mathvariant="normal">KVS</mi></msub><mo>=</mo><mi mathvariant="normal">max</mi><mo>(</mo><mn>0</mn><mo>,</mo><msub><mi>z</mi><mi mathvariant="normal">GVS</mi></msub><mo>−</mo><msub><mi>h</mi><mi>c</mi></msub><mo>)</mo></math></div>
+<div class="equation"><p>Poretryk i den vandmættede zone</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>u</mi><mo>=</mo><msub><mi>γ</mi><mi>w</mi></msub><mo>(</mo><mi>z</mi><mo>−</mo><msub><mi>z</mi><mi mathvariant="normal">GVS</mi></msub><mo>)</mo><mo>,</mo><mi>z</mi><mo>≥</mo><msub><mi>z</mi><mi mathvariant="normal">KVS</mi></msub></math></div>
+<div class="equation"><p>Poretryk over kapillarvandsspejlet i modellen</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>u</mi><mo>=</mo><mn>0</mn><mo>,</mo><mi>z</mi><mo>&lt;</mo><msub><mi>z</mi><mi mathvariant="normal">KVS</mi></msub></math></div>
 <div class="equation"><p>Effektiv spænding</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>z</mi></msub><mo>=</mo><msub><mi>σ</mi><mi>z</mi></msub><mo>−</mo><mi>u</mi></math></div>
 </section>
-<section class="panel"><h2>Undersøg selv</h2><p>Flyt grundvandsspejlet hen over laggrænsen. Hvilke kurver får et knæk ved spejlet, og hvad sker der ved laggrænsen?</p>
-<details><summary>Se forklaringen</summary><p>Poretrykket får hældningen γw under spejlet. Totalspændingen skifter hældning, hvis rumvægten ændres. Den effektive spændings hældning er forskellen på de to.</p></details>
-<h3>Forudsætninger</h3><p>Vandret terræn, udbredt ensformig last og hydrostatisk poretryk. Kapillaritet ses bort fra.</p>
+<section class="panel"><h2>Undersøg selv</h2>
+<p>Hold grundvandsspejlet fast, og øg den kapillære stighøjde. Flyt aflæsningsdybden ind i kapillarzonen. Hvorfor er den effektive spænding større end totalspændingen her?</p>
+<details><summary>Se forklaringen</summary><p>Poretrykket er negativt mellem KVS og GVS. Når det trækkes fra totalspændingen, bliver den effektive spænding større. Rumvægten skifter ved KVS, fordi jorden er vandmættet allerede fra denne dybde.</p></details>
+<h3>Hvad bestemmer den kapillære stighøjde?</h3>
+<p>Små porer giver større stighøjde. Porestørrelsen afhænger af kornstørrelse og poretal. Lærebogen angiver tilnærmelsen <em>h</em><sub>c</sub> <em>d</em><sub>10</sub> <em>e</em> ≈ konstant. Konstanten afhænger blandt andet af kornform og gradering og ligger typisk mellem 10 og 50 mm² med længder i mm. Fin jord kan derfor have et kapillarvandsspejl ved terræn, selv med GVS flere meter nede.</p>
+<h3>Forudsætninger</h3>
+<p>Vandret terræn, jævnt fordelt terrænlast og stillestående grundvand. Øvelsen bruger én kapillær stighøjde for hele profilen. Kapillarzonen afskæres ved terræn. Over KVS sættes poretrykket til nul som en forenkling. Porevinkelvand og overgangen i den umættede jord er udeladt.</p>
 </section>
 </div>
 <section class="panel book">
+<h2>Sådan beregnes rumvægten for sand og ler</h2>
+<p>Rumvægten er jordens vægt pr. rumfang, inklusive vandet i porerne. Begge formler kan bruges for begge jordarter. Poretal er et praktisk udgangspunkt for sand, mens vandindhold ofte er udgangspunktet for ler.</p>
+<div class="equation"><p>Sand · beregning ud fra poretal</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>γ</mi><mo>=</mo><msub><mi>γ</mi><mi>w</mi></msub><mfrac><mrow><msub><mi>d</mi><mi>s</mi></msub><mo>+</mo><mi>e</mi><msub><mi>S</mi><mi>w</mi></msub></mrow><mrow><mn>1</mn><mo>+</mo><mi>e</mi></mrow></mfrac></math></div><div class="equation"><p>Ler · beregning ud fra vandindhold</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>γ</mi><mo>=</mo><msub><mi>γ</mi><mi>w</mi></msub><mfrac><mrow><mn>1</mn><mo>+</mo><mi>w</mi></mrow><mrow><mfrac><mrow><mn>1</mn></mrow><mrow><msub><mi>d</mi><mi>s</mi></msub></mrow></mfrac><mo>+</mo><mfrac><mrow><mi>w</mi></mrow><mrow><msub><mi>S</mi><mi>w</mi></msub></mrow></mfrac></mrow></mfrac><mo>,</mo><msub><mi>S</mi><mi>w</mi></msub><mo>></mo><mn>0</mn></math></div>
+<p>Sæt mætningsgraden til 1 i begge formler for vandmættet jord. For tørt sand sættes mætningsgraden til 0 i poretalsformlen. Vælg rumvægten for den umættede zone ud fra dens vandindhold eller mætningsgrad. I kapillarzonen bruges den vandmættede rumvægt, selv om zonen ligger over GVS.</p>
+</section>
+<section class="panel book">
 <h2>Læs videre i lærebogen</h2>
 <p>Geoteknik, 3. udgave</p>
-<p>Kapitel 2 · Spændinger i jord, § 2.1, s. 59–66. Kapitel 1 · Klassifikation af jord, § 1.3, s. 34.</p>
+<p>Kapitel 2 · Spændinger i jord, § 2.1, s. 59–66, og § 2.2, s. 67–72. Kapitel 1 · Klassifikation af jord, § 1.3, s. 32–34.</p>
 </section>
 <nav class="nav" aria-label="Andre øvelser"><a href="../index.html">← Alle øvelser</a><a href="rankine.html">Rankine-jordtryk →</a></nav>
 </main>

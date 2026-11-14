@@ -39,6 +39,7 @@ if(!topic){
 
   function showControls(){
     inputs.replaceChildren();
+    const refresh=[];
     [...model.controls,...(model.modeControls?.[mode]??[])].forEach(control=>{
       const {id,label,min,max,step,unit}=control;
       const row=document.createElement('div');
@@ -47,17 +48,22 @@ if(!topic){
         <input type="range" id="in-${id}" min="${min}" max="${max}" step="${step}" value="${values[id]}">`;
       const slider=row.querySelector('input'), output=row.querySelector('output');
       const update=()=>{
+        const bounds=model.bounds?.[id]?.(values);
+        slider.min=bounds?.min??min;
+        slider.max=bounds?.max??max;
+        slider.value=values[id];
         output.value=format(values[id],unit,3);
         slider.setAttribute('aria-valuetext',output.value);
       };
-      update();
+      refresh.push(update);
       slider.addEventListener('input',()=>{
         values[id]=slider.valueAsNumber;
-        update();
+        refresh.forEach(update=>update());
         render();
       });
       inputs.append(row);
     });
+    refresh.forEach(update=>update());
   }
 
   (model.modes??[]).forEach((label,index)=>{
