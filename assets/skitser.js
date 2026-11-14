@@ -213,7 +213,7 @@ const skitser = {
   },
   paele(f,v,mode,{penetration}){
     const x=f.w*.47, y=mode?91:57, bottom=f.h-21, edge=17;
-    const b=14+56*v.b, toe=y+(bottom-y)*(.2+.74*v.l/15);
+    const b=14+56*v.b, toe=y+(bottom-y)*(.2+.74*v.l/18);
     lag(f,edge,y,f.w-2*edge,bottom-y,mode?earth:clay);
     f.rect(x-b/2,y-10,b,toe-y+10,steel);
     if(mode){

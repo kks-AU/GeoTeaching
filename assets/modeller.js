@@ -254,13 +254,13 @@ baereevne:{
 paele:{
   modes:['Geostatik · ler','Rammeformel · sand'],
   controls:[
-    input('b','Pælens sidelængde',.3,.2,.5,.01,metre),
-    input('l','Pælelængde',10,3,15,.1,metre)
+    input('b','Pælens sidelængde',.3,.25,.45,.01,metre),
+    input('l','Pælelængde',10,3,18,.1,metre)
   ],
   modeControls:[
     [input('cu','Udrænet styrke cᵤ',55,15,150,1,kpa),
     input('m','Materialefaktor m',.9,.8,1,.01,''),
-    input('r','Regenerationsfaktor r',.7,.1,1,.01,'')],
+    input('r','Regenerationsfaktor r',.7,0,1.2,.01,'')],
     [input('g','Ramklodsens tyngde G',40,10,100,1,'kN'),
     input('h','Faldhøjde h',.7,.1,1.5,.05,metre),
     input('eta','Effektivitet η',.7,.7,.95,.01,''),
@@ -282,7 +282,7 @@ paele:{
         caption:'Søjlerne viser de to længder i nævneren i rammeformlen. Modulet E for beton er 20 GPa som angivet på s. 418.'};
     }
     const shaft=4*v.b*v.l*v.cu*v.m*v.r, base=9*v.cu*area;
-    soejler(f,[['Overflademodstand langs skaftet',shaft,farve.green],['Spidsmodstand',base,farve.orange]],'kN',4600);
+    soejler(f,[['Overflademodstand langs skaftet',shaft,farve.green],['Spidsmodstand',base,farve.orange]],'kN',6500);
     return {metrics:[['Statisk modstand',shaft+base,'kN'],['Overfladeareal',4*v.b*v.l,'m²'],['Spidsareal',area,'m²',3]],
       caption:'Overflade- og spidsmodstanden summeres for den aksialt trykbelastede pæl.'};
   }

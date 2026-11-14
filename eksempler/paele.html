@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Enkeltpæles bæreevne · Geoteknik</title>
 <link rel="stylesheet" href="../assets/style.css?v=4">
-<script defer src="../assets/figurer.js?v=9"></script><script defer src="../assets/modeller.js?v=9"></script><script defer src="../assets/skitser.js?v=6"></script><script defer src="../assets/side.js?v=6"></script>
+<script defer src="../assets/figurer.js?v=9"></script><script defer src="../assets/modeller.js?v=10"></script><script defer src="../assets/skitser.js?v=10"></script><script defer src="../assets/side.js?v=6"></script>
 </head>
 <body data-topic="paele">
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -73,7 +73,12 @@
 </section>
 <section class="panel"><h2>Undersøg selv</h2><p>Halvér nedsynkningen pr. slag ved samme slagenergi. Hvorfor bliver den dynamiske modstand mindre end dobbelt så stor?</p>
 <details><summary>Se forklaringen</summary><p>Kun s halveres. Leddet ½s₀ i nævneren bevares og repræsenterer pælens elastiske sammentrykning i modellen.</p></details>
-<h3>Forudsætninger</h3><p>De to faner viser forskellige jordprofiler. Geostatikken gælder her en kvadratisk, rammet betonpæl i homogent vandmættet ler med spidsfaktor 9. Rammeeksemplet gælder en lodret betonpæl med spids i friktionsjord.</p>
+<h3>Valg af faktorer for overflademodstand i ler</h3>
+<p><strong>Materialefaktor <i>m</i>.</strong> For beton angiver lærebogen normalt 0,8–1,0, afhængigt af pælens overfladestruktur. En glattere overflade ligger i den lave ende, og en ru overflade i den høje ende. Bogen angiver normalt 1,0 for træ og 0,7 for stål samt lavere værdier for asfalt- eller tjærebelagte pæle. Skyderen dækker betonintervallet.</p>
+<p><strong>Regenerationsfaktor <i>r</i>.</strong> Faktoren beskriver forholdet mellem lerets forskydningsstyrke omkring pælen på belastningstidspunktet og lerets intakte styrke. Vælg den ud fra lertype, pæletype og tiden siden ramningen. I takt med at poreovertrykket aftager efter ramning, genvinder leret en del af sin styrke. Lærebogens eksempler på værdier, som faktoren kan nå over tid, er ca. 1,2 for blødt kvikler, 1,0 for blødt normalkonsolideret ler og 0,4 for fast dansk moræneler. Pæleforsøg kan bruges til at vurdere udviklingen over tid.</p>
+<h3>Betonpælens dimensioner</h3>
+<p>Øvelsen bruger kvadratiske tværsnit fra 25 × 25 til 45 × 45 cm og pælelængder op til 18 m i ét stykke. Håndtering, transport og opbevaring begrænser længden i ét stykke. Til dybere ramning kan flere pæleelementer sammenføjes med en CPG-kobling.</p>
+<h3>Forudsætninger</h3><p>De to faner viser forskellige jordprofiler. Geostatikken gælder her en kvadratisk, rammet betonpæl i homogent vandmættet ler med spidsfaktor 9. Lærebogens geostatiske formler tager primært sigte på pæle med typiske længder op til 12–15 m. Øvelsen viser beregningen også op til den oplyste længdegrænse på 18 m. Rammeeksemplet gælder en lodret betonpæl med spids i friktionsjord.</p>
 </section>
 </div>
 <section class="motivbilleder" aria-label="Anvendelse og forsøgsudstyr">
@@ -82,7 +87,7 @@
 <section class="panel book">
 <h2>Læs videre i lærebogen</h2>
 <p>Geoteknik, 3. udgave</p>
-<p>Kapitel 16 · Enkeltpæles bæreevne, § 16.3, s. 416–419 og § 16.4, s. 422–429.</p>
+<p>Kapitel 16 · Enkeltpæles bæreevne, § 16.3, s. 416–419 og § 16.4, s. 422–429. Valg af <i>m</i> og <i>r</i> behandles på s. 424–427.</p>
 </section>
 <nav class="nav" aria-label="Andre øvelser"><a href="baereevne.html">← Fundamenters bæreevne</a><a href="styrke.html">Jords forskydningsstyrke →</a></nav>
 </main>
