@@ -274,15 +274,15 @@ paele:{
       const s0=Math.sqrt(2*energy*length/(area*E));
       const s=0.2/v.blows;
       const resistance=energy/(s+s0/2);
-      soejler(f,[['Blivende nedsynkning s',s*1000,farve.green],['Elastisk led ½s₀',s0*500,farve.blue]],'mm',30);
+      soejler(f,[['Blivende nedsynkning s',s*1000,farve.green],['Elastisk led ½s₀',s0*500,farve.blue]],'mm',30,{showScale:false});
       return {penetration:s*1000,
         table:{heads:['Måleserie','Slag','Nedsynkning (mm)','s (mm/slag)','G (kN)','h (m)','Gh (kNm/slag)','ηGh (kNm/slag)'],
           rows:[['Afsluttende serie',v.blows,200,s*1000,v.g,v.h,v.g*v.h,energy]]},
         metrics:[['Dynamisk modstand',resistance,'kN'],['Nedsynkning pr. slag',s*1000,'mm',2],['Effektiv slagenergi',energy,'kNm'],['Længde i formlen',length,'m']],
-        caption:'Søjlernes fælles, faste skala går fra 0 til 30 mm. Tallet til højre for hver søjle viser den beregnede værdi af henholdsvis blivende nedsynkning pr. slag s og det elastiske led ½s₀. De to længder lægges sammen i rammeformlens nævner.'};
+        caption:'Tallet til højre for hver søjle viser den beregnede værdi af henholdsvis blivende nedsynkning pr. slag s og det elastiske led ½s₀. De to længder lægges sammen i rammeformlens nævner.'};
     }
     const shaft=4*v.b*v.l*v.cu*v.m*v.r, base=9*v.cu*area;
-    soejler(f,[['Overflademodstand langs skaftet',shaft,farve.green],['Spidsmodstand',base,farve.orange]],'kN',6500);
+    soejler(f,[['Overflademodstand langs skaftet',shaft,farve.green],['Spidsmodstand',base,farve.orange]],'kN',6500,{showScale:false});
     return {metrics:[['Statisk modstand',shaft+base,'kN'],['Overfladeareal',4*v.b*v.l,'m²'],['Spidsareal',area,'m²',3]],
       caption:'Overflade- og spidsmodstanden summeres for den aksialt trykbelastede pæl.'};
   }

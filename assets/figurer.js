@@ -88,7 +88,7 @@ function mohr(f,{phi,c,hi,lo,points=[],xMax,yMax}) {
   }
 }
 
-function soejler(f,items,unit,max) {
+function soejler(f,items,unit,max,{showScale=true}={}) {
   const left=16, width=f.w-32;
   items.forEach(([name,val,color],i)=>{
     const y=25+i*(Math.min(88,(f.h-25)/items.length));
@@ -97,8 +97,10 @@ function soejler(f,items,unit,max) {
     f.rect(left,y+10,(width-84)*val/max,26,color);
     f.label(f.w-22,y+28,`${tal(val)} ${unit}`,'#213d37','right');
   });
-  f.label(left,f.h-12,'0');
-  f.label(f.w-100,f.h-12,`${tal(max)} ${unit}`,'#213d37','right');
+  if(showScale){
+    f.label(left,f.h-12,'0');
+    f.label(f.w-100,f.h-12,`${tal(max)} ${unit}`,'#213d37','right');
+  }
 }
 
 function jordprofil(f,g,lag,water,max) {
