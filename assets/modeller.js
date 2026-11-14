@@ -196,7 +196,7 @@ konsolidering:{
     const [primaryNow,creepNow,totalNow]=strain(v.time);
     const curves=[['Primær tøjning',farve.green,[5,4]],['Krybetøjning',farve.orange],['Samlet tøjning',farve.blue]];
 
-    const g=diagram(f,{xMax:150,yMax:10,xLabel:'Spændingstilvækst (kPa)',yLabel:'Dybde i lerlaget (m)',down:true,profile:true});
+    const g=diagram(f,{xMax:150,yMax:v.depth,xLabel:'Spændingstilvækst (kPa)',yLabel:'Dybde i lerlaget (m)',down:true,profile:true});
     jordprofil(f,g,[[0,v.depth,farve.clay]],null,v.depth);
     f.line([[5,g.y(0)],[34,g.y(0)]],farve.blue,4);
     f.line([[5,g.y(v.depth)],[34,g.y(v.depth)]],mode?farve.blue:farve.gray,4);
@@ -215,7 +215,7 @@ konsolidering:{
 baereevne:{
   modes:['Stribefundament','Punktfundament'],
   controls:[
-    input('b','Fundamentbredde b',1.5,.5,5,.1,metre),
+    input('b','Fundamentbredde b',.7,.3,2,.05,metre),
     input('eb','Excentricitet i bredderetningen · eᵦ/b',0,-29,29,1,'%'),
     input('g','Rumvægt γ',18,0,24,.5,weight),
     input('q','Overlejringstryk q',20,0,100,1,kpa),
@@ -223,9 +223,14 @@ baereevne:{
     input('phi','Friktionsvinkel φ',30,0,45,1,'°')
   ],
   modeControls:[[],[
-    input('l','Fundamentlængde l',2,.5,6,.1,metre),
+    input('l','Fundamentlængde l',1.2,.4,2,.05,metre),
     input('el','Excentricitet i længderetningen · eₗ/l',0,-29,29,1,'%')
   ]],
+  bounds:{b:(v,mode)=>mode?{min:.4,max:2}:{min:.3,max:1}},
+  updateValues(v,mode){
+    const {min,max}=this.bounds.b(v,mode);
+    v.b=Math.max(min,Math.min(max,v.b));
+  },
   draw(f,v,mode){
     const eb=v.b*v.eb/100, el=mode?v.l*v.el/100:0;
     const width=v.b-2*Math.abs(eb), length=mode?v.l-2*Math.abs(el):1;
@@ -243,7 +248,7 @@ baereevne:{
       ['Rc · Bidrag fra kohæsion',area*v.c*nc*sc,farve.orange]
     ];
     const unit=mode?'kN':'kN/m';
-    soejler(f,parts,unit,mode?520000:110000);
+    soejler(f,parts,unit,mode?65000:15000);
     const dimensions=[['Excentricitet eᵦ',eb,'m',3],['Effektivt mål i bredderetningen',width,'m',3]];
     if(mode) dimensions.push(['Excentricitet eₗ',el,'m',3],['Effektivt mål i længderetningen',length,'m',3],['Effektivt areal A′',area,'m²',3],['sγ',sg,'',3],['sq',sq,'',3],['sc',sc,'',3]);
     return {footing:{eb,el,width,length},metrics:[['Brudbæreevne R',parts.reduce((sum,p)=>sum+p[1],0),unit],
@@ -289,6 +294,7 @@ paele:{
 },
 styrke:{
   controls:[
+    {id:'plotScale',label:'Visning af spændingsdiagram',value:0,options:['Nærbillede','Hele spændingsområdet']},
     input('tau1','Skæreboks · τf ved σ′ₙ = 50 kPa',38,5,110,1,kpa),
     input('tau2','Skæreboks · τf ved σ′ₙ = 150 kPa',96,5,230,1,kpa),
     input('s3','Triaksial · celletryk σ′₃',70,20,130,1,kpa),
@@ -302,14 +308,15 @@ styrke:{
     const phi=Math.atan(slope), sin=Math.sin(phi);
     const fail=2*(v.s3*sin+c*Math.cos(phi))/(1-sin);
     const hi=v.s3+fail*v.load/100;
-    mohr(f,{phi,c,hi,lo:v.s3,points:[[50,v.tau1],[150,v.tau2]],xMax:1500,yMax:750});
+    mohr(f,{phi,c,hi,lo:v.s3,points:[[50,v.tau1],[150,v.tau2]],xMax:v.plotScale?1500:360,yMax:v.plotScale?750:180,clip:true});
     return {metrics:[['Effektiv kohæsion c′',c,kpa],['Friktionsvinkel φ′',phi*180/Math.PI,'°'],['Deviator ved brud',fail,kpa],['Aktuel σ′₁',hi,kpa]],
       legend:[['Skæreboksens brudpunkter',farve.blue],['Triaksialprøvens Mohr-cirkel',farve.green],['Fælles brudlinje',farve.orange]],
-      caption:'De blå punkter viser τf ved henholdsvis σ′ₙ = 50 og 150 kPa på den vandrette akse. De fastlægger brudlinjen. Sæt deviatorandelen til 100 % for at se triaksialcirklen tangere linjen.'};
+      caption:'De blå punkter viser τf ved henholdsvis σ′ₙ = 50 og 150 kPa på den vandrette akse. De fastlægger brudlinjen. Vælg hele spændingsområdet, hvis cirklen fortsætter uden for udsnittet. Sæt deviatorandelen til 100 % for at se triaksialcirklen tangere linjen.'};
   }
 },
 saetninger:{
   controls:[
+    {id:'plotScale',label:'Spændingsakse',value:0,options:['0–200 kPa','0–8.000 kPa']},
     input('p','Sætningsgivende last P',600,50,2000,10,'kN'),
     input('b','Bredde B',2,.5,6,.1,metre),
     input('l','Længde L',3,.5,10,.1,metre),
@@ -321,7 +328,7 @@ saetninger:{
   ],
   draw(f,v){
     const pressure=z=>v.p/((v.b+z)*(v.l+z)), Z=v.z1+v.z2;
-    const g=diagram(f,{xMax:8000,yMax:Z,xLabel:'Spændingstilvækst Δσz (kPa)',yLabel:'Dybde under fundamentet (m)',down:true,profile:true});
+    const g=diagram(f,{xMax:v.plotScale?8000:200,yMax:Z,clip:true,xLabel:'Spændingstilvækst Δσz (kPa)',yLabel:'Dybde under fundamentet (m)',down:true,profile:true});
     jordprofil(f,g,[[0,v.z1,farve.soil],[v.z1,Z,farve.clay]],null,Z);
     g.plot(punkter(80,t=>[pressure(t*Z),t*Z]),farve.green);
     const rows=[];
@@ -336,7 +343,7 @@ saetninger:{
     const lower=rows.slice(v.n).reduce((s,r)=>s+r[3],0);
     return {metrics:[['Samlet sætning',upper+lower,'mm'],['Øvre jordlag',upper,'mm'],['Nedre jordlag',lower,'mm']],
       legend:[['Trykspredning',farve.green],['Øvre dellag',farve.blue],['Nedre dellag',farve.orange]],
-      caption:'Punkterne markerer de dybder, hvor spændingstilvæksten bruges til at beregne hvert sætningsbidrag.',
+      caption:'Punkterne markerer de dybder, hvor spændingstilvæksten bruges til at beregne hvert sætningsbidrag. Vælg den brede spændingsakse, hvis kurven fortsætter uden for udsnittet.',
       table:{heads:['Materiale','Lagmidte (m)','Δσ′ (kPa)','Bidrag (mm)'],rows}};
   }
 }

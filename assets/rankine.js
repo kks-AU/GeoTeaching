@@ -53,6 +53,8 @@ function currentState(delta,z,phi,gamma,q,zWater,saturated){
   const theta=mode==='active'?45+phi/2:mode==='passive'?45-phi/2:null;
   return {delta,z,phi,gamma,q,zWater,saturated,reduced,weightStress,K,k,vertical,horizontal,u,total:horizontal+u,mode,theta};
 }
+byId('wideScale').addEventListener('change',draw);
+
 function draw(){
   const gammaInput=byId('gamma'), saturatedInput=byId('saturated');
   gammaInput.max=Math.min(25,+saturatedInput.value-.5);
@@ -174,7 +176,8 @@ function drawSoil({delta,z,phi,horizontal,vertical,q,zWater,theta}){
 function drawCircle({phi,K,vertical,horizontal,theta,mode}){
   const l=46,r=335,t=16,b=206,mid=(t+b)/2;
   const ratio=Math.tan(rad(phi));
-  const scale=Math.min((r-l-12)/650,(b-t-17)/550);
+  const wide=byId('wideScale').checked;
+  const scale=wide?Math.min((r-l-12)/650,(b-t-17)/550):Math.min((r-l-12)/140,(b-t-17)/120);
   const X=s=>l+s*scale,Y=s=>mid-s*scale;
   const xEnd=Math.min((r-l)/scale,(mid-t)/scale/ratio);
   const circle=(h,stroke,width,opacity)=>{
@@ -192,14 +195,14 @@ function drawCircle({phi,K,vertical,horizontal,theta,mode}){
   }
   const n=niceStep((r-l)/scale/4), ticks=[];
   for(let s=n;X(s)<r-13;s+=n)ticks.push(s);
-  byId('circle').innerHTML=ticks.map(s=>line(X(s),t,X(s),b,'grid')+
+  byId('circle').innerHTML=`<defs><clipPath id="circleBounds"><rect x="${l-3}" y="${t}" width="${r-l+6}" height="${b-t}"/></clipPath></defs>`+ticks.map(s=>line(X(s),t,X(s),b,'grid')+
     label(X(s),b+15,fmt(s,Number.isInteger(n)?0:1),'small muted','middle')).join('')+
     line(l,t,l,b,'axis')+line(l,mid,r,mid,'axis')+
     label(27,22,'τ','small')+label(r,mid-7,'σ′ₙ','small','end')+
-    label(l,b+15,'0','small muted','middle')+env+muted+circle(horizontal,'#006d62',2.5,1)+tangent+
+    label(l,b+15,'0','small muted','middle')+'<g clip-path="url(#circleBounds)">'+env+muted+circle(horizontal,'#006d62',2.5,1)+tangent+
     point(X(vertical),mid,'#315781')+point(X(horizontal),mid,'#006d62')+
     label(X(vertical),mid-8,'σ′ᵥ','small on-plot','middle')+
-    label(X(horizontal),mid+18,'P = σ′ₕ','small on-plot','middle')+
+    label(X(horizontal),mid+18,'P = σ′ₕ','small on-plot','middle')+ '</g>'+
     label(18,241,'Stiplede linjer · τ = ±σ′ₙ tan φ′ · kPa','small muted');
 }
 function niceStep(raw){
@@ -208,7 +211,8 @@ function niceStep(raw){
 }
 function drawPressure({delta,K,vertical,horizontal,u,total,z}){
   const l=49,r=333,t=25,b=167;
-  const step=150, ceiling=750;
+  const wide=byId('wideScale').checked;
+  const step=wide?150:25, ceiling=wide?750:125;
   const X=d=>l+(d-travelMin)*(r-l)/(travelMax-travelMin), Y=p=>b-(b-t)*p/ceiling;
   const pts=limits.map(item=>({...item,p:K[item.key]*vertical}));
   let grid='';
@@ -226,11 +230,11 @@ function drawPressure({delta,K,vertical,horizontal,u,total,z}){
   const pressure=byId('pressure');
   pressure.setAttribute('aria-label',`Ved ${fmt(z)} meter er effektivt jordtryk ${fmt(horizontal)}, vandtryk ${fmt(u)} og totaltryk ${fmt(total)} kilopascal. `+
     pts.map(item=>item.name+' '+fmt(item.p)).join(', ')+'.');
-  pressure.innerHTML=grid+line(l,t,l,b,'axis')+line(l,b,r,b,'axis')+xAxis+
+  pressure.innerHTML=`<defs><clipPath id="pressureBounds"><rect x="${l-5}" y="${t}" width="${r-l+10}" height="${b-t+5}"/></clipPath></defs>`+grid+line(l,t,l,b,'axis')+line(l,b,r,b,'axis')+xAxis+
     label(l,16,'Vandret tryk [kPa]','small muted')+label(r,b+34,'Vægflytning [mm]','small muted','end')+
-    line(X(delta),Y(total),X(delta),b,'axis dash')+
+    '<g clip-path="url(#pressureBounds)">'+line(X(delta),Y(total),X(delta),b,'axis dash')+
     line(l,Y(u),r,Y(u),'water-curve')+curve(0,'teal')+curve(u,'total-curve')+
-    refs+active+totalPoint+
+    refs+active+totalPoint+'</g>'+
     pts.map((item,i)=>point(19+113*i,217,item.color,4)+
       label(27+113*i,221,`${item.name} ${fmt(item.p)}`,'small')).join('')+
     key.map(([x,cls,name])=>line(x,241,x+17,241,cls)+label(x+21,245,name,'small')).join('');

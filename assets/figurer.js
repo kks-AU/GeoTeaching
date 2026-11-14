@@ -59,7 +59,7 @@ function figur(canvas) {
   return {w,h,line,label,rect,dot,polygon,clipRect};
 }
 
-function diagram(f,{xMin=0,xMax,yMax,xLabel,yLabel,down=false,profile=false,equal=false,scaleX=v=>v,ticks=null}) {
+function diagram(f,{xMin=0,xMax,yMax,xLabel,yLabel,down=false,profile=false,equal=false,scaleX=v=>v,ticks=null,clip=false}) {
   const left=profile?86:56, top=30, bottom=f.h-44;
   const width=f.w-left-15, height=bottom-top;
   const start=scaleX(xMin), span=scaleX(xMax)-start;
@@ -80,13 +80,17 @@ function diagram(f,{xMin=0,xMax,yMax,xLabel,yLabel,down=false,profile=false,equa
   f.line([[left,y(yMax)],[left,y(0)],[x(xMax),y(0)]],'#61736e',1);
   f.label(left,17,yLabel);
   f.label(f.w-14,f.h-5,xLabel,'#213d37','right');
-  return {x,y,plot:(points,color,dash)=>f.line(points.map(([a,b])=>[x(a),y(b)]),color,2.6,dash),
-    dot:(a,b,color)=>f.dot(x(a),y(b),color)};
+  const drawData=draw=>{
+    if(clip) f.clipRect(left,Math.min(y(0),y(yMax)),x(xMax)-left,Math.abs(y(yMax)-y(0))+4,draw);
+    else draw();
+  };
+  return {x,y,plot:(points,color,dash)=>drawData(()=>f.line(points.map(([a,b])=>[x(a),y(b)]),color,2.6,dash)),
+    dot:(a,b,color)=>drawData(()=>f.dot(x(a),y(b),color))};
 }
 
-function mohr(f,{phi,c,hi,lo,points=[],xMax,yMax}) {
+function mohr(f,{phi,c,hi,lo,points=[],xMax,yMax,clip=false}) {
   const m=(hi+lo)/2, r=(hi-lo)/2;
-  const g=diagram(f,{xMax,yMax,
+  const g=diagram(f,{xMax,yMax,clip,
     xLabel:'Effektiv normalspænding σ′ (kPa)',yLabel:'Forskydningsspænding τ (kPa)',equal:true});
   const end=Math.min(xMax,phi?(yMax-c)/Math.tan(phi):xMax);
   g.plot([[0,c],[end,c+end*Math.tan(phi)]],farve.orange);

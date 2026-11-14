@@ -156,7 +156,7 @@ const skitser = {
     const [joinX,joinY]=spiral.at(-1);
     const surface=joinX+joinY/Math.tan(passive);
     // Use a fixed close-up and clip the outer failure zones to the soil panel.
-    const scale=Math.min(110,(f.w-2*edge-58)/5);
+    const scale=Math.min(mode?230:380,(f.w-2*edge-58)/(mode?2:1));
     const x=f.w/2;
     const screen=(horizontal,vertical)=>[x+horizontal*scale,top+vertical*scale];
     const loadX=x+eb*scale, left=x-v.b*scale/2, right=x+v.b*scale/2;
@@ -196,13 +196,13 @@ const skitser = {
         f.label((start+end)/2,top-arrowHeight-6,'q',farve.blue,'center');
       }
     }
-    vandretMaal(f,edge,edge+2*scale,bottom-24,'2 m');
+    vandretMaal(f,edge,edge+.25*scale,bottom-24,'0,25 m');
     f.label(f.w/2,bottom-9,`Effektiv bredde i snittet: ${tal(width,2)} m`,steel,'center');
     if(mode){
-      const scale=98/6;
+      const scale=49;
       const x=f.w/2, planW=v.b*scale, planL=v.l*scale, y=296;
       f.label(18,246,'Set ovenfra');
-      vandretMaal(f,18,18+2*scale,270,'2 m');
+      vandretMaal(f,18,18+.5*scale,270,'0,5 m');
       f.rect(x-planW/2,y-planL/2,planW,planL,'#dce4df');
       const centerX=x+eb*scale, centerY=y+el*scale;
       f.rect(centerX-width*scale/2,centerY-length*scale/2,width*scale,length*scale,'#87b5a3');
@@ -211,7 +211,7 @@ const skitser = {
       f.label(x+planW/2+8,y+4,`l = ${tal(v.l)} m`);
       vandretMaal(f,x-planW/2,x+planW/2,y+planL/2+17,`b = ${tal(v.b)} m`);
     }else{
-      const detailScale=Math.min(64,(f.w-52)/5);
+      const detailScale=Math.min(320,f.w-52);
       const half=v.b*detailScale/2, effectiveHalf=width*detailScale/2;
       const center=x+eb*detailScale, level=310;
       f.label(edge,246,'Forstørret snit ved fundamentsunderkanten');

@@ -43,20 +43,21 @@ if(!topic){
     const refresh=[];
     [...model.controls,...(model.modeControls?.[mode]??[])].forEach(control=>{
       const {id,label,min,max,step,unit,options}=control;
+      const row=document.createElement('div');
+      row.className='control';
       if(options){
         row.innerHTML=`<label for="in-${id}">${label}</label><select id="in-${id}">${options.map((option,i)=>`<option value="${i}">${option}</option>`).join('')}</select>`;
         const select=row.querySelector('select');
         select.value=values[id];
         select.addEventListener('change',()=>{
           values[id]=Number(select.value);
+          model.updateValues?.(values,mode);
           refresh.forEach(update=>update());
           render();
         });
         inputs.append(row);
         return;
       }
-      const row=document.createElement('div');
-      row.className='control';
       row.innerHTML=`<label for="in-${id}">${label}<output class="value" for="in-${id}"></output></label>
         <input type="range" id="in-${id}" min="${min}" max="${max}" step="${step}" value="${values[id]}">`;
       const slider=row.querySelector('input'), output=row.querySelector('output');
@@ -99,6 +100,7 @@ if(!topic){
 
   find('nulstil').addEventListener('click',()=>{
     Object.assign(values,defaults);
+    model.updateValues?.(values,mode);
     showControls();
     render();
   });
