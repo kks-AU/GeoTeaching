@@ -5,9 +5,9 @@ const clay = '#d8b699';
 const water = '#1c6a9a';
 const load = '#a34828';
 
-function pil(f,x,y,toX,toY,color=load) {
-  const angle=Math.atan2(toY-y,toX-x), tip=7;
-  f.line([[x,y],[toX,toY]],color,2);
+function pil(f,x,y,toX,toY,color=load,width=2,tip=7) {
+  const angle=Math.atan2(toY-y,toX-x);
+  f.line([[x,y],[toX,toY]],color,width);
   f.polygon([[toX,toY],
     [toX-tip*Math.cos(angle-.45),toY-tip*Math.sin(angle-.45)],
     [toX-tip*Math.cos(angle+.45),toY-tip*Math.sin(angle+.45)]],color);
@@ -91,8 +91,8 @@ const skitser = {
     const bottom=f.h-26, top=62, width=Math.min(118,f.w*.28);
     const H=(bottom-top)*v.depth/10;
     const baseline=bottom-H;
-    const heights=[result.metrics[1][1],result.metrics[2][1]].map(mm=>H*mm/(v.depth*1000));
-    const samples=[['Stamkurve',.27,farve.green],['Konstant K',.72,load]];
+    const heights=result.comparison.map(mm=>H*mm/(v.depth*1000));
+    const samples=[['Normalkonsolideret',.27,farve.gray],[v.ocr===1?'Valgt · OCR = 1':'Valgt · OCR > 1',.72,load]];
     samples.forEach(([name,pos,color],i)=>{
       const x=f.w*pos-width/2, head=baseline+heights[i];
       lag(f,x,head,width,bottom-head,clay);
@@ -104,7 +104,7 @@ const skitser = {
     });
     f.label(f.w/2,19,`Lasttrin Δσ′ = ${tal(v.inc)} kPa`,load,'center');
     lodretMaal(f,12,baseline,bottom,'Z');
-    return `Stive sider holder bredden fast. Den stiplede linje viser prøvens overkant før lasttrinnet. For laget på ${tal(v.depth)} m bliver sætningen δ henholdsvis ${tal(result.metrics[1][1])} mm langs stamkurven og ${tal(result.metrics[2][1])} mm med konstant K.`;
+    return `Stive sider holder bredden fast. Den stiplede linje viser prøvens overkant før lasttrinnet. For laget på ${tal(v.depth)} m giver den normalkonsoliderede reference δ = ${tal(result.comparison[0])} mm. Den valgte spændingshistorie giver δ = ${tal(result.comparison[1])} mm.`;
   },
   konsolidering(f,v,mode,result){
     const x=19, right=f.w-83, top=63, bottom=f.h-40;
@@ -125,14 +125,16 @@ const skitser = {
     const H=v.depth/(mode+1);
     lodretMaal(f,right+9,top,end,'Z');
     lodretMaal(f,right+37,top,top+layerHeight/(mode+1),'H',water);
-    if(v.time>0 && result.metrics[1][1]<99.95){
-      for(const fraction of [.2,.4,.6]){
-        const px=x+(right-x)*fraction;
-        pil(f,px,top+25,px,top-10,water);
-        if(mode) pil(f,px,end-25,px,end+12,water);
+    for(const fraction of [.2,.43,.66]){
+      const px=x+(right-x)*fraction;
+      pil(f,px,top+25,px,top-15,'#fffefa',8,16);
+      pil(f,px,top+25,px,top-15,'#084a78',4,12);
+      if(mode){
+        pil(f,px,end-25,px,end+16,'#fffefa',8,16);
+        pil(f,px,end-25,px,end+16,'#084a78',4,12);
       }
     }
-    return `Mørkere blåt betyder større poreovertryk Δu i forhold til lasttrinnet p. Blå pile viser drænretningen. Den længste drænvej H er ${tal(H)} m ved ${mode?'dobbeltsidig':'ensidig'} dræning.`;
+    return `Mørkere blåt betyder større poreovertryk Δu i forhold til lasttrinnet p. Pilene markerer drænretningen og vises i hele tidsforløbet. Den længste drænvej H er ${tal(H)} m ved ${mode?'dobbeltsidig':'ensidig'} dræning.`;
   },
   baereevne(f,v){
     const x=f.w/2, b=(f.w-54)*(.16+.46*v.b/5), top=91, bottom=f.h-28, edge=16;

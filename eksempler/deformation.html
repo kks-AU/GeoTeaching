@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Endimensional deformation · Geoteknik</title>
-<link rel="stylesheet" href="../assets/style.css?v=2">
-<script defer src="../assets/figurer.js?v=2"></script><script defer src="../assets/modeller.js?v=2"></script><script defer src="../assets/skitser.js?v=2"></script><script defer src="../assets/side.js?v=2"></script>
+<link rel="stylesheet" href="../assets/style.css?v=4">
+<script defer src="../assets/figurer.js?v=4"></script><script defer src="../assets/modeller.js?v=4"></script><script defer src="../assets/skitser.js?v=4"></script><script defer src="../assets/side.js?v=4"></script>
 </head>
 <body data-topic="deformation">
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -16,8 +16,9 @@
 <a href="../index.html">← Alle øvelser</a>
 <p class="tag">Tøjning og sætning</p>
 <h1>Endimensional deformation</h1>
-<p>Belast et lerlag, som er fastholdt sideværts. Sammenlign den logaritmiske stamkurve for normalkonsolideret ler med en lineær tilnærmelse med konstant konsolideringsmodul.</p>
+<p>Belast et lerlag, som er fastholdt sideværts. Skift mellem lineær og logaritmisk spændingsakse. Øg forbelastningen og følg overgangen fra genbelastning til stamkurven.</p>
 </section>
+<p><a class="button" href="konsolideringsforsog.html">Simulér et konsolideringsforsøg og bestem parametrene →</a></p>
 <div class="workspace">
 <section class="panel" aria-labelledby="params">
 <h2 id="params">Indstillinger</h2>
@@ -43,6 +44,8 @@
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>K</mi></math></dt><dd>konsolideringsmodul (omregnes fra MPa til kPa i formlen)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>Z</mi></math></dt><dd>oprindelig lagtykkelse (m)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>δ</mi></math></dt><dd>sætning (m i formlen, vist i mm)</dd></div>
+        <div><dt><math><msubsup><mi>σ</mi><mtext>pc</mtext><mo>′</mo></msubsup></math></dt><dd>forbelastningsspænding (kPa)</dd></div>
+        <div><dt>OCR</dt><dd>forbelastningsspænding divideret med effektiv startspænding. OCR = 1 svarer til normalkonsolideret ler.</dd></div>
       </dl>
     </details>
   </figcaption>
@@ -58,14 +61,17 @@
 <section class="panel"><h2>Ligninger</h2>
 <div class="equation"><p>Effektiv spænding efter lasttrinnet</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>e</mi></msub><mo>=</mo><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>f</mi></msub><mo>+</mo><mi>Δ</mi><msup><mi>σ</mi><mo>′</mo></msup></math></div>
 <div class="equation"><p>Tøjning langs stamkurven</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>ε</mi><mi>z</mi></msub><mo>=</mo><mi>Q</mi><msub><mi mathvariant="normal">log</mi><mrow><mn>10</mn></mrow></msub><mo>(</mo><mfrac><mrow><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>e</mi></msub></mrow><mrow><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>f</mi></msub></mrow></mfrac><mo>)</mo></math></div>
-<div class="equation"><p>Tøjning ved konstant modul</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>ε</mi><mi>z</mi></msub><mo>=</mo><mfrac><mrow><mi>Δ</mi><msup><mi>σ</mi><mo>′</mo></msup></mrow><mrow><mi>K</mi></mrow></mfrac></math></div>
+<div class="equation"><p>Forbelastningsspænding</p><math display="block"><msubsup><mi>σ</mi><mtext>pc</mtext><mo>′</mo></msubsup><mo>=</mo><mi mathvariant="normal">OCR</mi><msubsup><mi>σ</mi><mi>f</mi><mo>′</mo></msubsup></math></div><div class="equation"><p>Genbelastning, når slutspændingen højst er forbelastningsspændingen</p><math display="block"><msub><mi>ε</mi><mi>z</mi></msub><mo>=</mo><mfrac><mrow><msubsup><mi>σ</mi><mi>e</mi><mo>′</mo></msubsup><mo>−</mo><msubsup><mi>σ</mi><mi>f</mi><mo>′</mo></msubsup></mrow><mrow><mi>K</mi></mrow></mfrac></math></div><div class="equation"><p>Når slutspændingen passerer forbelastningsspændingen</p><math display="block"><msub><mi>ε</mi><mi>z</mi></msub><mo>=</mo><mfrac><mrow><msubsup><mi>σ</mi><mtext>pc</mtext><mo>′</mo></msubsup><mo>−</mo><msubsup><mi>σ</mi><mi>f</mi><mo>′</mo></msubsup></mrow><mrow><mi>K</mi></mrow></mfrac><mo>+</mo><mi>Q</mi><msub><mi mathvariant="normal">log</mi><mn>10</mn></msub><mo>(</mo><mfrac><mrow><msubsup><mi>σ</mi><mi>e</mi><mo>′</mo></msubsup></mrow><mrow><msubsup><mi>σ</mi><mtext>pc</mtext><mo>′</mo></msubsup></mrow></mfrac><mo>)</mo></math></div>
 <div class="equation"><p>Lerlagets sætning</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>δ</mi><mo>=</mo><mi>Z</mi><msub><mi>ε</mi><mi>z</mi></msub></math></div>
 </section>
-<section class="panel"><h2>Undersøg selv</h2><p>Fordobl startspændingen og behold spændingstilvæksten. Hvilken af de to modeller giver nu mindre tøjning end før?</p>
-<details><summary>Se forklaringen</summary><p>Stamkurven giver mindre tøjning, fordi forholdet σ′e/σ′f falder. Ved fastholdt K er tøjningen fortsat Δσ′/K.</p></details>
-<h3>Forudsætninger</h3><p>Ensartede spændinger og materialeparametre over den valgte lagtykkelse. K-modellen repræsenterer en lineær tilnærmelse over det valgte spændingsinterval.</p>
+<section class="panel"><h2>Undersøg selv</h2><p>Vælg OCR &gt; 1 og flyt slutspændingen fra under til over forbelastningsspændingen. Skift så mellem lineær og logaritmisk akse. Hvilken gren bliver ret på log₁₀-aksen?</p>
+<details><summary>Se forklaringen</summary><p>Stamkurven er ret på log₁₀-aksen. Genbelastningsgrenen med konstant K er ret på den lineære akse. Ved OCR = 1 følger leret stamkurven fra starten.</p></details>
+<h3>Forudsætninger</h3><p>Ensartede spændinger og materialeparametre over den valgte lagtykkelse. Genbelastning tilnærmes med konstant K frem til forbelastningsspændingen. Modellen bruger et skarpt knæk ved overgangen til stamkurven. I en målt arbejdskurve er overgangen jævn.</p>
 </section>
 </div>
+<section class="motivbilleder" aria-label="Anvendelse og forsøgsudstyr">
+<figure><img loading="lazy" width="506" height="336" src="../assets/fotos/oedometer.jpg" alt="Ødometer med belastningsramme og måleur"><figcaption>En ødometerprøve belastes lodret i en stiv ring. <span>Genereret motivbillede.</span></figcaption></figure>
+</section>
 <section class="panel book">
 <h2>Læs videre i lærebogen</h2>
 <p>Geoteknik, 3. udgave</p>

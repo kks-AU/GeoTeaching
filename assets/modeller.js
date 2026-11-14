@@ -1,5 +1,21 @@
 const input = (id,label,value,min,max,step,unit) => ({id,label,value,min,max,step,unit});
 const kpa='kPa', metre='m', weight='kN/m³';
+function lerToejning(stress,start,pc,K,Q){
+  const reload=(Math.min(stress,pc)-start)/K;
+  return reload+Q*Math.log10(Math.max(stress,pc)/pc);
+}
+
+function logSpændingTicks(min,max){
+  const ticks=[];
+  for(let decade=Math.floor(Math.log10(min));decade<=Math.ceil(Math.log10(max));decade++){
+    for(const m of [1,2,5]){
+      const value=m*10**decade;
+      if(value>=min && value<=max) ticks.push(value);
+    }
+  }
+  return ticks;
+}
+
 const models = {
 spaendinger:{
   controls:[
@@ -90,24 +106,43 @@ rankine:{
   }
 },
 deformation:{
+  modes:['Lineær spændingsakse','Log₁₀-spændingsakse'],
   controls:[
     input('start','Effektiv startspænding σ′f',50,10,200,5,kpa),
-    input('inc','Spændingstilvækst Δσ′',60,0,200,5,kpa),
+    input('inc','Spændingstilvækst Δσ′',100,0,600,5,kpa),
+    input('ocr','Overkonsolideringsgrad · OCR',2,1,10,.1,''),
     input('depth','Lagtykkelse Z',3,.5,10,.1,metre),
     input('q','Tøjningsindeks Q',18,2,35,.5,'%'),
-    input('mod','Konsolideringsmodul K',3,1,30,.1,'MPa')
+    input('mod','Genbelastningsmodul K',12,5,100,.5,'MPa')
   ],
-  draw(f,v){
-    const xMax=Math.max(100,v.start+v.inc+25);
-    const nc=s=>v.q*Math.log10(s/v.start), lin=s=>100*(s-v.start)/(v.mod*1000);
-    const g=diagram(f,{xMax,yMax:Math.max(5,nc(xMax),lin(xMax))*1.08,xLabel:'Effektiv spænding σ′ (kPa)',yLabel:'Tøjning (%)',down:true});
-    [[nc,farve.green],[lin,farve.orange]].forEach(([fn,color])=>{
-      g.plot(punkter(70,t=>{const s=v.start+t*(xMax-v.start);return [s,fn(s)];}),color);
-      const end=v.start+v.inc;
-      g.dot(end,fn(end),color);
-    });
-    return {metrics:[['Slutspænding',v.start+v.inc,kpa],['Sætning · stamkurve',v.depth*10*nc(v.start+v.inc),'mm'],['Sætning · konstant K',v.depth*10*lin(v.start+v.inc),'mm']],
-      legend:[['Stamkurve',farve.green],['Konstant K',farve.orange]],caption:'Tøjningen måles fra startspændingen. Punkterne viser tøjningen efter lasttrinnet.'};
+  draw(f,v,mode){
+    const end=v.start+v.inc, pc=v.start*v.ocr, K=v.mod*1000, Q=v.q/100;
+    const strain=(stress,threshold)=>100*lerToejning(stress,v.start,threshold,K,Q);
+    const xMax=Math.ceil(Math.max(end*1.22,pc*1.13,v.start*1.7)/10)*10;
+    const g=diagram(f,{xMin:mode?v.start:0,xMax,yMax:Math.max(.5,strain(xMax,v.start),strain(xMax,pc))*1.1,
+      scaleX:mode?Math.log10:undefined,ticks:mode?logSpændingTicks(v.start,xMax):null,
+      xLabel:mode?'Effektiv spænding σ′ (kPa) · log₁₀':'Effektiv spænding σ′ (kPa) · lineær',
+      yLabel:'Lodret tøjning εz (%)',down:true});
+    const segment=(a,b,threshold,color,dash)=>g.plot(punkter(90,t=>{
+      const stress=a+t*(b-a);
+      return [stress,strain(stress,threshold)];
+    }),color,dash);
+    if(v.ocr>1){
+      segment(v.start,xMax,v.start,farve.gray,[5,4]);
+      segment(v.start,pc,pc,farve.orange);
+      g.plot([[pc,0],[pc,strain(pc,pc)]],farve.gray,[3,3]);
+      g.dot(pc,strain(pc,pc),farve.orange);
+    }
+    segment(pc,xMax,pc,farve.green);
+    const actual=strain(end,pc), normally=strain(end,v.start);
+    g.dot(end,normally,farve.gray);
+    g.dot(end,actual,end<pc?farve.orange:farve.green);
+    const branch=end<pc?'Genbelastning':end===pc && v.ocr>1?'Ved forbelastningsspændingen':v.ocr>1?'Forbi forbelastningen':'Stamkurve';
+    return {metrics:[['Slutspænding σ′e',end,kpa],['Forbelastningsspænding σ′pc',pc,kpa],
+      ['Tøjning',actual,'%'],['Sætning',v.depth*10*actual,'mm'],['Gren ved slutspænding',branch]],
+      comparison:[v.depth*10*normally,v.depth*10*actual],
+      legend:v.ocr>1?[['Genbelastning',farve.orange],['Stamkurve efter genbelastning',farve.green],['Normalkonsolideret reference',farve.gray]]:[['Stamkurve · normalkonsolideret',farve.green]],
+      caption:'Punkterne viser sluttilstanden. Aksevalget ændrer afbildningen, mens tøjning og sætning bevares.'};
   }
 },
 konsolidering:{

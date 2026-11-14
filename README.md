@@ -2,7 +2,7 @@
 Interactive teaching examples
 
 
-Åbn `index.html` i en browser. Forsiden og de otte øvelser er statiske og bruger relative stier.
+Åbn `index.html` i en browser. Forsiden og de ni øvelser er statiske og bruger relative stier.
 
 ## Udgivelse med GitHub Pages
 

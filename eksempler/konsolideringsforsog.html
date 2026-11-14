@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1D-konsolideringsforsøg · Geoteknik</title>
+<link rel="stylesheet" href="../assets/style.css?v=4">
+<script defer src="../assets/figurer.js?v=4"></script>
+<script defer src="../assets/modeller.js?v=4"></script>
+<script defer src="../assets/skitser.js?v=4"></script>
+<script defer src="../assets/oedometer.js?v=4"></script>
+</head>
+<body data-topic="konsolideringsforsog">
+<a class="skip" href="#indhold">Gå til indhold</a>
+<header><div class="wrap"><a class="brand" href="../index.html">Geoteknik</a><small>Interaktive undervisningseksempler</small></div></header>
+
+<main id="indhold">
+<section class="exercise-head">
+<a href="../index.html">← Alle øvelser</a>
+<h1>1D-konsolideringsforsøg</h1>
+<p>Belast en lerprøve trinvis i et ødometer. Prøven holdes fast sideværts af ringen, og vandet drænes gennem filtersten i top og bund. Brug arbejdskurven og et lasttrins tidskurve til at bestemme jordens parametre.</p>
+</section>
+<section class="panel lab-controls" aria-label="Forsøgsindstillinger">
+<label for="proeve">Prøve <select id="proeve"><option value="forud">Forkonsolideret · σ′pc = 100 kPa</option><option value="normal">Normalkonsolideret · σ′pc = 25 kPa</option></select></label>
+<label for="tykkelse">Oprindelig prøvehøjde <output for="tykkelse" id="tykkelsevaerdi"></output><input type="range" id="tykkelse" min="10" max="50" value="20"></label>
+<label for="trin">Lasttrin <select id="trin"><option value="0">25 → 50 kPa</option><option value="1">50 → 100 kPa</option><option value="2" selected>100 → 200 kPa</option><option value="3">200 → 400 kPa</option><option value="4">400 → 800 kPa</option></select></label>
+<label for="aflaesning">Din aflæsning af t₅₀ <output for="aflaesning" id="aflaesningvaerdi"></output><input type="range" id="aflaesning" min="0" max="100" step=".1" value="38"></label>
+<label for="krybevalg">Afstand mellem krybepunkterne <select id="krybevalg"><option value="2">Sen tid er 2 gange tidlig tid</option><option value="5">Sen tid er 5 gange tidlig tid</option><option value="10" selected>Sen tid er 10 gange tidlig tid</option></select></label>
+</section>
+<div class="lab-plots">
+<section class="panel"><h2>Tidskurve for lasttrinnet</h2>
+<canvas id="tidskurve" role="img" aria-label="Logaritmisk tidskurve med linjer ved 50 og 100 procent primær konsolidering" aria-describedby="aflaesningstatus aflaesninger"></canvas>
+<p id="aflaesningstatus"></p><p class="hint" id="aflaesninger"></p>
+</section>
+<section class="panel"><h2>Arbejdskurve</h2>
+<canvas id="arbejdskurve" role="img" aria-label="Primær lodret tøjning mod effektiv spænding på en logaritmisk akse" aria-describedby="trininfo"></canvas>
+<p id="trininfo"></p>
+</section>
+</div>
+<div class="notes">
+<section class="panel"><h2>Parametre fra kurverne</h2>
+<dl class="lab-results" id="afledte"></dl>
+</section>
+<section class="panel"><h2>Prøven i ødometeret</h2><figure class="skitse">
+<canvas id="apparat" role="img" aria-label="Lerprøve i en stiv ring mellem to drænende filtersten" aria-describedby="apparattekst"></canvas>
+<figcaption id="apparattekst" class="hint">Z er prøvens oprindelige højde. De blå filtersten markerer dobbeltsidig dræning. Prøvens sammentrykning er vist forstørret.</figcaption>
+</figure></section>
+</div>
+<div class="notes">
+<section class="panel"><h2>Ligninger til tolkning</h2>
+<div class="equation"><p>K · modul for det valgte lasttrin</p><math display="block"><mi>K</mi><mo>=</mo><mfrac><mrow><mi>Δ</mi><msup><mi>σ</mi><mo>′</mo></msup></mrow><mrow><msub><mi>ε</mi><mn>100</mn></msub><mo>−</mo><msub><mi>ε</mi><mn>0</mn></msub></mrow></mfrac></math></div><div class="equation"><p>Q · stamkurvens tøjning pr. spændingsdekade</p><math display="block"><mi>Q</mi><mo>=</mo><mfrac><mrow><msub><mi>ε</mi><mn>100</mn></msub><mo>−</mo><msub><mi>ε</mi><mn>0</mn></msub></mrow><mrow><msub><mi mathvariant="normal">log</mi><mn>10</mn></msub><mo>(</mo><mfrac><mrow><msubsup><mi>σ</mi><mi>e</mi><mo>′</mo></msubsup></mrow><mrow><msubsup><mi>σ</mi><mi>f</mi><mo>′</mo></msubsup></mrow></mfrac><mo>)</mo></mrow></mfrac></math></div><div class="equation"><p>cᵥ · aflæs ved 50 % primær konsolidering</p><math display="block"><msub><mi>c</mi><mi>v</mi></msub><mo>=</mo><mfrac><mrow><msub><mi>T</mi><mn>50</mn></msub><msup><mi>H</mi><mn>2</mn></msup></mrow><mrow><msub><mi>t</mi><mn>50</mn></msub></mrow></mfrac></math></div><div class="equation"><p>k · hydraulisk ledningsevne</p><math display="block"><mi>k</mi><mo>=</mo><mfrac><mrow><msub><mi>c</mi><mi>v</mi></msub><msub><mi>γ</mi><mi>w</mi></msub></mrow><mrow><mi>K</mi></mrow></mfrac></math></div><div class="equation"><p>Qₛ · krybetøjning pr. tidsdekade over forbelastningsspændingen</p><math display="block"><msub><mi>Q</mi><mi>s</mi></msub><mo>=</mo><mfrac><mrow><msub><mi>ε</mi><mi>B</mi></msub><mo>−</mo><msub><mi>ε</mi><mi>A</mi></msub></mrow><mrow><msub><mi mathvariant="normal">log</mi><mn>10</mn></msub><mo>(</mo><mfrac><mrow><msub><mi>t</mi><mi>B</mi></msub></mrow><mrow><msub><mi>t</mi><mi>A</mi></msub></mrow></mfrac><mo>)</mo></mrow></mfrac></math></div>
+</section>
+<section class="panel"><h2>Aflæs kurverne</h2>
+<p>Flyt den blå markør, til den rammer den orange linje ved 50 % primær konsolidering. Sammenlign derefter et trin under og over forbelastningsspændingen. De orange prikker sent på tidskurven afgrænser intervallet til bestemmelse af krybehældningen.</p>
+<p>Her er 0 og 100 % primær konsolidering markeret ud fra simuleringen. Ved et målt forsøg skal de først findes ved tolkning af tidskurven, eksempelvis med Casagrandes metode i § 6.6. Simuleringen bruger gennemsnitlig prøvehøjde i lasttrinnet og normaliserer den primære kurve til 100 % ved T = 2. Den lægger krybning til efter den praktiske afslutning af primær konsolidering ved T = 2 og viser krybning over forbelastningen.</p>
+<dl class="lab-results">
+<div><dt>Δσ′, σ′f og σ′e</dt><dd>spændingstilvækst samt effektiv spænding før og efter lasttrinnet (kPa)</dd></div>
+<div><dt>ε₀ og ε₁₀₀</dt><dd>lodret tøjning ved 0 og 100 % primær konsolidering (decimaltal i formlerne)</dd></div>
+<div><dt>H</dt><dd>længste drænvej ved 50 % konsolidering, halvdelen af den aktuelle prøvehøjde (m)</dd></div>
+<div><dt>T₅₀ og t₅₀</dt><dd>tidsfaktoren 0,2 og aflæst tid til 50 % primær konsolidering (sekunder i formlen)</dd></div>
+<div><dt>cᵥ og γw</dt><dd>konsolideringskoefficienten, betegnet cₖ i lærebogen (m²/s), og vandets rumvægt (10 kN/m³)</dd></div>
+<div><dt>tₐ, tᵦ, εₐ og εᵦ</dt><dd>tider og tøjninger ved de to orange punkter på krybegrenen</dd></div>
+<div><dt>σ′pc</dt><dd>forbelastningsspænding. Bestem Q på et trin på stamkurven.</dd></div>
+</dl>
+</section>
+</div>
+<section class="motivbilleder" aria-label="Anvendelse og forsøgsudstyr">
+<figure><img loading="lazy" width="506" height="336" src="../assets/fotos/oedometer.jpg" alt="Konsolideringsapparat med måleur"><figcaption>Ødometer med belastningsramme og måleur. <span>Genereret motivbillede.</span></figcaption></figure>
+</section>
+<section class="panel book"><h2>Læs videre i lærebogen</h2>
+<p>Geoteknik, 3. udgave. Kapitel 5, §§ 5.2–5.6, s. 141–154. Kapitel 6, §§ 6.2–6.3, s. 162–167, § 6.5, s. 169–170, og § 6.6, s. 170–177.</p></section>
+<nav class="nav" aria-label="Andre øvelser"><a href="deformation.html">← Endimensional deformation</a><a href="konsolidering.html">Konsolidering over tid →</a></nav>
+</main>
+<footer><div class="wrap"><span>Fagligt grundlag · Geoteknik, 3. udgave</span><a href="../index.html">Alle øvelser</a></div></footer>
+</body>
+</html>

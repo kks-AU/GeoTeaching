@@ -48,20 +48,22 @@ function figur(canvas) {
   return {w,h,line,label,rect,dot,polygon};
 }
 
-function diagram(f,{xMin=0,xMax,yMax,xLabel,yLabel,down=false,profile=false,equal=false}) {
+function diagram(f,{xMin=0,xMax,yMax,xLabel,yLabel,down=false,profile=false,equal=false,scaleX=v=>v,ticks=null}) {
   const left=profile?86:56, top=30, bottom=f.h-44;
   const width=f.w-left-15, height=bottom-top;
-  const span=xMax-xMin;
+  const start=scaleX(xMin), span=scaleX(xMax)-start;
   const unit=Math.min(width/span,height/yMax);
   const xs=equal?unit:width/span, ys=equal?unit:height/yMax;
-  const x=v=>left+(v-xMin)*xs;
+  const x=v=>left+(scaleX(v)-start)*xs;
   const y=v=>down?top+v*ys:bottom-v*ys;
   for(let i=0;i<=4;i++){
-    const a=xMin+span*i/4, b=yMax*i/4;
-    f.line([[x(a),y(0)],[x(a),y(yMax)]],'#e0e6da',1);
+    const b=yMax*i/4;
     f.line([[x(xMin),y(b)],[x(xMax),y(b)]],'#e0e6da',1);
-    f.label(x(a),bottom+18,tal(a,2),'#52645e','center');
     f.label(left-7,y(b)+4,tal(b,2),'#52645e','right');
+  }
+  for(const a of ticks??punkter(4,t=>xMin+(xMax-xMin)*t)){
+    f.line([[x(a),y(0)],[x(a),y(yMax)]],'#e0e6da',1);
+    f.label(x(a),bottom+18,tal(a,2),'#52645e','center');
   }
   if(xMin<0) f.line([[x(0),y(0)],[x(0),y(yMax)]],'#61736e',1,[3,3]);
   f.line([[left,y(yMax)],[left,y(0)],[x(xMax),y(0)]],'#61736e',1);
