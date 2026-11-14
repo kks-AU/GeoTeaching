@@ -6,22 +6,6 @@
 .motivbilleder figure{margin:0;width:min(100%,380px);background:var(--white);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .motivbilleder img{display:block;width:100%;height:auto;aspect-ratio:506/336;object-fit:cover}
 .motivbilleder .apparatfoto img{aspect-ratio:auto}
-.apparatfoto .fotoannotering{position:relative}
-.fotoannotering svg{position:absolute;inset:0;width:100%;height:100%}
-.fotoannotering .maal{
-  fill:none;
-  stroke:#12483e;
-  stroke-width:1.8;
-}
-.fotoannotering text{
-  fill:#12483e;
-  font-size:20px;
-  font-weight:650;
-  paint-order:stroke;
-  stroke:#fff;
-  stroke-width:4px;
-  stroke-linejoin:round;
-}
 .motivbilleder figcaption{padding:10px 13px;font-size:.9rem}
 .motivbilleder figcaption span{display:block;font-size:.78rem;color:var(--muted);margin-top:2px}
 .lab-controls,.lab-plots{display:grid;gap:16px;grid-template-columns:repeat(2,minmax(0,1fr))}
