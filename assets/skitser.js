@@ -155,8 +155,8 @@ const skitser = {
     });
     const [joinX,joinY]=spiral.at(-1);
     const surface=joinX+joinY/Math.tan(passive);
-    // Use a fixed close-up and clip the outer failure zones to the soil panel.
-    const scale=Math.min(mode?230:380,(f.w-2*edge-58)/(mode?2:1));
+    // At b = 0.7 m and φ = 30°, the mechanism spans about 6.71 m and reaches 1.11 m in depth.
+    const scale=Math.min((f.w-2*edge-24)/6.8,(bottom-top-32)/1.12);
     const x=f.w/2;
     const screen=(horizontal,vertical)=>[x+horizontal*scale,top+vertical*scale];
     const loadX=x+eb*scale, left=x-v.b*scale/2, right=x+v.b*scale/2;
@@ -196,7 +196,7 @@ const skitser = {
         f.label((start+end)/2,top-arrowHeight-6,'q',farve.blue,'center');
       }
     }
-    vandretMaal(f,edge,edge+.25*scale,bottom-24,'0,25 m');
+    vandretMaal(f,edge,edge+scale,bottom-24,'1 m');
     f.label(f.w/2,bottom-9,`Effektiv bredde i snittet: ${tal(width,2)} m`,steel,'center');
     if(mode){
       const scale=49;
@@ -224,7 +224,7 @@ const skitser = {
       vandretMaal(f,center-effectiveHalf,center+effectiveHalf,343,`b′ = ${tal(width,2)} m`);
     }
     const note=mode?' Planen viser det effektive areal. Snittet viser den plane brudmekanisme i bredderetningen.':' Det forstørrede snit viser hele bredden b og den effektive bredde b′. Den grønne stribe er den effektive kontaktflade.';
-    return 'Hovedsnittet er et forstørret udsnit med fast målestok. Ved stor brududbredelse fortsætter brudzonen uden for udsnittet. De blå pile viser det jævnt fordelte overlejringstryk q ved fundamentsunderkanten (FUK). Under den effektive bredde ligger en central kile, to logaritmiske spiralzoner og ydre passive kiler.'+note;
+    return 'Hovedsnittet viser hele brudfiguren ved standardværdierne. Målestokken er fast, så større brudzoner kan fortsætte uden for udsnittet. De blå pile viser det jævnt fordelte overlejringstryk q ved fundamentsunderkanten (FUK). Under den effektive bredde ligger en central kile, to logaritmiske spiralzoner og ydre passive kiler.'+note;
   },
   paele(f,v,mode,{penetration}){
     const x=f.w*.47, y=mode?91:57, bottom=f.h-21, edge=17;
