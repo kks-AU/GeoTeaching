@@ -142,7 +142,7 @@ const skitser = {
   },
   baereevne(f,v,mode,{footing}){
     const {eb,el,width,length}=footing;
-    const top=104, edge=16, bottom=mode?225:f.h-21;
+    const top=104, edge=16, bottom=225;
     const phi=rad(v.phi), active=Math.PI/4+phi/2, passive=Math.PI/4-phi/2;
     const wedgeDepth=width/2*Math.tan(active);
     const radius=width/2/Math.cos(active);
@@ -197,7 +197,7 @@ const skitser = {
     vandretMaal(f,edge,edge+5*scale,bottom-24,'5 m');
     f.label(f.w/2,bottom-9,`Effektiv bredde i snittet: ${tal(width,2)} m`,steel,'center');
     if(mode){
-      const scale=88/6;
+      const scale=98/6;
       const x=f.w/2, planW=v.b*scale, planL=v.l*scale, y=296;
       f.label(18,246,'Set ovenfra');
       vandretMaal(f,18,18+2*scale,270,'2 m');
@@ -206,11 +206,23 @@ const skitser = {
       f.rect(centerX-width*scale/2,centerY-length*scale/2,width*scale,length*scale,'#87b5a3');
       f.dot(x,y,steel,3);
       f.dot(centerX,centerY,load,4);
-      f.label(x+planW/2+8,y+4,'l');
-      f.label(x,y+planL/2+16,'b',steel,'center');
+      f.label(x+planW/2+8,y+4,`l = ${tal(v.l)} m`);
+      vandretMaal(f,x-planW/2,x+planW/2,y+planL/2+17,`b = ${tal(v.b)} m`);
+    }else{
+      const detailScale=Math.min(64,(f.w-52)/5);
+      const half=v.b*detailScale/2, effectiveHalf=width*detailScale/2;
+      const center=x+eb*detailScale, level=310;
+      f.label(edge,246,'Forstørret snit ved fundamentsunderkanten');
+      vandretMaal(f,x-half,x+half,275,`b = ${tal(v.b)} m`);
+      f.rect(x-half,level-14,2*half,14,steel);
+      f.line([[x,280],[x,level+17]],farve.gray,1,[3,4]);
+      f.rect(center-effectiveHalf,level,2*effectiveHalf,8,farve.green);
+      pil(f,center,281,center,level-15,load,2.5);
+      f.label(center+9,292,'V',load);
+      vandretMaal(f,center-effectiveHalf,center+effectiveHalf,343,`b′ = ${tal(width,2)} m`);
     }
-    const note=mode?' Planen viser det effektive areal. Snittet viser den plane brudmekanisme i bredderetningen.':'';
-    return 'Snittet og planvisningen har hver sin faste målestok. De blå pile viser det jævnt fordelte overlejringstryk q ved fundamentsunderkanten (FUK). Under den effektive bredde ligger en central kile, to logaritmiske spiralzoner og ydre passive kiler.'+note;
+    const note=mode?' Planen viser det effektive areal. Snittet viser den plane brudmekanisme i bredderetningen.':' Det forstørrede snit viser hele bredden b og den effektive bredde b′. Den grønne stribe er den effektive kontaktflade.';
+    return 'Hver tegning har fast målestok, når du ændrer fundamentets mål. De blå pile viser det jævnt fordelte overlejringstryk q ved fundamentsunderkanten (FUK). Under den effektive bredde ligger en central kile, to logaritmiske spiralzoner og ydre passive kiler.'+note;
   },
   paele(f,v,mode,{penetration}){
     const x=f.w*.47, y=mode?91:57, bottom=f.h-21, edge=17;
