@@ -142,36 +142,63 @@ const skitser = {
   },
   baereevne(f,v,mode,{footing}){
     const {eb,el,width,length}=footing;
-    const x=f.w/2, b=(f.w-54)*(.19+.35*v.b/5), top=102, edge=16;
-    const bottom=mode?225:f.h-21;
-    const left=x-b/2, right=x+b/2, loadX=x+b*eb/v.b;
-    const half=b*width/v.b/2;
-    const a=loadX-half, z=loadX+half;
-    const depth=Math.min(55,(bottom-top)*.52,half*1.9);
-    const extent=Math.min(half*1.45,a-edge-5,f.w-edge-z-5);
-    const toe=[loadX,top+depth*1.17];
-    const fan=(side,start)=>punkter(16,t=>[start+side*extent*t,top+depth*(.9*Math.cos(Math.PI*t/2))]);
-    const leftFan=fan(-1,a),rightFan=fan(1,z);
-    const boundary=[...leftFan.reverse(),toe,...rightFan];
+    const top=104, edge=16, bottom=mode?225:f.h-21;
+    const phi=rad(v.phi), active=Math.PI/4+phi/2, passive=Math.PI/4-phi/2;
+    const wedgeDepth=width/2*Math.tan(active);
+    const radius=width/2/Math.cos(active);
+    // Prandtl's planar mechanism: each spiral turns through 90 degrees.
+    const spiral=punkter(48,t=>{
+      const rotation=t*Math.PI/2;
+      const angle=Math.PI-active-rotation;
+      const r=radius*Math.exp(rotation*Math.tan(phi));
+      return [width/2+r*Math.cos(angle),r*Math.sin(angle)];
+    });
+    const [joinX,joinY]=spiral.at(-1);
+    const surface=joinX+joinY/Math.tan(passive);
+    const minX=Math.min(-v.b/2,eb-surface), maxX=Math.max(v.b/2,eb+surface);
+    const maxDepth=Math.max(wedgeDepth,...spiral.map(([,y])=>y));
+    const scale=Math.min((f.w-2*edge-40)/(maxX-minX),(bottom-top-34)/maxDepth);
+    const x=f.w/2-(minX+maxX)*scale/2;
+    const screen=(horizontal,vertical)=>[x+horizontal*scale,top+vertical*scale];
+    const loadX=x+eb*scale, left=x-v.b*scale/2, right=x+v.b*scale/2;
+    const toe=screen(eb,wedgeDepth);
+    const leftContact=screen(eb-width/2,0), rightContact=screen(eb+width/2,0);
     lag(f,edge,top,f.w-2*edge,bottom-top,earth);
-    f.polygon(boundary,'#47887940');
-    f.polygon([[a,top],toe,[z,top]],'#377f6a58');
-    f.line(boundary,farve.green,2);
-    f.line([[a,top],toe,[z,top]],farve.green,1.5);
-    f.rect(left,top-15,b,15,steel);
-    f.rect(a,top,2*half,5,farve.green);
+    for(const side of [-1,1]){
+      const pivot=screen(eb+side*width/2,0);
+      const arc=spiral.map(([x,y])=>screen(eb+side*x,y));
+      const outcrop=screen(eb+side*surface,0);
+      f.polygon([pivot,...arc],'#78ab9885');
+      f.polygon([pivot,arc.at(-1),outcrop],'#47887940');
+      f.line([...arc,outcrop],farve.green,2);
+      f.line([pivot,arc.at(-1)],farve.green,1,[3,3]);
+    }
+    f.polygon([leftContact,toe,rightContact],'#377f6a78');
+    f.line([leftContact,toe,rightContact],farve.green,1.5);
+    f.line([[edge,top],[f.w-edge,top]],steel,1);
+    f.rect(left,top-15,right-left,15,steel);
+    f.rect(leftContact[0],top,rightContact[0]-leftContact[0],4,farve.green);
     f.line([[x,44],[x,top-15]],farve.gray,1,[4,3]);
-    vandretMaal(f,left,right,32,`b = ${tal(v.b)} m`);
+    f.label(x,22,`b = ${tal(v.b)} m`,steel,'center');
     if(eb) vandretMaal(f,Math.min(x,loadX),Math.max(x,loadX),55,'eᵦ');
     pil(f,loadX,61,loadX,top-17);
-    f.label(loadX+10,73,'V',load);
-    const sideLeft=(edge+left)/2, sideRight=f.w-sideLeft;
-    if(v.q) for(const px of [sideLeft,sideRight]) pil(f,px,top-12-v.q/5,px,top-2,farve.blue);
-    for(const px of [sideLeft,sideRight]) f.label(px,top+16,'q',farve.blue,'center');
-    f.label(x,bottom-9,`Effektiv kontaktbredde i snittet: ${tal(width,2)} m`,steel,'center');
+    f.label(loadX+9,72,'V',load);
+    f.label(edge,top+17,'FUK',steel);
+    if(v.q){
+      const arrowHeight=12+v.q/5;
+      for(const [start,end] of [[edge,left],[right,f.w-edge]]){
+        const count=Math.max(1,Math.floor((end-start)/18));
+        for(let i=0;i<count;i++){
+          const px=start+(i+.5)*(end-start)/count;
+          pil(f,px,top-arrowHeight,px,top,farve.blue);
+        }
+        f.label((start+end)/2,top-arrowHeight-6,'q',farve.blue,'center');
+      }
+    }
+    f.label(f.w/2,bottom-9,`Effektiv bredde i snittet: ${tal(width,2)} m`,steel,'center');
     if(mode){
       const scale=Math.min(124/v.b,88/v.l);
-      const planW=v.b*scale, planL=v.l*scale, y=296;
+      const x=f.w/2, planW=v.b*scale, planL=v.l*scale, y=296;
       f.label(18,246,'Set ovenfra');
       f.rect(x-planW/2,y-planL/2,planW,planL,'#dce4df');
       const centerX=x+eb*scale, centerY=y+el*scale;
@@ -181,7 +208,8 @@ const skitser = {
       f.label(x+planW/2+8,y+4,'l');
       f.label(x,y+planL/2+16,'b',steel,'center');
     }
-    return 'Den grønne kontaktflade og brudzone flytter sig med lastresultanten V. Brudfiguren er skematisk. Ved punktfundament viser planen fundamentsmidten som en mørk prik og lastens angrebspunkt som en orange prik.';
+    const note=mode?' Planen viser det effektive areal. Snittet viser den plane brudmekanisme i bredderetningen.':'';
+    return 'De blå pile viser det jævnt fordelte overlejringstryk q ved fundamentsunderkanten (FUK). Under den effektive bredde ligger en central kile, to logaritmiske spiralzoner og ydre passive kiler.'+note;
   },
   paele(f,v,mode,{penetration}){
     const x=f.w*.47, y=mode?91:57, bottom=f.h-21, edge=17;
