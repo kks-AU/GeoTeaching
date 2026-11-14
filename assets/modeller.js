@@ -248,7 +248,7 @@ baereevne:{
       ['Rc · Bidrag fra kohæsion',area*v.c*nc*sc,farve.orange]
     ];
     const unit=mode?'kN':'kN/m';
-    soejler(f,parts,unit,mode?65000:15000);
+    soejler(f,parts,unit,mode?65000:15000,{showScale:false});
     const dimensions=[['Excentricitet eᵦ',eb,'m',3],['Effektivt mål i bredderetningen',width,'m',3]];
     if(mode) dimensions.push(['Excentricitet eₗ',el,'m',3],['Effektivt mål i længderetningen',length,'m',3],['Effektivt areal A′',area,'m²',3],['sγ',sg,'',3],['sq',sq,'',3],['sc',sc,'',3]);
     return {footing:{eb,el,width,length},metrics:[['Brudbæreevne R',parts.reduce((sum,p)=>sum+p[1],0),unit],
