@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jords forskydningsstyrke · Geoteknik</title>
 <link rel="stylesheet" href="../assets/style.css?v=4">
-<script defer src="../assets/figurer.js?v=2"></script><script defer src="../assets/modeller.js?v=2"></script><script defer src="../assets/skitser.js?v=2"></script><script defer src="../assets/side.js?v=2"></script>
+<script defer src="../assets/figurer.js?v=2"></script><script defer src="../assets/modeller.js?v=7"></script><script defer src="../assets/skitser.js?v=7"></script><script defer src="../assets/side.js?v=2"></script>
 </head>
 <body data-topic="styrke">
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -22,6 +22,7 @@
 <section class="panel" aria-labelledby="params">
 <h2 id="params">Indstillinger</h2>
 <div class="tabs" id="faner" role="group" aria-label="Beregningsvalg" hidden></div>
+<p class="hint">I skæreboksen holdes den effektive normalspænding <i>σ</i>′<sub>n</sub> fast ved 50 eller 150 kPa. De to skydere ændrer forskydningsspændingen <i>τ</i><sub>f</sub> ved brud.</p>
 <div id="indstillinger"></div>
 <button type="button" id="nulstil">Nulstil værdier</button>
 <noscript><p>Aktivér JavaScript for at bruge øvelsen.</p></noscript>
@@ -36,7 +37,7 @@
       <summary>Symboler og enheder</summary>
       <dl>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>τ</mi><mi>f</mi></msub></math></dt><dd>forskydningsspænding ved brud (kPa)</dd></div>
-        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>f</mi></msub></math></dt><dd>effektiv normalspænding på brudplanet (kPa)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><msup><mi>σ</mi><mo>′</mo></msup><mi>f</mi></msub></math></dt><dd>effektiv normalspænding på brudplanet ved brud (kPa). Lærebogens σ′<sub>f</sub> er den fastholdte σ′<sub>n</sub> i skæreboksforsøget.</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>c</mi><mo>′</mo></msup></math></dt><dd>effektiv kohæsion (kPa)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>φ</mi><mo>′</mo></msup></math></dt><dd>effektiv friktionsvinkel (°)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>c</mi><mi>u</mi></msub></math></dt><dd>udrænet forskydningsstyrke (kPa)</dd></div>

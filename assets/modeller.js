@@ -299,8 +299,8 @@ paele:{
 },
 styrke:{
   controls:[
-    input('tau1','Skæreboks · τf ved 50 kPa',38,5,110,1,kpa),
-    input('tau2','Skæreboks · τf ved 150 kPa',96,5,230,1,kpa),
+    input('tau1','Skæreboks · τf ved σ′ₙ = 50 kPa',38,5,110,1,kpa),
+    input('tau2','Skæreboks · τf ved σ′ₙ = 150 kPa',96,5,230,1,kpa),
     input('s3','Triaksial · celletryk σ′₃',70,20,130,1,kpa),
     input('load','Triaksial · andel af deviator ved brud',85,0,100,1,'%')
   ],
@@ -315,7 +315,7 @@ styrke:{
     mohr(f,{phi,c,hi,lo:v.s3,points:[[50,v.tau1],[150,v.tau2]],extra:Math.max(180,1.13*(v.s3+fail))});
     return {metrics:[['Effektiv kohæsion c′',c,kpa],['Friktionsvinkel φ′',phi*180/Math.PI,'°'],['Deviator ved brud',fail,kpa],['Aktuel σ′₁',hi,kpa]],
       legend:[['Skæreboksens brudpunkter',farve.blue],['Triaksialprøvens Mohr-cirkel',farve.green],['Fælles brudlinje',farve.orange]],
-      caption:'De blå punkter fastlægger brudlinjen. Sæt deviatorandelen til 100 % for at se triaksialcirklen tangere linjen.'};
+      caption:'De blå punkter viser τf ved henholdsvis σ′ₙ = 50 og 150 kPa på den vandrette akse. De fastlægger brudlinjen. Sæt deviatorandelen til 100 % for at se triaksialcirklen tangere linjen.'};
   }
 },
 saetninger:{

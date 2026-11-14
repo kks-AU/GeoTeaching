@@ -221,7 +221,7 @@ const skitser = {
     f.line([[x1-half,base-box],[x1-half,base],[x1+half,base],[x1+half,base-box]],steel,2);
     f.line([[x1-half+slip,base-box],[x1-half+slip,base-2*box],[x1+half+slip,base-2*box],[x1+half+slip,base-box]],steel,2);
     pil(f,x1,base-2*box-35,x1,base-2*box-3);
-    f.label(x1-9,base-2*box-28,'σ′f',load,'right');
+    f.label(x1,base-2*box-43,'σ′ₙ = 50 / 150 kPa',load,'center');
     pil(f,x1+half+slip-26,base-box-13,x1+half+slip-4,base-box-13);
     f.label(x1+half+slip-14,base-box-22,'τf',load,'center');
     f.rect(x2-sample-13,base-94,2*sample+26,101,'#c9e3ec');
@@ -236,7 +236,7 @@ const skitser = {
     f.label(x2+sample+7,base-33,'σ′₃',water);
     f.label(x1+3,base+30,'Skæreboks',steel,'center');
     f.label(x2,base+30,'Triaksialprøve',steel,'center');
-    return 'Skæreboksen belaster prøven vinkelret på det vandrette brudplan og forskyder de to halvdele. I triaksialforsøget påvirker hovedspændingerne prøven aksialt og fra siden. De viste flytninger er skematiske.';
+    return 'I skæreboksen viser den lodrette pil den effektive normalspænding σ′ₙ på brudplanet. Den holdes ved 50 kPa i det ene forsøg og 150 kPa i det andet. Den vandrette pil viser forskydningsspændingen τf ved brud. I triaksialforsøget påvirker hovedspændingerne prøven aksialt og fra siden. De viste flytninger er skematiske.';
   },
   saetninger(f,v){
     const x=f.w*.48, left=16, right=f.w-18, top=57;
