@@ -155,25 +155,27 @@ const skitser = {
     });
     const [joinX,joinY]=spiral.at(-1);
     const surface=joinX+joinY/Math.tan(passive);
-    // The envelope covers b ≤ 5 m and φ ≤ 45° from the exercise controls.
-    const scale=Math.min((f.w-2*edge-24)/124,(225-top-34)/34);
+    // Use a fixed close-up and clip the outer failure zones to the soil panel.
+    const scale=Math.min(38,(f.w-2*edge)/13);
     const x=f.w/2;
     const screen=(horizontal,vertical)=>[x+horizontal*scale,top+vertical*scale];
     const loadX=x+eb*scale, left=x-v.b*scale/2, right=x+v.b*scale/2;
     const toe=screen(eb,wedgeDepth);
     const leftContact=screen(eb-width/2,0), rightContact=screen(eb+width/2,0);
     lag(f,edge,top,f.w-2*edge,bottom-top,earth);
-    for(const side of [-1,1]){
-      const pivot=screen(eb+side*width/2,0);
-      const arc=spiral.map(([x,y])=>screen(eb+side*x,y));
-      const outcrop=screen(eb+side*surface,0);
-      f.polygon([pivot,...arc],'#78ab9885');
-      f.polygon([pivot,arc.at(-1),outcrop],'#47887940');
-      f.line([...arc,outcrop],farve.green,2);
-      f.line([pivot,arc.at(-1)],farve.green,1,[3,3]);
-    }
-    f.polygon([leftContact,toe,rightContact],'#377f6a78');
-    f.line([leftContact,toe,rightContact],farve.green,1.5);
+    f.clipRect(edge,top,f.w-2*edge,bottom-top,()=>{
+      for(const side of [-1,1]){
+        const pivot=screen(eb+side*width/2,0);
+        const arc=spiral.map(([x,y])=>screen(eb+side*x,y));
+        const outcrop=screen(eb+side*surface,0);
+        f.polygon([pivot,...arc],'#78ab9885');
+        f.polygon([pivot,arc.at(-1),outcrop],'#47887940');
+        f.line([...arc,outcrop],farve.green,2);
+        f.line([pivot,arc.at(-1)],farve.green,1,[3,3]);
+      }
+      f.polygon([leftContact,toe,rightContact],'#377f6a78');
+      f.line([leftContact,toe,rightContact],farve.green,1.5);
+    });
     f.line([[edge,top],[f.w-edge,top]],steel,1);
     f.rect(left,top-15,right-left,15,steel);
     f.rect(leftContact[0],top,rightContact[0]-leftContact[0],4,farve.green);
@@ -194,7 +196,7 @@ const skitser = {
         f.label((start+end)/2,top-arrowHeight-6,'q',farve.blue,'center');
       }
     }
-    vandretMaal(f,edge,edge+5*scale,bottom-24,'5 m');
+    vandretMaal(f,edge,edge+2*scale,bottom-24,'2 m');
     f.label(f.w/2,bottom-9,`Effektiv bredde i snittet: ${tal(width,2)} m`,steel,'center');
     if(mode){
       const scale=98/6;
@@ -222,7 +224,7 @@ const skitser = {
       vandretMaal(f,center-effectiveHalf,center+effectiveHalf,343,`b′ = ${tal(width,2)} m`);
     }
     const note=mode?' Planen viser det effektive areal. Snittet viser den plane brudmekanisme i bredderetningen.':' Det forstørrede snit viser hele bredden b og den effektive bredde b′. Den grønne stribe er den effektive kontaktflade.';
-    return 'Hver tegning har fast målestok, når du ændrer fundamentets mål. De blå pile viser det jævnt fordelte overlejringstryk q ved fundamentsunderkanten (FUK). Under den effektive bredde ligger en central kile, to logaritmiske spiralzoner og ydre passive kiler.'+note;
+    return 'Hovedsnittet er et forstørret udsnit med fast målestok. Ved stor brududbredelse fortsætter brudzonen uden for udsnittet. De blå pile viser det jævnt fordelte overlejringstryk q ved fundamentsunderkanten (FUK). Under den effektive bredde ligger en central kile, to logaritmiske spiralzoner og ydre passive kiler.'+note;
   },
   paele(f,v,mode,{penetration}){
     const x=f.w*.47, y=mode?91:57, bottom=f.h-21, edge=17;

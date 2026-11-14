@@ -45,7 +45,18 @@ function figur(canvas) {
     ctx.fillStyle=color;
     ctx.fill();
   }
-  return {w,h,line,label,rect,dot,polygon};
+  function clipRect(x,y,width,height,draw) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x,y,width,height);
+    ctx.clip();
+    try {
+      draw();
+    } finally {
+      ctx.restore();
+    }
+  }
+  return {w,h,line,label,rect,dot,polygon,clipRect};
 }
 
 function diagram(f,{xMin=0,xMax,yMax,xLabel,yLabel,down=false,profile=false,equal=false,scaleX=v=>v,ticks=null}) {
