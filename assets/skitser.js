@@ -140,26 +140,50 @@ const skitser = {
     }
     return `Mørkere blåt betyder større poreovertryk Δu i forhold til terrænlasten p. Orange pile viser terrænlasten. Blå pile viser drænretningen. Den længste drænvej H er ${tal(H)} m ved ${mode?'dobbeltsidig':'ensidig'} dræning.`;
   },
-  baereevne(f,v){
-    const x=f.w/2, b=(f.w-54)*(.16+.46*v.b/5), top=91, bottom=f.h-28, edge=16;
+  baereevne(f,v,mode,{footing}){
+    const {eb,el,width,length}=footing;
+    const x=f.w/2, b=(f.w-54)*(.19+.35*v.b/5), top=102, edge=16;
+    const bottom=mode?225:f.h-21;
+    const left=x-b/2, right=x+b/2, loadX=x+b*eb/v.b;
+    const half=b*width/v.b/2;
+    const a=loadX-half, z=loadX+half;
+    const depth=Math.min(55,(bottom-top)*.52,half*1.9);
+    const extent=Math.min(half*1.45,a-edge-5,f.w-edge-z-5);
+    const toe=[loadX,top+depth*1.17];
+    const fan=(side,start)=>punkter(16,t=>[start+side*extent*t,top+depth*(.9*Math.cos(Math.PI*t/2))]);
+    const leftFan=fan(-1,a),rightFan=fan(1,z);
+    const boundary=[...leftFan.reverse(),toe,...rightFan];
     lag(f,edge,top,f.w-2*edge,bottom-top,earth);
-    f.rect(x-b/2,top-14,b,14,steel);
-    f.label(x,19,'Lodret centrisk last',load,'center');
-    pil(f,x,28,x,top-17);
-    const sideLeft=(edge+x-b/2)/2, sideRight=f.w-sideLeft;
-    if(v.q){
-      const length=9+28*v.q/100;
-      for(const cx of [sideLeft,sideRight]) pil(f,cx,top-length,cx,top-2,farve.blue);
+    f.polygon(boundary,'#47887940');
+    f.polygon([[a,top],toe,[z,top]],'#377f6a58');
+    f.line(boundary,farve.green,2);
+    f.line([[a,top],toe,[z,top]],farve.green,1.5);
+    f.rect(left,top-15,b,15,steel);
+    f.rect(a,top,2*half,5,farve.green);
+    f.line([[x,44],[x,top-15]],farve.gray,1,[4,3]);
+    vandretMaal(f,left,right,32,`b = ${tal(v.b)} m`);
+    if(eb) vandretMaal(f,Math.min(x,loadX),Math.max(x,loadX),55,'eᵦ');
+    pil(f,loadX,61,loadX,top-17);
+    f.label(loadX+10,73,'V',load);
+    const sideLeft=(edge+left)/2, sideRight=f.w-sideLeft;
+    if(v.q) for(const px of [sideLeft,sideRight]) pil(f,px,top-12-v.q/5,px,top-2,farve.blue);
+    for(const px of [sideLeft,sideRight]) f.label(px,top+16,'q',farve.blue,'center');
+    f.label(x,bottom-9,`Effektiv kontaktbredde i snittet: ${tal(width,2)} m`,steel,'center');
+    if(mode){
+      const scale=Math.min(124/v.b,88/v.l);
+      const planW=v.b*scale, planL=v.l*scale, y=296;
+      f.label(18,246,'Set ovenfra');
+      f.rect(x-planW/2,y-planL/2,planW,planL,'#dce4df');
+      const centerX=x+eb*scale, centerY=y+el*scale;
+      f.rect(centerX-width*scale/2,centerY-length*scale/2,width*scale,length*scale,'#87b5a3');
+      f.dot(x,y,steel,3);
+      f.dot(centerX,centerY,load,4);
+      f.label(x+planW/2+8,y+4,'l');
+      f.label(x,y+planL/2+16,'b',steel,'center');
     }
-    f.label(sideLeft,top+18,'q',farve.blue,'center');
-    f.label(sideRight,top+18,'q',farve.blue,'center');
-    f.line([[edge,top],[x-b/2,top]],steel,1);
-    f.line([[x+b/2,top],[f.w-edge,top]],steel,1);
-    vandretMaal(f,x-b/2,x+b/2,top+26,`b = ${tal(v.b)} m`);
-    f.label(x,bottom-16,`Jord under fundamentet · γ, c, φ`,steel,'center');
-    return 'Snit gennem et stribefundament. Den røde pil viser den påførte last. De blå pile viser overlejringstrykket q ved fundamentets underside på begge sider. Jorden under fundamentet har rumvægt γ, kohæsion c og friktionsvinkel φ.';
+    return 'Den grønne kontaktflade og brudzone flytter sig med lastresultanten V. Brudfiguren er skematisk. Ved punktfundament viser planen fundamentsmidten som en mørk prik og lastens angrebspunkt som en orange prik.';
   },
-  paele(f,v,mode){
+  paele(f,v,mode,{penetration}){
     const x=f.w*.47, y=mode?91:57, bottom=f.h-21, edge=17;
     const b=14+56*v.b, toe=y+(bottom-y)*(.2+.74*v.l/15);
     lag(f,edge,y,f.w-2*edge,bottom-y,mode?earth:clay);
@@ -170,7 +194,7 @@ const skitser = {
       f.label(x-b/2-12,hammer+10,'G',load,'right');
       lodretMaal(f,x+b/2+12,hammer+12,y-10,'h',load);
       f.line([[x-b/2-6,toe],[x+b/2+6,toe]],steel,1,[3,3]);
-      pil(f,x,toe+3,x,Math.min(bottom+4,toe+7+v.s*.62),load);
+      pil(f,x,toe+3,x,Math.min(bottom+4,toe+7+penetration*.62),load);
       f.label(x+12,toe+14,'s',load);
       f.label(edge+8,bottom-7,'Sand');
     }else{

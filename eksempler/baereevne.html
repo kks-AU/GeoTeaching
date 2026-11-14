@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fundamenters bæreevne · Geoteknik</title>
 <link rel="stylesheet" href="../assets/style.css?v=4">
-<script defer src="../assets/figurer.js?v=2"></script><script defer src="../assets/modeller.js?v=2"></script><script defer src="../assets/skitser.js?v=2"></script><script defer src="../assets/side.js?v=2"></script>
+<script defer src="../assets/figurer.js?v=6"></script><script defer src="../assets/modeller.js?v=6"></script><script defer src="../assets/skitser.js?v=6"></script><script defer src="../assets/side.js?v=6"></script>
 </head>
 <body data-topic="baereevne">
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -14,9 +14,9 @@
 <main id="indhold">
 <section class="exercise-head">
 <a href="../index.html">← Alle øvelser</a>
-<p class="tag">Stribefundament</p>
+<p class="tag">Stribe- og punktfundamenter</p>
 <h1>Fundamenters bæreevne</h1>
-<p>Ændr fundamentets bredde eller jordens styrke. Søjlerne viser tre beregnede bidrag i kN/m. Summen er den lodrette last pr. løbende meter, som jorden kan bære ved brud for det viste stribefundament.</p>
+<p>Ændr fundamentets bredde eller jordens styrke. Søjlerne viser tre bidrag til den lodrette brudbæreevne. For et stribefundament vises de pr. løbende meter, og for et punktfundament vises de for hele fundamentet.</p>
 </section>
 <div class="workspace">
 <section class="panel" aria-labelledby="params">
@@ -29,16 +29,16 @@
 <section class="panel" aria-labelledby="figurtitel">
 <h2 id="figurtitel">Principskitse og resultater</h2>
 <figure class="skitse">
-  <canvas id="skitse" role="img" aria-label="Principskitse" aria-describedby="skitsetekst"></canvas>
+  <canvas style="height: 365px" id="skitse" role="img" aria-label="Principskitse" aria-describedby="skitsetekst"></canvas>
   <figcaption>
     <p class="hint" id="skitsetekst"></p>
     <details class="symboler">
       <summary>Symboler og enheder</summary>
       <dl>
-        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>R</mi></math></dt><dd>lodret brudbæreevne (kN/m)</dd></div>
-        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>R</mi><mi>γ</mi></msub></math></dt><dd>bidrag fra jordens egenvægt (kN/m)</dd></div>
-        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>R</mi><mi>q</mi></msub></math></dt><dd>bidrag fra overlejringstrykket (kN/m)</dd></div>
-        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>R</mi><mi>c</mi></msub></math></dt><dd>bidrag fra kohæsionen (kN/m)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>R</mi></math></dt><dd>lodret brudbæreevne (kN/m for stribe, kN for punkt)</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>R</mi><mi>γ</mi></msub></math></dt><dd>bidrag fra jordens egenvægt</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>R</mi><mi>q</mi></msub></math></dt><dd>bidrag fra overlejringstrykket</dd></div>
+        <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>R</mi><mi>c</mi></msub></math></dt><dd>bidrag fra kohæsionen</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>b</mi></math></dt><dd>fundamentbredde (m)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>γ</mi></math></dt><dd>jordens rumvægt i bæreevneformlen (kN/m³)</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>q</mi></math></dt><dd>overlejringstryk ved fundamentsunderkanten (kPa)</dd></div>
@@ -47,6 +47,14 @@
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>N</mi><mi>γ</mi></msub></math></dt><dd>dimensionsløs faktor for rumvægt</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>N</mi><mi>q</mi></msub></math></dt><dd>dimensionsløs faktor for overlejring</dd></div>
         <div><dt><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>N</mi><mi>c</mi></msub></math></dt><dd>dimensionsløs faktor for kohæsion</dd></div>
+        <div><dt><i>V</i>, <i>M</i></dt><dd>lodret lastresultant og moment om fundamentets midte. Brug samme grundlag for begge, enten pr. meter eller for hele fundamentet.</dd></div>
+        <div><dt><i>e</i>, <i>e</i><sub>b</sub>, <i>e</i><sub>l</sub></dt><dd>signeret excentricitet i hhv. den betragtede retning, bredderetningen og længderetningen (m)</dd></div>
+        <div><dt><i>l</i></dt><dd>geometrisk længde (m)</dd></div>
+        <div><dt><i>B</i>′, <i>L</i>′</dt><dd>effektive mål i fundamentets bredde- og længderetning før sortering (m)</dd></div>
+        <div><dt><i>b</i>′, <i>l</i>′</dt><dd>ved punktfundament det korteste og længste effektive mål (m). Ved stribefundament er b′ den effektive bredde.</dd></div>
+        <div><dt><i>A</i>′</dt><dd>effektivt areal for punktfundamentet (m²)</dd></div>
+        <div><dt><i>s</i><sub>γ</sub>, <i>s</i><sub>q</sub>, <i>s</i><sub>c</sub></dt><dd>formfaktorer for egenvægt, overlejring og kohæsion</dd></div>
+        <div><dt><i>a</i></dt><dd>beregningsgrundlag, b′ pr. løbende meter stribe eller A′ for et punktfundament</dd></div>
       </dl>
     </details>
   </figcaption>
@@ -61,32 +69,39 @@
 <div class="notes">
 <section class="panel"><h2>Ligninger</h2>
 <div class="equation"><p>Brudbæreevne pr. løbende meter</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><mi>R</mi><mo>=</mo><msub><mi>R</mi><mi>γ</mi></msub><mo>+</mo><msub><mi>R</mi><mi>q</mi></msub><mo>+</mo><msub><mi>R</mi><mi>c</mi></msub></math></div>
-<div class="equation"><p>Bidrag fra jordens egenvægt</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>R</mi><mi>γ</mi></msub><mo>=</mo><mfrac><mrow><mn>1</mn></mrow><mrow><mn>2</mn></mrow></mfrac><mi>γ</mi><msup><mi>b</mi><mn>2</mn></msup><msub><mi>N</mi><mi>γ</mi></msub></math></div>
-<div class="equation"><p>Bidrag fra overlejringstrykket</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>R</mi><mi>q</mi></msub><mo>=</mo><mi>q</mi><mi>b</mi><msub><mi>N</mi><mi>q</mi></msub></math></div>
-<div class="equation"><p>Bidrag fra kohæsionen</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>R</mi><mi>c</mi></msub><mo>=</mo><mi>c</mi><mi>b</mi><msub><mi>N</mi><mi>c</mi></msub></math></div>
+<div class="equation"><p>Excentricitet ud fra moment og lodret last</p><math display="block"><mi>e</mi><mo>=</mo><mfrac><mrow><mi>M</mi></mrow><mrow><mi>V</mi></mrow></mfrac></math></div>
+<div class="equation"><p>Effektivt mål i bredderetningen</p><math display="block"><msup><mi>B</mi><mo>′</mo></msup><mo>=</mo><mi>b</mi><mo>−</mo><mn>2</mn><mo>|</mo><msub><mi>e</mi><mi>b</mi></msub><mo>|</mo></math></div>
+<div class="equation"><p>Effektivt mål i længderetningen</p><math display="block"><msup><mi>L</mi><mo>′</mo></msup><mo>=</mo><mi>l</mi><mo>−</mo><mn>2</mn><mo>|</mo><msub><mi>e</mi><mi>l</mi></msub><mo>|</mo></math></div>
+<div class="equation"><p>Effektivt areal for punktfundament</p><math display="block"><msup><mi>A</mi><mo>′</mo></msup><mo>=</mo><msup><mi>B</mi><mo>′</mo></msup><msup><mi>L</mi><mo>′</mo></msup></math></div>
+<div class="equation"><p>Bidrag fra jordens egenvægt</p><math display="block"><msub><mi>R</mi><mi>γ</mi></msub><mo>=</mo><mfrac><mrow><mn>1</mn></mrow><mrow><mn>2</mn></mrow></mfrac><mi>a</mi><mi>γ</mi><msup><mi>b</mi><mo>′</mo></msup><msub><mi>N</mi><mi>γ</mi></msub><msub><mi>s</mi><mi>γ</mi></msub></math></div>
+<div class="equation"><p>Bidrag fra overlejringstryk</p><math display="block"><msub><mi>R</mi><mi>q</mi></msub><mo>=</mo><mi>a</mi><mi>q</mi><msub><mi>N</mi><mi>q</mi></msub><msub><mi>s</mi><mi>q</mi></msub></math></div>
+<div class="equation"><p>Bidrag fra kohæsion</p><math display="block"><msub><mi>R</mi><mi>c</mi></msub><mo>=</mo><mi>a</mi><mi>c</mi><msub><mi>N</mi><mi>c</mi></msub><msub><mi>s</mi><mi>c</mi></msub></math></div>
+<div class="equation"><p>Formfaktor for rumvægt</p><math display="block"><msub><mi>s</mi><mi>γ</mi></msub><mo>=</mo><mn>1</mn><mo>−</mo><mn>0,4</mn><mfrac><mrow><msup><mi>b</mi><mo>′</mo></msup></mrow><mrow><msup><mi>l</mi><mo>′</mo></msup></mrow></mfrac></math></div>
+<div class="equation"><p>Formfaktor for kohæsion og drænet overlejring</p><math display="block"><msub><mi>s</mi><mi>c</mi></msub><mo>=</mo><msub><mi>s</mi><mi>q</mi></msub><mo>=</mo><mn>1</mn><mo>+</mo><mn>0,2</mn><mfrac><mrow><msup><mi>b</mi><mo>′</mo></msup></mrow><mrow><msup><mi>l</mi><mo>′</mo></msup></mrow></mfrac></math></div>
 <div class="equation"><p>Bæreevnefaktor for overlejring</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>N</mi><mi>q</mi></msub><mo>=</mo><mi mathvariant="normal">exp</mi><mo>(</mo><mi>π</mi><mi mathvariant="normal">tan</mi><mi>φ</mi><mo>)</mo><mfrac><mrow><mn>1</mn><mo>+</mo><mi mathvariant="normal">sin</mi><mi>φ</mi></mrow><mrow><mn>1</mn><mo>−</mo><mi mathvariant="normal">sin</mi><mi>φ</mi></mrow></mfrac></math></div>
 <div class="equation"><p>Bæreevnefaktor for kohæsion</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>N</mi><mi>c</mi></msub><mo>=</mo><mfrac><mrow><msub><mi>N</mi><mi>q</mi></msub><mo>−</mo><mn>1</mn></mrow><mrow><mi mathvariant="normal">tan</mi><mi>φ</mi></mrow></mfrac></math></div>
 <div class="equation"><p>Bæreevnefaktor for rumvægt</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>N</mi><mi>γ</mi></msub><mo>=</mo><mfrac><mrow><mn>1</mn></mrow><mrow><mn>4</mn></mrow></mfrac><msup><mrow><mo>[</mo><mo>(</mo><msub><mi>N</mi><mi>q</mi></msub><mo>−</mo><mn>1</mn><mo>)</mo><mi mathvariant="normal">cos</mi><mi>φ</mi><mo>]</mo></mrow><mrow><mfrac><mrow><mn>3</mn></mrow><mrow><mn>2</mn></mrow></mfrac></mrow></msup></math></div>
 <div class="equation"><p>Ved friktionsvinkel nul</p><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><msub><mi>N</mi><mi>γ</mi></msub><mo>=</mo><mn>0</mn><mo>,</mo><msub><mi>N</mi><mi>q</mi></msub><mo>=</mo><mn>1</mn><mo>,</mo><msub><mi>N</mi><mi>c</mi></msub><mo>=</mo><mi>π</mi><mo>+</mo><mn>2</mn></math></div>
 </section>
-<section class="panel"><h2>Undersøg selv</h2><p>Fordobl bredden ved uændrede jordparametre. Hvilket bidrag vokser med en faktor fire?</p>
+<section class="panel"><h2>Undersøg selv</h2><p>Vælg stribefundament, og flyt lasten fra midten af fundamentet, til excentriciteten er 25 % af bredden. Hvad sker der med den effektive bredde og bidraget fra jordens egenvægt?</p>
 <details><summary>Se forklaringen</summary><p>Rumvægtsbidraget er proportionalt med b². Overlejrings- og kohæsionsbidraget er proportionale med b.</p></details>
 <h3>Hvad viser søjlerne?</h3>
 <ul class="bids">
-<li><strong>Jordens egenvægt.</strong> Når fundamentet presses ned, må jord under og ved siden af det flytte sig. Jordens egenvægt bidrager til modstanden. Leddet er proportionalt med rumvægten og med bredden i anden potens.</li>
-<li><strong>Overlejringstryk.</strong> Jord og eventuel last over niveauet for fundamentets underside giver et tryk på jorden uden for fundamentet. Trykket holder den omgivende jord nede, når fundamentet presses ned. Det indtastes i kPa og omregnes i formlen til et bidrag i kN/m.</li>
+<li><strong>Jordens egenvægt.</strong> Når fundamentet presses ned, må jord under og ved siden af det flytte sig. Jordens egenvægt bidrager til modstanden. Leddet afhænger af rumvægten, den effektive bredde og formfaktoren. For stribefundamentet indgår den effektive bredde i anden potens.</li>
+<li><strong>Overlejringstryk.</strong> Jord og eventuel last over niveauet for fundamentets underside giver et tryk på jorden uden for fundamentet. Trykket holder den omgivende jord nede, når fundamentet presses ned. Det indtastes i kPa og omregnes i formlen til et bidrag til brudbæreevnen.</li>
 <li><strong>Kohæsion.</strong> Kohæsionen er den del af forskydningsstyrken, der er til stede ved nul normalspænding i den valgte spændingsanalyse. Den giver modstand langs brudfladen.</li>
 </ul>
-<h3>Forudsætninger</h3><p>Centrisk lodret belastet stribefundament. Beregningen viser brudbæreevne pr. løbende meter for grundtilfældet i § 10.2. Ved drænet beregning indtastes effektive værdier. Ved φ = 0 kan c og q repræsentere udrænet styrke og totalt overlejringstryk.</p>
+<h3>Forudsætninger</h3><p>Lodret last, vandret fundamentsflade og dybde- og hældningsfaktorer lig 1. For stribefundament er formfaktorerne 1. Ved drænet beregning indtastes effektive værdier. Ved udrænet beregning sættes φ = 0, c er den udrænede forskydningsstyrke, og q er totalt overlejringstryk med formfaktor 1.</p><p>Skyderne går til 29 % af den tilsvarende side. Fra 30 % skal den alternative brudfigur under den ubelastede del også undersøges, jf. § 10.5.</p>
 </section>
 </div>
 <section class="motivbilleder" aria-label="Anvendelse og forsøgsudstyr">
 <figure><img loading="lazy" width="506" height="336" src="../assets/fotos/stribefundament.jpg" alt="Støbt betonstribe i en rende"><figcaption>Et stribefundament fører lasten fra en væg ned i jorden. <span>Genereret motivbillede.</span></figcaption></figure>
+<figure><img loading="lazy" width="506" height="336" src="../assets/fotos/punktfundament.jpg" alt="Rektangulært betonfundament i en udgravning"><figcaption>Et punktfundament fører en koncentreret last ned i jorden. <span>Genereret motivbillede.</span></figcaption></figure>
 </section>
 <section class="panel book">
 <h2>Læs videre i lærebogen</h2>
 <p>Geoteknik, 3. udgave</p>
-<p>Kapitel 10 · Fundamenters bæreevne, § 10.2, s. 255–257.</p>
+<p>Kapitel 10 · Fundamenters bæreevne, §§ 10.2–10.4, s. 255–262, og § 10.5, s. 266–267.</p>
 </section>
 <nav class="nav" aria-label="Andre øvelser"><a href="konsolidering.html">← 1D-konsolidering og deformation over tid</a><a href="paele.html">Enkeltpæles bæreevne →</a></nav>
 </main>

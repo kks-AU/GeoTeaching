@@ -223,25 +223,42 @@ konsolidering:{
   }
 },
 baereevne:{
+  modes:['Stribefundament','Punktfundament'],
   controls:[
     input('b','Fundamentbredde b',1.5,.5,5,.1,metre),
+    input('eb','Excentricitet i bredderetningen · eᵦ/b',0,-29,29,1,'%'),
     input('g','Rumvægt γ',18,0,24,.5,weight),
     input('q','Overlejringstryk q',20,0,100,1,kpa),
     input('c','Kohæsion c',5,0,80,1,kpa),
     input('phi','Friktionsvinkel φ',30,0,45,1,'°')
   ],
-  draw(f,v){
+  modeControls:[[],[
+    input('l','Fundamentlængde l',2,.5,6,.1,metre),
+    input('el','Excentricitet i længderetningen · eₗ/l',0,-29,29,1,'%')
+  ]],
+  draw(f,v,mode){
+    const eb=v.b*v.eb/100, el=mode?v.l*v.el/100:0;
+    const width=v.b-2*Math.abs(eb), length=mode?v.l-2*Math.abs(el):1;
+    const short=mode?Math.min(width,length):width;
+    const ratio=mode?short/Math.max(width,length):0;
+    const area=width*length;
+    const sg=1-.4*ratio, sc=1+.2*ratio, sq=v.phi?sc:1;
     const phi=rad(v.phi), s=Math.sin(phi);
     const nq=Math.exp(Math.PI*Math.tan(phi))*(1+s)/(1-s);
     const nc=phi?(nq-1)/Math.tan(phi):Math.PI+2;
     const ng=.25*((nq-1)*Math.cos(phi))**1.5;
     const parts=[
-      ['Rγ · Bidrag fra jordens egenvægt',.5*v.g*v.b**2*ng,farve.green],
-      ['Rq · Bidrag fra overlejringstryk',v.q*v.b*nq,farve.blue],
-      ['Rc · Bidrag fra kohæsion',v.c*v.b*nc,farve.orange]
+      ['Rγ · Bidrag fra jordens egenvægt',area*.5*v.g*short*ng*sg,farve.green],
+      ['Rq · Bidrag fra overlejringstryk',area*v.q*nq*sq,farve.blue],
+      ['Rc · Bidrag fra kohæsion',area*v.c*nc*sc,farve.orange]
     ];
-    soejler(f,parts,'kN/m');
-    return {metrics:[['Brudbæreevne R',parts.reduce((sum,p)=>sum+p[1],0),'kN/m'],['Nγ',ng],['Nq',nq],['Nc',nc],...parts.map(([label,value])=>[label,value,'kN/m'])],caption:'Hver søjle viser et bidrag til den lodrette brudbæreevne pr. løbende meter fundament. Søjlerne har fælles skala.'};
+    const unit=mode?'kN':'kN/m';
+    soejler(f,parts,unit);
+    const dimensions=[['Excentricitet eᵦ',eb,'m',3],['Effektivt mål i bredderetningen',width,'m',3]];
+    if(mode) dimensions.push(['Excentricitet eₗ',el,'m',3],['Effektivt mål i længderetningen',length,'m',3],['Effektivt areal A′',area,'m²',3],['sγ',sg,'',3],['sq',sq,'',3],['sc',sc,'',3]);
+    return {footing:{eb,el,width,length},metrics:[['Brudbæreevne R',parts.reduce((sum,p)=>sum+p[1],0),unit],
+      ...dimensions,['Nγ',ng],['Nq',nq],['Nc',nc],...parts.map(([label,value])=>[label,value,unit])],
+      caption:`Søjlerne viser de tre bidrag til brudbæreevnen i ${unit} på fælles skala.`};
   }
 },
 paele:{
@@ -257,7 +274,7 @@ paele:{
     [input('g','Ramklodsens tyngde G',40,10,100,1,'kN'),
     input('h','Faldhøjde h',.7,.1,1.5,.05,metre),
     input('eta','Effektivitet η',.7,.7,.95,.01,''),
-    input('s','Nedsynkning pr. slag s',5,1,30,.5,'mm')]
+    input('blows','Rammejournal · slag for 200 mm',40,7,200,1,'slag')]
   ],
   draw(f,v,mode){
     const area=v.b**2;
@@ -265,10 +282,13 @@ paele:{
       const E=20e6, energy=v.eta*v.h*v.g;
       const length=v.l<20*v.b?(v.l+20*v.b)/2:v.l;
       const s0=Math.sqrt(2*energy*length/(area*E));
-      const s=v.s/1000;
+      const s=0.2/v.blows;
       const resistance=energy/(s+s0/2);
-      soejler(f,[['Blivende nedsynkning s',v.s,farve.green],['Elastisk led ½s₀',s0*500,farve.blue]],'mm');
-      return {metrics:[['Dynamisk modstand',resistance,'kN'],['Effektiv slagenergi',energy,'kNm'],['Længde i formlen',length,'m']],
+      soejler(f,[['Blivende nedsynkning s',s*1000,farve.green],['Elastisk led ½s₀',s0*500,farve.blue]],'mm');
+      return {penetration:s*1000,
+        table:{heads:['Måleserie','Slag','Nedsynkning (mm)','s (mm/slag)','G (kN)','h (m)','Gh (kNm/slag)','ηGh (kNm/slag)'],
+          rows:[['Afsluttende serie',v.blows,200,s*1000,v.g,v.h,v.g*v.h,energy]]},
+        metrics:[['Dynamisk modstand',resistance,'kN'],['Nedsynkning pr. slag',s*1000,'mm',2],['Effektiv slagenergi',energy,'kNm'],['Længde i formlen',length,'m']],
         caption:'Søjlerne viser de to længder i nævneren i rammeformlen. Modulet E for beton er 20 GPa som angivet på s. 418.'};
     }
     const shaft=4*v.b*v.l*v.cu*v.m*v.r, base=9*v.cu*area;
