@@ -279,7 +279,7 @@ paele:{
         table:{heads:['Måleserie','Slag','Nedsynkning (mm)','s (mm/slag)','G (kN)','h (m)','Gh (kNm/slag)','ηGh (kNm/slag)'],
           rows:[['Afsluttende serie',v.blows,200,s*1000,v.g,v.h,v.g*v.h,energy]]},
         metrics:[['Dynamisk modstand',resistance,'kN'],['Nedsynkning pr. slag',s*1000,'mm',2],['Effektiv slagenergi',energy,'kNm'],['Længde i formlen',length,'m']],
-        caption:'Søjlerne viser de to længder i nævneren i rammeformlen. Modulet E for beton er 20 GPa som angivet på s. 418.'};
+        caption:'Søjlernes fælles, faste skala går fra 0 til 30 mm. Tallet til højre for hver søjle viser den beregnede værdi af henholdsvis blivende nedsynkning pr. slag s og det elastiske led ½s₀. De to længder lægges sammen i rammeformlens nævner.'};
     }
     const shaft=4*v.b*v.l*v.cu*v.m*v.r, base=9*v.cu*area;
     soejler(f,[['Overflademodstand langs skaftet',shaft,farve.green],['Spidsmodstand',base,farve.orange]],'kN',6500);
