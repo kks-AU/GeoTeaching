@@ -155,10 +155,9 @@ const skitser = {
     });
     const [joinX,joinY]=spiral.at(-1);
     const surface=joinX+joinY/Math.tan(passive);
-    const minX=Math.min(-v.b/2,eb-surface), maxX=Math.max(v.b/2,eb+surface);
-    const maxDepth=Math.max(wedgeDepth,...spiral.map(([,y])=>y));
-    const scale=Math.min((f.w-2*edge-40)/(maxX-minX),(bottom-top-34)/maxDepth);
-    const x=f.w/2-(minX+maxX)*scale/2;
+    // The envelope covers b ≤ 5 m and φ ≤ 45° from the exercise controls.
+    const scale=Math.min((f.w-2*edge-24)/124,(225-top-34)/34);
+    const x=f.w/2;
     const screen=(horizontal,vertical)=>[x+horizontal*scale,top+vertical*scale];
     const loadX=x+eb*scale, left=x-v.b*scale/2, right=x+v.b*scale/2;
     const toe=screen(eb,wedgeDepth);
@@ -179,7 +178,7 @@ const skitser = {
     f.rect(left,top-15,right-left,15,steel);
     f.rect(leftContact[0],top,rightContact[0]-leftContact[0],4,farve.green);
     f.line([[x,44],[x,top-15]],farve.gray,1,[4,3]);
-    f.label(x,22,`b = ${tal(v.b)} m`,steel,'center');
+    vandretMaal(f,left,right,32,`b = ${tal(v.b)} m`);
     if(eb) vandretMaal(f,Math.min(x,loadX),Math.max(x,loadX),55,'eᵦ');
     pil(f,loadX,61,loadX,top-17);
     f.label(loadX+9,72,'V',load);
@@ -195,11 +194,13 @@ const skitser = {
         f.label((start+end)/2,top-arrowHeight-6,'q',farve.blue,'center');
       }
     }
+    vandretMaal(f,edge,edge+5*scale,bottom-24,'5 m');
     f.label(f.w/2,bottom-9,`Effektiv bredde i snittet: ${tal(width,2)} m`,steel,'center');
     if(mode){
-      const scale=Math.min(124/v.b,88/v.l);
+      const scale=88/6;
       const x=f.w/2, planW=v.b*scale, planL=v.l*scale, y=296;
       f.label(18,246,'Set ovenfra');
+      vandretMaal(f,18,18+2*scale,270,'2 m');
       f.rect(x-planW/2,y-planL/2,planW,planL,'#dce4df');
       const centerX=x+eb*scale, centerY=y+el*scale;
       f.rect(centerX-width*scale/2,centerY-length*scale/2,width*scale,length*scale,'#87b5a3');
@@ -209,7 +210,7 @@ const skitser = {
       f.label(x,y+planL/2+16,'b',steel,'center');
     }
     const note=mode?' Planen viser det effektive areal. Snittet viser den plane brudmekanisme i bredderetningen.':'';
-    return 'De blå pile viser det jævnt fordelte overlejringstryk q ved fundamentsunderkanten (FUK). Under den effektive bredde ligger en central kile, to logaritmiske spiralzoner og ydre passive kiler.'+note;
+    return 'Snittet og planvisningen har hver sin faste målestok. De blå pile viser det jævnt fordelte overlejringstryk q ved fundamentsunderkanten (FUK). Under den effektive bredde ligger en central kile, to logaritmiske spiralzoner og ydre passive kiler.'+note;
   },
   paele(f,v,mode,{penetration}){
     const x=f.w*.47, y=mode?91:57, bottom=f.h-21, edge=17;
