@@ -156,7 +156,7 @@ const skitser = {
     const [joinX,joinY]=spiral.at(-1);
     const surface=joinX+joinY/Math.tan(passive);
     // Use a fixed close-up and clip the outer failure zones to the soil panel.
-    const scale=Math.min(38,(f.w-2*edge)/13);
+    const scale=Math.min(110,(f.w-2*edge-58)/5);
     const x=f.w/2;
     const screen=(horizontal,vertical)=>[x+horizontal*scale,top+vertical*scale];
     const loadX=x+eb*scale, left=x-v.b*scale/2, right=x+v.b*scale/2;
