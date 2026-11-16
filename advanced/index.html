@@ -7,8 +7,8 @@
 <link rel="stylesheet" href="../assets/style.css?v=5">
 <link rel="stylesheet" href="cam-clay.css?v=2">
 <script defer src="../assets/figurer.js?v=17"></script>
-<script defer src="cam-clay-model.js?v=2"></script>
-<script defer src="cam-clay.js?v=3"></script>
+<script defer src="cam-clay-model.js?v=3"></script>
+<script defer src="cam-clay.js?v=4"></script>
 </head>
 <body class="cam-clay">
 <a class="skip" href="#content">Skip to content</a>
@@ -61,7 +61,7 @@
     <h2 id="tracking">Follow the test</h2>
     <div class="playback">
       <div class="control">
-        <label for="progress"><span id="progress-label">Axial strain</span> <output id="progress-value" for="progress">13%</output></label>
+        <label for="progress"><span id="progress-label">Axial strain</span> <output id="progress-value" for="progress"></output></label>
         <input id="progress" type="range" min="0" max="100" value="65" aria-describedby="progress-note">
       </div>
       <button id="play" type="button">Play</button>
@@ -105,6 +105,7 @@
       <dl class="cam-metrics">
         <div><dt>Mean effective stress <i>p</i>′</dt><dd id="mean-value"></dd></div>
         <div><dt>Deviator stress <i>q</i></dt><dd id="deviator-value"></dd></div>
+        <div><dt>Stress ratio <i>q</i>/<i>p</i>′</dt><dd id="stress-ratio-value"></dd></div>
         <div><dt>Yield pressure <i>p</i>′<sub>c</sub></dt><dd id="yield-value"></dd></div>
         <div><dt>Excess pore pressure Δ<i>u</i></dt><dd id="pore-value"></dd></div>
         <div><dt>Specific volume <i>v</i></dt><dd id="volume-value"></dd></div>
@@ -135,6 +136,7 @@
       <p><i>M</i> is the critical state ratio <i>q</i>/<i>p</i>′. In the <i>v</i>–ln(<i>p</i>′) plane, <i>λ</i> and <i>κ</i> are the magnitudes of the normal compression and swelling slopes. <i>N</i> = 2.8 is the specific volume on the normal compression line at <i>p</i>′<sub>ref</sub> = 1 kPa.</p>
       <p>The specimen starts isotropic. Both triaxial tests hold total cell pressure constant. The undrained test assumes saturation and incompressible constituents. The exercise follows analytical stress paths with associated plastic flow and uses illustrative material values.</p>
       <p><i>v</i><sub>0</sub> is the initial specific volume. Strains are logarithmic and displayed as percentages. The deviatoric strain <i>ε</i><sub>q</sub> combines elastic strain from a constant shear modulus <i>G</i> = 5 MPa with plastic strain integrated along the stress path.</p>
+      <p>The model generally approaches critical state asymptotically. To show the plateau at finite strain, the simulator switches to the theoretical limit once the stress ratio <i>q</i>/<i>p</i>′ is within 0.1% of <i>M</i>.</p>
     </details>
   </section>
   <section class="panel">

@@ -78,7 +78,7 @@ function camMarkLimit(chart, point, limit) {
 
 function camDrawResponse({ id, yLabel, value, digits }, bounds, states, traced, state) {
   const chart = figur(document.getElementById(id));
-  const maximum = 100 * camClayMaxAxialStrain;
+  const maximum = bounds.xMax;
   const plot = camGrid(chart, {
     xMin: 0, xMax: maximum, yMin: bounds.min, yMax: bounds.max,
     xLabel: 'ε₁ (%)', yLabel, xTicks: punkter(4, t => t * maximum), yDigits: digits,
@@ -152,8 +152,9 @@ function camUpdateAxisStatus() {
     camRun.referenceStates.some(({ p, v }) =>
       p < axes.volumeXMin || p > axes.volumeXMax || v < axes.volumeYMin || v > axes.volumeYMax) ||
     (camRun.model.limit && camResponseCharts.some(({ id, value }) => {
-      const { min, max } = axes.response[id];
-      return camRun.states.some(state => value(state) < min || value(state) > max);
+      const { min, max, xMax } = axes.response[id];
+      return 100 * camRun.model.maxAxialStrain > xMax ||
+        camRun.states.some(state => value(state) < min || value(state) > max);
     })));
   const message = clipped ? 'Some curves extend beyond the locked limits. Unlock the axes to see the full test.' : '';
   if (message !== camAxisStatus.textContent) camAxisStatus.textContent = message;
@@ -195,7 +196,7 @@ function camUpdateSetup() {
       const values = states.map(value);
       const min = Math.floor(Math.min(0, ...values) * 1.08 / unit) * unit;
       const max = ceil(Math.max(min < 0 ? unit : 4 * unit, ...values.map(y => y * 1.08)), unit);
-      return [id, { min, max }];
+      return [id, { min, max, xMax: 100 * model.maxAxialStrain }];
     }));
     // If the lock was set during an isotropic test, these charts had no visible axes yet.
     if (camLockedAxes && !camLockedAxes.response) camLockedAxes.response = axes.response;
@@ -205,7 +206,7 @@ function camUpdateSetup() {
   });
   document.querySelector('#progress-label').textContent = model.limit ? 'Axial strain' : 'Test progress';
   document.querySelector('#progress-note').textContent = model.limit
-    ? 'The triaxial test runs to 20% axial strain. The open circle marks the theoretical critical state.'
+    ? 'This test runs to ' + camNumber.format(100 * model.maxAxialStrain) + '% axial strain to show the approach to critical state and the plateau that follows.'
     : 'The slider follows the isotropic loading and unloading sequence.';
   camRun = { params, model, positions, states, referenceStates, axes, largestPc, largestQ };
   camUpdateAxisStatus();
@@ -224,6 +225,7 @@ function camRender() {
   camProgress.setAttribute('aria-valuetext', progressLabel);
   document.querySelector('#mean-value').textContent = camPressure(state.p);
   document.querySelector('#deviator-value').textContent = camPressure(state.q);
+  document.querySelector('#stress-ratio-value').textContent = (state.q / state.p).toFixed(4);
   document.querySelector('#yield-value').textContent = camPressure(state.pc);
   document.querySelector('#pore-value').textContent = camPressure(state.u);
   document.querySelector('#volume-value').textContent = state.v.toFixed(3);
@@ -235,8 +237,7 @@ function camRender() {
     hardening: ['Plastic compression and hardening', 'The stress point lies on the yield ellipse. Plastic compression raises the yield pressure and expands the ellipse.'],
     softening: ['Plastic dilation and softening', 'The stress point lies on the yield ellipse. Plastic dilation lowers the yield pressure and shrinks the ellipse.'],
     unloading: ['Elastic unloading', 'The specimen swells as mean effective stress falls. The yield ellipse retains the size reached at peak pressure.'],
-    critical: ['Critical state', 'At the limiting state q = Mp′, plastic shear can continue at constant stress and constant specific volume.'],
-    'near-critical': ['Near critical state', 'The stress ratio q/p′ is within 0.1% of M. Further shear brings the specimen closer to constant stress and constant specific volume.'],
+    critical: ['Critical state', 'Plastic shear continues at q = Mp′ with constant effective stresses and specific volume.'],
   };
   const [phase, description] = messages[state.phase];
   document.querySelector('#phase').textContent = phase;

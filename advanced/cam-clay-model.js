@@ -1,6 +1,6 @@
 const camClayReference = { pressure: 1, volume: 2.8 };
 const camClayShearModulus = 5000; // kPa
-const camClayMaxAxialStrain = 0.20;
+const camClayCriticalTolerance = 0.001; // Relative difference between q/p′ and M.
 
 function camClayVolume(p, pc, lambda, kappa) {
   const { pressure, volume } = camClayReference;
@@ -58,7 +58,6 @@ function camClayTest({ test, p0, ocr, m, lambda, kappa }) {
   const firstYield = triaxialState(etaYield, true);
   firstYield.axialStrain = elasticAxialStrain(firstYield);
   firstYield.phase = 'yield';
-  const yieldsAtCritical = Math.abs(etaYield - m) < 1e-10;
 
   // With η = M + (η_y − M) exp(−s), the factor dη/ds = M − η
   // cancels the critical-state singularity in the associated flow rule.
@@ -72,19 +71,26 @@ function camClayTest({ test, p0, ocr, m, lambda, kappa }) {
     return (2 * eta / (m + eta)) * (lambda - kappa) / v * capSlope;
   }
 
-  const step = 0.025;
+  const gap = Math.abs(etaYield - m);
+  const criticalDistance = gap <= m * camClayCriticalTolerance ? 0
+    : Math.log(gap / (m * camClayCriticalTolerance));
+  const steps = Math.ceil(criticalDistance / 0.025);
+  const step = criticalDistance / Math.max(steps, 1);
   const axialStrains = [firstYield.axialStrain];
-  if (!yieldsAtCritical) {
-    let plasticShear = 0;
-    for (let i = 1; axialStrains.at(-1) < camClayMaxAxialStrain; i += 1) {
-      const s = i * step;
-      plasticShear += step * (plasticShearRate(s - step) + 4 * plasticShearRate(s - step / 2) + plasticShearRate(s)) / 6;
-      axialStrains.push(elasticAxialStrain(triaxialState(etaAt(s), false)) + plasticShear);
-    }
+  let plasticShear = 0;
+  for (let i = 1; i <= steps; i += 1) {
+    const s = i * step;
+    plasticShear += step * (plasticShearRate(s - step) + 4 * plasticShearRate(s - step / 2) + plasticShearRate(s)) / 6;
+    axialStrains.push(elasticAxialStrain(triaxialState(etaAt(s), false)) + plasticShear);
   }
 
+  const criticalStrain = axialStrains.at(-1);
+  const maxAxialStrain = Math.max(20, 10 * Math.ceil((100 * criticalStrain + 5) / 10)) / 100;
+  const criticalProgress = criticalStrain / maxAxialStrain;
+  const limit = { ...triaxialState(m, false), phase: 'critical' };
+
   function at(progress) {
-    const axialStrain = progress * camClayMaxAxialStrain;
+    const axialStrain = progress * maxAxialStrain;
     if (axialStrain === 0) {
       return { ...triaxialState(0, true), phase: 'initial', axialStrain };
     }
@@ -99,7 +105,7 @@ function camClayTest({ test, p0, ocr, m, lambda, kappa }) {
       }
       return { ...triaxialState((low + high) / 2, true), axialStrain };
     }
-    if (yieldsAtCritical) return { ...firstYield, phase: 'critical', axialStrain };
+    if (progress >= criticalProgress) return { ...limit, axialStrain };
 
     let low = 0;
     let high = axialStrains.length - 1;
@@ -112,11 +118,9 @@ function camClayTest({ test, p0, ocr, m, lambda, kappa }) {
     const after = axialStrains[high];
     const fraction = (axialStrain - before) / (after - before);
     const eta = etaAt((low + fraction) * step);
-    const state = triaxialState(eta, false);
-    if (Math.abs(eta - m) <= m * 0.001) state.phase = 'near-critical';
-    return { ...state, axialStrain };
+    return { ...triaxialState(eta, false), axialStrain };
   }
 
-  const limit = triaxialState(m, false);
-  return { at, checkpoints: [firstYield.axialStrain / camClayMaxAxialStrain], pc0, limit };
+  const checkpoints = [firstYield.axialStrain / maxAxialStrain, criticalProgress];
+  return { at, checkpoints, pc0, limit, maxAxialStrain };
 }
