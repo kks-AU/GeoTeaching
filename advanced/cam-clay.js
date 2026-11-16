@@ -1,6 +1,8 @@
 const camForm = document.querySelector('#experiment');
 const camProgress = document.querySelector('#progress');
 const camPlay = document.querySelector('#play');
+const camAxisLock = document.querySelector('#lock-axes');
+const camAxisStatus = document.querySelector('#axis-status');
 const camStress = document.querySelector('#stress');
 const camVolume = document.querySelector('#volume');
 const camOptions = ['ocr', 'p0', 'm', 'lambda', 'kappa'];
@@ -19,12 +21,18 @@ const camBoundaries = {
 
 let camRun;
 let camFrame;
+let camLockedAxes;
 
-function camGrid(f, { xMin, xMax, yMin, yMax, xLabel, yLabel, xTicks, log }) {
-  const left = 45;
-  const right = f.w - 19;
+function camGrid(f, { xMin, xMax, yMin, yMax, xLabel, yLabel, xTicks, log, square }) {
+  const availableWidth = f.w - 45 - 19;
   const top = 28;
-  const bottom = f.h - 45;
+  const availableHeight = f.h - top - 45;
+  const side = Math.min(availableWidth, availableHeight);
+  const width = square ? side : availableWidth;
+  const height = square ? side : availableHeight;
+  const left = 45 + (availableWidth - width) / 2;
+  const right = left + width;
+  const bottom = top + height;
   const axis = log ? Math.log : value => value;
   const x = value => left + (axis(value) - axis(xMin)) / (axis(xMax) - axis(xMin)) * (right - left);
   const y = value => bottom - (value - yMin) / (yMax - yMin) * (bottom - top);
@@ -40,9 +48,10 @@ function camGrid(f, { xMin, xMax, yMin, yMax, xLabel, yLabel, xTicks, log }) {
   }
   f.line([[left, top], [left, bottom], [right, bottom]], '#61736e', 1);
   f.label(left, 17, yLabel);
-  f.label(right, f.h - 8, xLabel, '#213d37', 'right');
+  f.label(right, bottom + 37, xLabel, '#213d37', 'right');
   return {
     point: (a, b) => [x(a), y(b)],
+    contains: (a, b) => a >= xMin && a <= xMax && b >= yMin && b <= yMax,
     clip: draw => f.clipRect(left, top, right - left + 1, bottom - top + 1, draw),
   };
 }
@@ -55,15 +64,17 @@ function camEllipse(pc, m, plot) {
 }
 
 function camDraw(state, traced) {
-  const { params, model, states, axes } = camRun;
+  const { params, model, states } = camRun;
+  const axes = camLockedAxes ?? camRun.axes;
   const { m, lambda, kappa } = params;
   const stressChart = figur(camStress);
   const stressPlot = camGrid(stressChart, {
-    xMin: 0, xMax: axes.stressX, yMin: 0, yMax: axes.stressY,
-    xLabel: 'p′ (kPa)', yLabel: 'q (kPa)', xTicks: punkter(4, t => t * axes.stressX),
+    xMin: 0, xMax: axes.stressMax, yMin: 0, yMax: axes.stressMax,
+    xLabel: 'p′ (kPa)', yLabel: 'q (kPa)', xTicks: punkter(4, t => t * axes.stressMax),
+    square: true,
   });
   const stressPoint = ({ p, q }) => stressPlot.point(p, q);
-  const lineEnd = Math.min(axes.stressX, axes.stressY / m);
+  const lineEnd = axes.stressMax / Math.max(1, m);
   stressPlot.clip(() => {
     stressChart.line([stressPlot.point(0, 0), stressPlot.point(lineEnd, m * lineEnd)], camColours.critical, 1.6, [6, 4]);
     stressChart.line(camEllipse(state.pc, m, stressPlot), camColours.yield, 1.8);
@@ -71,8 +82,10 @@ function camDraw(state, traced) {
     stressChart.line(states.map(stressPoint), camColours.path, 1.7);
     stressChart.line(traced.map(stressPoint), camColours.current, 2.7);
   });
-  stressChart.dot(...stressPoint(state), '#fff', 6.3);
-  stressChart.dot(...stressPoint(state), camColours.current, 4.2);
+  if (stressPlot.contains(state.p, state.q)) {
+    stressChart.dot(...stressPoint(state), '#fff', 6.3);
+    stressChart.dot(...stressPoint(state), camColours.current, 4.2);
+  }
 
   const volumeChart = figur(camVolume);
   const volumePlot = camGrid(volumeChart, {
@@ -90,8 +103,19 @@ function camDraw(state, traced) {
     volumeChart.line(states.map(volumePoint), camColours.path, 1.7);
     volumeChart.line(traced.map(volumePoint), camColours.current, 2.7);
   });
-  volumeChart.dot(...volumePoint(state), '#fff', 6.3);
-  volumeChart.dot(...volumePoint(state), camColours.current, 4.2);
+  if (volumePlot.contains(state.p, state.v)) {
+    volumeChart.dot(...volumePoint(state), '#fff', 6.3);
+    volumeChart.dot(...volumePoint(state), camColours.current, 4.2);
+  }
+}
+
+function camUpdateAxisStatus() {
+  const axes = camLockedAxes;
+  const clipped = axes && (camRun.largestPc > axes.stressMax || camRun.largestQ > axes.stressMax ||
+    camRun.states.some(({ p, v }) =>
+      p < axes.volumeXMin || p > axes.volumeXMax || v < axes.volumeYMin || v > axes.volumeYMax));
+  const message = clipped ? 'Some curves extend beyond the locked limits. Unlock the axes to see the full test.' : '';
+  if (message !== camAxisStatus.textContent) camAxisStatus.textContent = message;
 }
 
 function camUpdateSetup() {
@@ -117,15 +141,15 @@ function camUpdateSetup() {
   const volumes = [...states.map(state => state.v), vLow, vHigh];
   const ceil = (value, step) => Math.ceil(value / step) * step;
   const axes = {
-    stressX: ceil(largestPc * 1.05, 40),
-    stressY: ceil(largestQ * 1.15, 40),
+    stressMax: ceil(Math.max(largestPc * 1.05, largestQ * 1.15), 40),
     volumeXMin: pLow,
     volumeXMax: pHigh,
     volumeYMin: Math.floor((Math.min(...volumes) - 0.012) / 0.02) * 0.02,
     volumeYMax: ceil(Math.max(...volumes) + 0.012, 0.02),
     volumeTicks: punkter(3, t => pLow * (pHigh / pLow) ** t),
   };
-  camRun = { params, model, positions, states, axes };
+  camRun = { params, model, positions, states, axes, largestPc, largestQ };
+  camUpdateAxisStatus();
   camRender();
 }
 
@@ -185,6 +209,11 @@ camPlay.addEventListener('click', () => {
 });
 
 camProgress.addEventListener('input', () => { camStop(); camRender(); });
+camAxisLock.addEventListener('change', () => {
+  camLockedAxes = camAxisLock.checked ? camRun.axes : undefined;
+  camUpdateAxisStatus();
+  camRender();
+});
 camForm.addEventListener('input', () => { camStop(); camUpdateSetup(); });
 camForm.querySelectorAll('[data-ocr]').forEach(button => {
   button.addEventListener('click', () => {
@@ -200,4 +229,5 @@ camForm.addEventListener('reset', () => {
 });
 
 camUpdateSetup();
+if (camAxisLock.checked) camLockedAxes = camRun.axes;
 new ResizeObserver(camRender).observe(camStress);

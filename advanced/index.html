@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Modified Cam Clay · Advanced Geotechnics</title>
 <link rel="stylesheet" href="../assets/style.css?v=5">
-<link rel="stylesheet" href="cam-clay.css?v=1">
+<link rel="stylesheet" href="cam-clay.css?v=2">
 <script defer src="../assets/figurer.js?v=17"></script>
 <script defer src="cam-clay-model.js?v=1"></script>
-<script defer src="cam-clay.js?v=1"></script>
+<script defer src="cam-clay.js?v=2"></script>
 </head>
 <body class="cam-clay">
 <a class="skip" href="#content">Skip to content</a>
@@ -67,11 +67,13 @@
       <button id="play" type="button">Play</button>
     </div>
     <p id="progress-note" class="hint">The slider moves along the stress path. Equal steps represent positions along the path rather than equal increments of strain or time.</p>
+    <label class="cam-axis-lock"><input id="lock-axes" type="checkbox"> Lock both charts’ axis limits</label>
+    <p id="axis-status" class="hint" role="status"></p>
     <div class="cam-plots">
       <figure>
         <h3>Effective stress path</h3>
         <canvas id="stress" role="img" aria-label="Effective stress path and the evolving yield surface" aria-describedby="stress-caption"></canvas>
-        <figcaption id="stress-caption"><i>p</i>′ is mean effective stress and <i>q</i> is deviator stress.</figcaption>
+        <figcaption id="stress-caption"><i>p</i>′ is mean effective stress and <i>q</i> is deviator stress. The axes use the same kPa scale.</figcaption>
       </figure>
       <figure>
         <h3>Compression and swelling</h3>

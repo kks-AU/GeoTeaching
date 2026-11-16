@@ -17,10 +17,13 @@
 .playback { display: flex; gap: 1rem; align-items: center; }
 .playback .control { flex: 1; margin: 0; }
 .playback button { min-width: 6rem; }
+.cam-axis-lock { display: inline-flex; align-items: center; gap: .35rem; margin-top: .75rem; font-size: .9rem; font-weight: 650; }
+.cam-axis-lock input { accent-color: var(--green); }
+#axis-status:empty { margin: 0; }
 .cam-plots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; margin-top: 1rem; }
 .cam-plots figure { min-width: 0; margin: 0; }
 .cam-plots h3 { font-size: 1.1rem; margin-bottom: .4rem; }
-.cam-plots canvas { height: 250px; border: 1px solid var(--line); }
+.cam-plots canvas { height: clamp(260px, 30vw, 370px); border: 1px solid var(--line); }
 .cam-plots figcaption { font-size: .82rem; color: var(--muted); margin-top: .35rem; }
 .cam-key { display: flex; flex-wrap: wrap; gap: .3rem 1rem; list-style: none; padding: 0; font-size: .77rem; color: var(--muted); }
 .cam-key li { display: flex; align-items: center; gap: .35rem; }
@@ -45,5 +48,5 @@
 }
 @media (max-width: 680px) {
   .cam-clay .workspace { grid-template-columns: 1fr; }
-  .cam-plots canvas { height: 235px; }
+  .cam-plots canvas { height: clamp(255px, 80vw, 370px); }
 }
