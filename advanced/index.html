@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="cam-clay.css?v=2">
 <script defer src="../assets/figurer.js?v=17"></script>
 <script defer src="cam-clay-model.js?v=4"></script>
-<script defer src="cam-clay.js?v=5"></script>
+<script defer src="cam-clay.js?v=6"></script>
 </head>
 <body class="cam-clay">
 <a class="skip" href="#content">Skip to content</a>
@@ -88,15 +88,20 @@
         <canvas id="volume" role="img" aria-label="Specific volume against mean effective stress on a logarithmic scale" aria-describedby="volume-caption"></canvas>
         <figcaption id="volume-caption"><i>v</i> = 1 + <i>e</i>, where <i>e</i> is the void ratio. The stress axis is logarithmic.</figcaption>
       </figure>
+      <figure id="deviator-stress-figure" hidden>
+        <h3>Deviator stress</h3>
+        <canvas id="deviator-stress" role="img" aria-label="Deviator stress versus axial strain" aria-describedby="deviator-stress-caption"></canvas>
+        <figcaption id="deviator-stress-caption"><i>q</i> is the difference between axial and radial effective stresses. <i>ε</i><sub>1</sub> is axial compression strain.</figcaption>
+      </figure>
       <figure id="volumetric-strain-figure" hidden>
         <h3>Volumetric strain</h3>
         <canvas id="volumetric-strain" role="img" aria-label="Volumetric strain versus axial strain" aria-describedby="volumetric-strain-caption"></canvas>
-        <figcaption id="volumetric-strain-caption"><i>ε</i><sub>v</sub> is positive for volume reduction and negative for expansion. It stays at zero in the undrained test. <i>ε</i><sub>1</sub> is axial compression strain.</figcaption>
+        <figcaption id="volumetric-strain-caption"><i>ε</i><sub>v</sub> is positive for volume reduction and negative for expansion. <i>ε</i><sub>1</sub> is axial compression strain.</figcaption>
       </figure>
       <figure id="pore-pressure-figure" hidden>
         <h3>Excess pore pressure</h3>
         <canvas id="pore-pressure" role="img" aria-label="Excess pore pressure versus axial strain" aria-describedby="pore-pressure-caption"></canvas>
-        <figcaption id="pore-pressure-caption">Δ<i>u</i> is the change in pore pressure from the start of the test. It stays at zero in the drained test. <i>ε</i><sub>1</sub> is axial compression strain.</figcaption>
+        <figcaption id="pore-pressure-caption">Δ<i>u</i> is the change in pore pressure from the start of the test. <i>ε</i><sub>1</sub> is axial compression strain.</figcaption>
       </figure>
     </div>
     <ul class="cam-key" aria-label="Figure legend">

@@ -6,8 +6,9 @@ const camAxisStatus = document.querySelector('#axis-status');
 const camStress = document.querySelector('#stress');
 const camVolume = document.querySelector('#volume');
 const camResponseCharts = [
-  { id: 'volumetric-strain', yLabel: 'εᵥ (%)', value: state => 100 * state.volumetricStrain, unit: 0.5, digits: 2 },
-  { id: 'pore-pressure', yLabel: 'Δu (kPa)', value: state => state.u, unit: 10, digits: 1 },
+  { id: 'deviator-stress', yLabel: 'q (kPa)', value: state => state.q, unit: 10, digits: 1 },
+  { id: 'volumetric-strain', test: 'drained', yLabel: 'εᵥ (%)', value: state => 100 * state.volumetricStrain, unit: 0.5, digits: 2 },
+  { id: 'pore-pressure', test: 'undrained', yLabel: 'Δu (kPa)', value: state => state.u, unit: 10, digits: 1 },
 ];
 const camOptions = ['ocr', 'p0', 'm', 'lambda', 'kappa', 'n', 'g'];
 const camColours = Object.fromEntries(
@@ -76,12 +77,12 @@ function camMarkLimit(chart, point, limit) {
   chart.dot(...position, '#fffef9', 2.9);
 }
 
-function camDrawResponse({ id, yLabel, value, digits }, bounds, states, traced, state) {
+function camDrawResponse({ id, yLabel, value, digits }, { response, responseXMax }, states, traced, state) {
   const chart = figur(document.getElementById(id));
-  const maximum = bounds.xMax;
+  const { min, max } = response[id];
   const plot = camGrid(chart, {
-    xMin: 0, xMax: maximum, yMin: bounds.min, yMax: bounds.max,
-    xLabel: 'ε₁ (%)', yLabel, xTicks: punkter(4, t => t * maximum), yDigits: digits,
+    xMin: 0, xMax: responseXMax, yMin: min, yMax: max,
+    xLabel: 'ε₁ (%)', yLabel, xTicks: punkter(4, t => t * responseXMax), yDigits: digits,
   });
   const point = sample => plot.point(100 * sample.axialStrain, value(sample));
   plot.clip(() => {
@@ -140,10 +141,8 @@ function camDraw(state, traced) {
     volumeChart.dot(...volumePoint(state), '#fff', 6.3);
     volumeChart.dot(...volumePoint(state), camColours.current, 4.2);
   }
-  if (model.limit) {
-    camResponseCharts.forEach(definition =>
-      camDrawResponse(definition, axes.response[definition.id], states, traced, state));
-  }
+  camRun.responseCharts.forEach(definition =>
+    camDrawResponse(definition, axes, states, traced, state));
 }
 
 function camUpdateAxisStatus() {
@@ -151,11 +150,11 @@ function camUpdateAxisStatus() {
   const clipped = axes && (camRun.largestPc > axes.stressMax || camRun.largestQ > axes.stressMax ||
     camRun.referenceStates.some(({ p, v }) =>
       p < axes.volumeXMin || p > axes.volumeXMax || v < axes.volumeYMin || v > axes.volumeYMax) ||
-    (camRun.model.limit && camResponseCharts.some(({ id, value }) => {
-      const { min, max, xMax } = axes.response[id];
-      return 100 * camRun.model.maxAxialStrain > xMax ||
-        camRun.states.some(state => value(state) < min || value(state) > max);
-    })));
+    (camRun.responseCharts.length && (camRun.axes.responseXMax > axes.responseXMax ||
+      camRun.responseCharts.some(({ id, value }) => {
+        const { min, max } = axes.response[id];
+        return camRun.states.some(state => value(state) < min || value(state) > max);
+      }))));
   const message = clipped ? 'Some curves extend beyond the locked limits. Unlock the axes to see the full test.' : '';
   if (message !== camAxisStatus.textContent) camAxisStatus.textContent = message;
 }
@@ -192,18 +191,24 @@ function camUpdateSetup() {
     volumeYMax: ceil(Math.max(...volumes) + 0.012, 0.02),
     volumeTicks: punkter(3, t => pLow * (pHigh / pLow) ** t),
   };
-  if (model.limit) {
-    axes.response = Object.fromEntries(camResponseCharts.map(({ id, value, unit }) => {
+  const responseCharts = model.limit
+    ? camResponseCharts.filter(chart => !chart.test || chart.test === params.test) : [];
+  if (responseCharts.length) {
+    axes.responseXMax = 100 * model.maxAxialStrain;
+    axes.response = Object.fromEntries(responseCharts.map(({ id, value, unit }) => {
       const values = states.map(value);
       const min = Math.floor(Math.min(0, ...values) * 1.08 / unit) * unit;
       const max = ceil(Math.max(min < 0 ? unit : 4 * unit, ...values.map(y => y * 1.08)), unit);
-      return [id, { min, max, xMax: 100 * model.maxAxialStrain }];
+      return [id, { min, max }];
     }));
-    // If the lock was set during an isotropic test, these charts had no visible axes yet.
-    if (camLockedAxes && !camLockedAxes.response) camLockedAxes.response = axes.response;
+    // A newly visible chart takes its initial y limits from the current run.
+    if (camLockedAxes) {
+      camLockedAxes.responseXMax ??= axes.responseXMax;
+      camLockedAxes.response = { ...axes.response, ...camLockedAxes.response };
+    }
   }
-  camResponseCharts.forEach(({ id }) => {
-    document.getElementById(id + '-figure').hidden = !model.limit;
+  camResponseCharts.forEach(chart => {
+    document.getElementById(chart.id + '-figure').hidden = !responseCharts.includes(chart);
   });
   const followsAxialStrain = model.limit && !model.axialStrainReverses;
   document.querySelector('#progress-label').textContent = followsAxialStrain ? 'Axial strain' : 'Test progress';
@@ -213,7 +218,7 @@ function camUpdateSetup() {
   document.querySelector('#progress-note').textContent = model.axialStrainReverses
     ? 'Axial strain decreases over part of this path. The slider follows the loading sequence. ' + progressNote
     : progressNote;
-  camRun = { params, model, positions, states, referenceStates, axes, largestPc, largestQ };
+  camRun = { params, model, positions, states, referenceStates, axes, largestPc, largestQ, responseCharts };
   camUpdateAxisStatus();
   camRender();
 }
