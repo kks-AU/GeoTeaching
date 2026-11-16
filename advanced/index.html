@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modified Cam Clay · Advanced Geotechnics</title>
+<link rel="stylesheet" href="../assets/style.css?v=5">
+<link rel="stylesheet" href="cam-clay.css?v=1">
+<script defer src="../assets/figurer.js?v=17"></script>
+<script defer src="cam-clay-model.js?v=1"></script>
+<script defer src="cam-clay.js?v=1"></script>
+</head>
+<body class="cam-clay">
+<a class="skip" href="#content">Skip to content</a>
+<header><div class="wrap"><a class="brand" href="../index.html">← Geotechnics home</a><small>Advanced Geotechnics</small></div></header>
+<main id="content">
+<section class="exercise-head">
+  <h1>Modified Cam Clay</h1>
+  <p>Follow a clay specimen from its initial stress state through yielding. Change its stress history or the drainage conditions to see how the stress path, yield surface and specific volume respond.</p>
+</section>
+<div class="workspace">
+  <section class="panel" aria-labelledby="settings">
+    <h2 id="settings">Test setup</h2>
+    <form id="experiment">
+      <label for="test">Loading programme</label>
+      <select id="test" name="test">
+        <option value="drained">Drained triaxial compression</option>
+        <option value="undrained">Undrained triaxial compression</option>
+        <option value="isotropic">Isotropic compression and unloading</option>
+      </select>
+      <p id="boundary" class="hint"></p>
+      <div class="presets" role="group" aria-label="Stress history presets">
+        <button type="button" data-ocr="1">Normally consolidated</button>
+        <button type="button" data-ocr="3">Overconsolidated</button>
+      </div>
+      <div class="control">
+        <label for="ocr">Overconsolidation ratio (OCR) <output id="ocr-value" for="ocr">1.00</output></label>
+        <input id="ocr" name="ocr" type="range" min="1" max="4" step="0.05" value="1">
+      </div>
+      <div class="control">
+        <label for="p0"><span>Initial mean effective stress <i>p</i>′<sub>0</sub></span> <output id="p0-value" for="p0">100 kPa</output></label>
+        <input id="p0" name="p0" type="range" min="50" max="150" step="5" value="100">
+      </div>
+      <div class="control">
+        <label for="m"><span>Critical state stress ratio <i>M</i></span> <output id="m-value" for="m">1.20</output></label>
+        <input id="m" name="m" type="range" min="0.8" max="1.5" step="0.025" value="1.2">
+      </div>
+      <div class="control">
+        <label for="lambda"><span>Normal compression slope <i>λ</i></span> <output id="lambda-value" for="lambda">0.160</output></label>
+        <input id="lambda" name="lambda" type="range" min="0.09" max="0.22" step="0.005" value="0.16">
+      </div>
+      <div class="control">
+        <label for="kappa"><span>Unloading and reloading slope <i>κ</i></span> <output id="kappa-value" for="kappa">0.040</output></label>
+        <input id="kappa" name="kappa" type="range" min="0.015" max="0.06" step="0.005" value="0.04">
+      </div>
+      <button type="reset">Reset setup</button>
+    </form>
+    <noscript><p>Enable JavaScript to run the simulator.</p></noscript>
+  </section>
+  <section class="panel experiment" aria-labelledby="tracking">
+    <h2 id="tracking">Follow the test</h2>
+    <div class="playback">
+      <div class="control">
+        <label for="progress">Test progress <output id="progress-value" for="progress">65%</output></label>
+        <input id="progress" type="range" min="0" max="100" value="65" aria-describedby="progress-note">
+      </div>
+      <button id="play" type="button">Play</button>
+    </div>
+    <p id="progress-note" class="hint">The slider moves along the stress path. Equal steps represent positions along the path rather than equal increments of strain or time.</p>
+    <div class="cam-plots">
+      <figure>
+        <h3>Effective stress path</h3>
+        <canvas id="stress" role="img" aria-label="Effective stress path and the evolving yield surface" aria-describedby="stress-caption"></canvas>
+        <figcaption id="stress-caption"><i>p</i>′ is mean effective stress and <i>q</i> is deviator stress.</figcaption>
+      </figure>
+      <figure>
+        <h3>Compression and swelling</h3>
+        <canvas id="volume" role="img" aria-label="Specific volume against mean effective stress on a logarithmic scale" aria-describedby="volume-caption"></canvas>
+        <figcaption id="volume-caption"><i>v</i> = 1 + <i>e</i>, where <i>e</i> is the void ratio. The stress axis is logarithmic.</figcaption>
+      </figure>
+    </div>
+    <ul class="cam-key" aria-label="Figure legend">
+      <li class="key-state">Current state and path traced</li>
+      <li class="key-path">Full test path</li>
+      <li class="key-initial">Initial yield ellipse</li>
+      <li class="key-yield">Current yield ellipse</li>
+      <li class="key-critical">Critical state line</li>
+      <li class="key-normal">Normal compression line</li>
+    </ul>
+    <div class="cam-state">
+      <h3 id="phase"></h3>
+      <p id="interpretation"></p>
+      <dl class="cam-metrics">
+        <div><dt>Mean effective stress <i>p</i>′</dt><dd id="mean-value"></dd></div>
+        <div><dt>Deviator stress <i>q</i></dt><dd id="deviator-value"></dd></div>
+        <div><dt>Yield pressure <i>p</i>′<sub>c</sub></dt><dd id="yield-value"></dd></div>
+        <div><dt>Excess pore pressure Δ<i>u</i></dt><dd id="pore-value"></dd></div>
+        <div><dt>Specific volume <i>v</i></dt><dd id="volume-value"></dd></div>
+      </dl>
+    </div>
+  </section>
+</div>
+<div class="notes cam-notes">
+  <section class="panel">
+    <h2>Model equations</h2>
+    <div class="equation"><p>Stress invariants in triaxial compression</p>
+      <math display="block"><msup><mi>p</mi><mo>′</mo></msup><mo>=</mo><mfrac><mrow><msubsup><mi>σ</mi><mn>1</mn><mo>′</mo></msubsup><mo>+</mo><mn>2</mn><msubsup><mi>σ</mi><mn>3</mn><mo>′</mo></msubsup></mrow><mn>3</mn></mfrac><mo>,</mo><mspace width="1em"/><mi>q</mi><mo>=</mo><msubsup><mi>σ</mi><mn>1</mn><mo>′</mo></msubsup><mo>−</mo><msubsup><mi>σ</mi><mn>3</mn><mo>′</mo></msubsup></math>
+    </div>
+    <div class="equation"><p>Yield ellipse and critical state</p>
+      <math display="block"><msup><mi>q</mi><mn>2</mn></msup><mo>=</mo><msup><mi>M</mi><mn>2</mn></msup><msup><mi>p</mi><mo>′</mo></msup><mo>(</mo><msubsup><mi>p</mi><mi>c</mi><mo>′</mo></msubsup><mo>−</mo><msup><mi>p</mi><mo>′</mo></msup><mo>)</mo><mo>,</mo><mspace width="1em"/><mi>q</mi><mo>=</mo><mi>M</mi><msup><mi>p</mi><mo>′</mo></msup></math>
+    </div>
+    <div class="equation"><p>Specific volume on the swelling line through the current yield pressure</p>
+      <math display="block"><mi>v</mi><mo>=</mo><mi>N</mi><mo>−</mo><mi>λ</mi><mi mathvariant="normal">ln</mi><mfrac><msubsup><mi>p</mi><mi>c</mi><mo>′</mo></msubsup><msubsup><mi>p</mi><mtext>ref</mtext><mo>′</mo></msubsup></mfrac><mo>+</mo><mi>κ</mi><mi mathvariant="normal">ln</mi><mfrac><msubsup><mi>p</mi><mi>c</mi><mo>′</mo></msubsup><msup><mi>p</mi><mo>′</mo></msup></mfrac></math>
+    </div>
+    <div class="equation"><p>Initial yield pressure and triaxial excess pore pressure</p>
+      <math display="block"><msubsup><mi>p</mi><mrow><mi>c</mi><mn>0</mn></mrow><mo>′</mo></msubsup><mo>=</mo><mtext>OCR</mtext><msubsup><mi>p</mi><mn>0</mn><mo>′</mo></msubsup><mo>,</mo><mspace width="1em"/><mi>Δ</mi><mi>u</mi><mo>=</mo><msubsup><mi>p</mi><mn>0</mn><mo>′</mo></msubsup><mo>+</mo><mfrac><mi>q</mi><mn>3</mn></mfrac><mo>−</mo><msup><mi>p</mi><mo>′</mo></msup></math>
+    </div>
+    <details><summary>Symbols and assumptions</summary>
+      <p><i>σ</i>′<sub>1</sub> and <i>σ</i>′<sub>3</sub> are axial and radial effective stresses. <i>p</i>′<sub>c</sub> is the current isotropic yield pressure and <i>p</i>′<sub>c0</sub> its initial value. Stresses and pore pressure are in kPa, with compression positive.</p>
+      <p><i>M</i> is the critical state ratio <i>q</i>/<i>p</i>′. In the <i>v</i>–ln(<i>p</i>′) plane, <i>λ</i> and <i>κ</i> are the magnitudes of the normal compression and swelling slopes. <i>N</i> = 2.8 is the specific volume on the normal compression line at <i>p</i>′<sub>ref</sub> = 1 kPa.</p>
+      <p>The specimen starts isotropic. Both triaxial tests hold total cell pressure constant. The undrained test assumes saturation and incompressible constituents. The exercise follows analytical stress paths with associated plastic flow and uses illustrative material values.</p>
+    </details>
+  </section>
+  <section class="panel">
+    <h2>Try these comparisons</h2>
+    <ol>
+      <li>Run a normally consolidated specimen in drained and undrained compression. Which way does <i>p</i>′ move after yielding, and what happens to <i>v</i>?</li>
+      <li>Set OCR to 3 in the undrained test. Follow the path past first yield. Does <i>p</i>′<sub>c</sub> grow or shrink?</li>
+      <li>Run isotropic compression and unloading with OCR above 1. Compare the swelling and normal compression slopes. Does the specimen recover its initial volume when it returns to <i>p</i>′<sub>0</sub>?</li>
+    </ol>
+    <details><summary>Check your reasoning</summary>
+      <p>In the drained normally consolidated test, <i>p</i>′ increases and <i>v</i> decreases. In the undrained normally consolidated test, <i>v</i> stays constant and <i>p</i>′ falls as excess pore pressure builds.</p>
+      <p>At OCR = 3 the undrained path reaches yield above the critical state line and the ellipse shrinks as the specimen approaches critical state. Isotropic unloading follows the flatter swelling line, leaving a permanent volume reduction.</p>
+    </details>
+    <h3>Further reading</h3>
+    <p>Roscoe, K. H. and Burland, J. B. (1968), <cite>On the generalised stress-strain behaviour of ‘wet’ clay</cite>, in <cite>Engineering Plasticity</cite>, pp. 535–609. <a href="https://www.researchgate.net/publication/303225549_On_the_generalized_stress-strain_behaviour_of_wet_clay_MHEYMAN_J_LECKIE_F_P_eds">Original publication</a></p>
+    <p>For background in <cite>Lærebog i Geoteknik</cite>, 3rd ed., see <a href="../eksempler/spaendinger.html">effective stress</a> (Chapter 2, § 2.1, pp. 59–66) and <a href="../eksempler/konsolideringsforsog.html">compressibility and consolidation tests</a> (Chapter 5, §§ 5.2–5.6, pp. 141–154, and Chapter 6, § 6.6, pp. 170–177).</p>
+  </section>
+</div>
+</main>
+<footer><div class="wrap"><span>Advanced Geotechnics</span><a href="../index.html">All exercises</a></div></footer>
+</body>
+</html>
