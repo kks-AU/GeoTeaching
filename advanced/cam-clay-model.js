@@ -1,20 +1,19 @@
-const camClayReference = { pressure: 1, volume: 2.8 };
-const camClayShearModulus = 5000; // kPa
+const camClayReferencePressure = 1; // kPa
 const camClayCriticalTolerance = 0.001; // Relative difference between q/p′ and M.
 
-function camClayVolume(p, pc, lambda, kappa) {
-  const { pressure, volume } = camClayReference;
-  return volume - lambda * Math.log(pc / pressure) + kappa * Math.log(pc / p);
+function camClayVolume(p, pc, { n, lambda, kappa }) {
+  return n - lambda * Math.log(pc / camClayReferencePressure) + kappa * Math.log(pc / p);
 }
 
-function camClayTest({ test, p0, ocr, m, lambda, kappa }) {
+function camClayTest(params) {
+  const { test, p0, ocr, m, lambda, kappa, g } = params;
   const pc0 = ocr * p0;
   const isIsotropic = test === 'isotropic';
   const isUndrained = test === 'undrained';
-  const initialVolume = camClayVolume(p0, pc0, lambda, kappa);
+  const initialVolume = camClayVolume(p0, pc0, params);
   const makeState = (p, q, pc, phase) => ({
     p, q, pc, phase,
-    v: isUndrained ? initialVolume : camClayVolume(p, pc, lambda, kappa),
+    v: isUndrained ? initialVolume : camClayVolume(p, pc, params),
     u: isUndrained ? p0 + q / 3 - p : 0,
   });
 
@@ -54,9 +53,9 @@ function camClayTest({ test, p0, ocr, m, lambda, kappa }) {
     return state;
   }
 
-  const elasticAxialStrain = state => state.volumetricStrain / 3 + state.q / (3 * camClayShearModulus);
+  const axialStrainWithoutPlasticShear = state => state.volumetricStrain / 3 + state.q / (3 * g);
   const firstYield = triaxialState(etaYield, true);
-  firstYield.axialStrain = elasticAxialStrain(firstYield);
+  firstYield.axialStrain = axialStrainWithoutPlasticShear(firstYield);
   firstYield.phase = 'yield';
 
   // With η = M + (η_y − M) exp(−s), the factor dη/ds = M − η
@@ -77,50 +76,58 @@ function camClayTest({ test, p0, ocr, m, lambda, kappa }) {
   const steps = Math.ceil(criticalDistance / 0.025);
   const step = criticalDistance / Math.max(steps, 1);
   const axialStrains = [firstYield.axialStrain];
+  const strainPath = [firstYield.axialStrain];
   let plasticShear = 0;
+  let reversedStrain = 0;
   for (let i = 1; i <= steps; i += 1) {
     const s = i * step;
     plasticShear += step * (plasticShearRate(s - step) + 4 * plasticShearRate(s - step / 2) + plasticShearRate(s)) / 6;
-    axialStrains.push(elasticAxialStrain(triaxialState(etaAt(s), false)) + plasticShear);
+    const strain = axialStrainWithoutPlasticShear(triaxialState(etaAt(s), false)) + plasticShear;
+    // Count both forward and reverse strain increments so the lookup
+    // follows the loading sequence even when axial strain decreases.
+    reversedStrain += Math.max(0, axialStrains.at(-1) - strain);
+    axialStrains.push(strain);
+    strainPath.push(strain + 2 * reversedStrain);
   }
 
   const criticalStrain = axialStrains.at(-1);
-  const maxAxialStrain = Math.max(20, 10 * Math.ceil((100 * criticalStrain + 5) / 10)) / 100;
-  const criticalProgress = criticalStrain / maxAxialStrain;
+  const requiredStrain = Math.max(criticalStrain + 0.05, ...axialStrains);
+  const maxAxialStrain = Math.max(20, 10 * Math.ceil(10 * requiredStrain)) / 100;
+  const pathLength = maxAxialStrain + 2 * reversedStrain;
+  const criticalProgress = strainPath.at(-1) / pathLength;
   const limit = { ...triaxialState(m, false), phase: 'critical' };
 
   function at(progress) {
-    const axialStrain = progress * maxAxialStrain;
-    if (axialStrain === 0) {
-      return { ...triaxialState(0, true), phase: 'initial', axialStrain };
+    const position = progress * pathLength;
+    if (position === 0) {
+      return { ...triaxialState(0, true), phase: 'initial', axialStrain: 0 };
     }
-    if (Math.abs(axialStrain - firstYield.axialStrain) < 1e-12) return firstYield;
-    if (axialStrain < firstYield.axialStrain) {
+    if (Math.abs(position - firstYield.axialStrain) < 1e-12) return firstYield;
+    if (position < firstYield.axialStrain) {
       let low = 0;
       let high = etaYield;
       for (let i = 0; i < 30; i += 1) {
         const mid = (low + high) / 2;
-        if (elasticAxialStrain(triaxialState(mid, true)) < axialStrain) low = mid;
+        if (axialStrainWithoutPlasticShear(triaxialState(mid, true)) < position) low = mid;
         else high = mid;
       }
-      return { ...triaxialState((low + high) / 2, true), axialStrain };
+      return { ...triaxialState((low + high) / 2, true), axialStrain: position };
     }
-    if (progress >= criticalProgress) return { ...limit, axialStrain };
+    if (progress >= criticalProgress) return { ...limit, axialStrain: maxAxialStrain - (1 - progress) * pathLength };
 
     let low = 0;
-    let high = axialStrains.length - 1;
+    let high = strainPath.length - 1;
     while (high - low > 1) {
       const mid = Math.floor((low + high) / 2);
-      if (axialStrains[mid] < axialStrain) low = mid;
+      if (strainPath[mid] < position) low = mid;
       else high = mid;
     }
-    const before = axialStrains[low];
-    const after = axialStrains[high];
-    const fraction = (axialStrain - before) / (after - before);
+    const fraction = (position - strainPath[low]) / (strainPath[high] - strainPath[low]);
     const eta = etaAt((low + fraction) * step);
+    const axialStrain = axialStrains[low] + fraction * (axialStrains[high] - axialStrains[low]);
     return { ...triaxialState(eta, false), axialStrain };
   }
 
-  const checkpoints = [firstYield.axialStrain / maxAxialStrain, criticalProgress];
-  return { at, checkpoints, pc0, limit, maxAxialStrain };
+  const checkpoints = [firstYield.axialStrain / pathLength, criticalProgress];
+  return { at, checkpoints, pc0, limit, maxAxialStrain, axialStrainReverses: reversedStrain > 0 };
 }

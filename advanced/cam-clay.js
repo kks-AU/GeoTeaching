@@ -9,7 +9,7 @@ const camResponseCharts = [
   { id: 'volumetric-strain', yLabel: 'εᵥ (%)', value: state => 100 * state.volumetricStrain, unit: 0.5, digits: 2 },
   { id: 'pore-pressure', yLabel: 'Δu (kPa)', value: state => state.u, unit: 10, digits: 1 },
 ];
-const camOptions = ['ocr', 'p0', 'm', 'lambda', 'kappa'];
+const camOptions = ['ocr', 'p0', 'm', 'lambda', 'kappa', 'n', 'g'];
 const camColours = Object.fromEntries(
   ['current', 'path', 'initial', 'yield', 'critical', 'normal'].map(name =>
     [name, getComputedStyle(document.body).getPropertyValue('--cam-' + name).trim()])
@@ -97,7 +97,7 @@ function camDrawResponse({ id, yLabel, value, digits }, bounds, states, traced, 
 function camDraw(state, traced) {
   const { params, model, states } = camRun;
   const axes = camLockedAxes ?? camRun.axes;
-  const { m, lambda, kappa } = params;
+  const { m } = params;
   const stressChart = figur(camStress);
   const stressPlot = camGrid(stressChart, {
     xMin: 0, xMax: axes.stressMax, yMin: 0, yMax: axes.stressMax,
@@ -127,8 +127,8 @@ function camDraw(state, traced) {
   });
   const volumePoint = ({ p, v }) => volumePlot.point(p, v);
   const reference = axes.volumeTicks;
-  const normal = p => camClayVolume(p, p, lambda, kappa);
-  const critical = p => camClayVolume(p, 2 * p, lambda, kappa);
+  const normal = p => camClayVolume(p, p, params);
+  const critical = p => camClayVolume(p, 2 * p, params);
   volumePlot.clip(() => {
     volumeChart.line(reference.map(p => volumePlot.point(p, normal(p))), camColours.normal, 1.6, [3, 4]);
     volumeChart.line(reference.map(p => volumePlot.point(p, critical(p))), camColours.critical, 1.6, [6, 4]);
@@ -166,11 +166,12 @@ function camUpdateSetup() {
   camOptions.forEach(name => {
     const value = params[name];
     const decimals = name === 'lambda' || name === 'kappa' || name === 'm' ? 3 : 2;
-    document.querySelector('#' + name + '-value').value =
-      name === 'p0' ? camPressure(value) : value.toFixed(decimals);
+    const units = { p0: 'kPa', g: 'MPa' };
+    document.querySelector('#' + name + '-value').value = units[name]
+      ? camNumber.format(value) + ' ' + units[name] : value.toFixed(decimals);
   });
   document.querySelector('#boundary').textContent = camBoundaries[params.test];
-  const model = camClayTest(params);
+  const model = camClayTest({ ...params, g: params.g * 1000 });
   const positions = [...new Set([...punkter(180, t => t), ...model.checkpoints])].sort((a, b) => a - b);
   const states = positions.map(model.at);
   const referenceStates = model.limit ? [...states, model.limit] : states;
@@ -179,8 +180,8 @@ function camUpdateSetup() {
   const pressures = referenceStates.map(state => state.p);
   const pLow = Math.min(...pressures) * 0.74;
   const pHigh = Math.max(...pressures) * 1.32;
-  const vLow = camClayVolume(pHigh, 2 * pHigh, params.lambda, params.kappa);
-  const vHigh = camClayVolume(pLow, pLow, params.lambda, params.kappa);
+  const vLow = camClayVolume(pHigh, 2 * pHigh, params);
+  const vHigh = camClayVolume(pLow, pLow, params);
   const volumes = [...referenceStates.map(state => state.v), vLow, vHigh];
   const ceil = (value, step) => Math.ceil(value / step) * step;
   const axes = {
@@ -204,10 +205,14 @@ function camUpdateSetup() {
   camResponseCharts.forEach(({ id }) => {
     document.getElementById(id + '-figure').hidden = !model.limit;
   });
-  document.querySelector('#progress-label').textContent = model.limit ? 'Axial strain' : 'Test progress';
-  document.querySelector('#progress-note').textContent = model.limit
+  const followsAxialStrain = model.limit && !model.axialStrainReverses;
+  document.querySelector('#progress-label').textContent = followsAxialStrain ? 'Axial strain' : 'Test progress';
+  const progressNote = model.limit
     ? 'This test runs to ' + camNumber.format(100 * model.maxAxialStrain) + '% axial strain to show the approach to critical state and the plateau that follows.'
     : 'The slider follows the isotropic loading and unloading sequence.';
+  document.querySelector('#progress-note').textContent = model.axialStrainReverses
+    ? 'Axial strain decreases over part of this path. The slider follows the loading sequence. ' + progressNote
+    : progressNote;
   camRun = { params, model, positions, states, referenceStates, axes, largestPc, largestQ };
   camUpdateAxisStatus();
   camRender();
@@ -221,8 +226,9 @@ function camRender() {
   traced.push(state);
   camDraw(state, traced);
   const progressLabel = camNumber.format(model.limit ? 100 * state.axialStrain : 100 * progress) + '%';
-  document.querySelector('#progress-value').value = progressLabel;
-  camProgress.setAttribute('aria-valuetext', progressLabel);
+  const readout = model.axialStrainReverses ? progressLabel + ' axial strain' : progressLabel;
+  document.querySelector('#progress-value').value = readout;
+  camProgress.setAttribute('aria-valuetext', readout);
   document.querySelector('#mean-value').textContent = camPressure(state.p);
   document.querySelector('#deviator-value').textContent = camPressure(state.q);
   document.querySelector('#stress-ratio-value').textContent = (state.q / state.p).toFixed(4);

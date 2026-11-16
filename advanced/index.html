@@ -7,8 +7,8 @@
 <link rel="stylesheet" href="../assets/style.css?v=5">
 <link rel="stylesheet" href="cam-clay.css?v=2">
 <script defer src="../assets/figurer.js?v=17"></script>
-<script defer src="cam-clay-model.js?v=3"></script>
-<script defer src="cam-clay.js?v=4"></script>
+<script defer src="cam-clay-model.js?v=4"></script>
+<script defer src="cam-clay.js?v=5"></script>
 </head>
 <body class="cam-clay">
 <a class="skip" href="#content">Skip to content</a>
@@ -52,6 +52,14 @@
       <div class="control">
         <label for="kappa"><span>Unloading and reloading slope <i>κ</i></span> <output id="kappa-value" for="kappa">0.040</output></label>
         <input id="kappa" name="kappa" type="range" min="0.015" max="0.06" step="0.005" value="0.04">
+      </div>
+      <div class="control">
+        <label for="n"><span>Normal compression intercept <i>N</i></span> <output id="n-value" for="n">2.80</output></label>
+        <input id="n" name="n" type="range" min="2.5" max="3.6" step="0.01" value="2.8">
+      </div>
+      <div class="control">
+        <label for="g"><span>Elastic shear modulus <i>G</i></span> <output id="g-value" for="g">5 MPa</output></label>
+        <input id="g" name="g" type="range" min="1" max="30" step="0.5" value="5">
       </div>
       <button type="reset">Reset setup</button>
     </form>
@@ -133,9 +141,9 @@
     </div>
     <details><summary>Symbols and assumptions</summary>
       <p><i>σ</i>′<sub>1</sub> and <i>σ</i>′<sub>3</sub> are axial and radial effective stresses. <i>p</i>′<sub>c</sub> is the current isotropic yield pressure and <i>p</i>′<sub>c0</sub> its initial value. Stresses and pore pressure are in kPa, with compression positive.</p>
-      <p><i>M</i> is the critical state ratio <i>q</i>/<i>p</i>′. In the <i>v</i>–ln(<i>p</i>′) plane, <i>λ</i> and <i>κ</i> are the magnitudes of the normal compression and swelling slopes. <i>N</i> = 2.8 is the specific volume on the normal compression line at <i>p</i>′<sub>ref</sub> = 1 kPa.</p>
+      <p><i>M</i> is the critical state ratio <i>q</i>/<i>p</i>′. In the <i>v</i>–ln(<i>p</i>′) plane, <i>λ</i> and <i>κ</i> are the magnitudes of the normal compression and swelling slopes. <i>N</i> sets the specific volume on the normal compression line at <i>p</i>′<sub>ref</sub> = 1 kPa.</p>
       <p>The specimen starts isotropic. Both triaxial tests hold total cell pressure constant. The undrained test assumes saturation and incompressible constituents. The exercise follows analytical stress paths with associated plastic flow and uses illustrative material values.</p>
-      <p><i>v</i><sub>0</sub> is the initial specific volume. Strains are logarithmic and displayed as percentages. The deviatoric strain <i>ε</i><sub>q</sub> combines elastic strain from a constant shear modulus <i>G</i> = 5 MPa with plastic strain integrated along the stress path.</p>
+      <p><i>v</i><sub>0</sub> is the initial specific volume. Strains are logarithmic and displayed as percentages. The deviatoric strain <i>ε</i><sub>q</sub> combines elastic strain from the selected shear modulus <i>G</i>, which stays constant during each test, with plastic strain integrated along the stress path.</p>
       <p>The model generally approaches critical state asymptotically. To show the plateau at finite strain, the simulator switches to the theoretical limit once the stress ratio <i>q</i>/<i>p</i>′ is within 0.1% of <i>M</i>.</p>
     </details>
   </section>
