@@ -5,6 +5,12 @@ const camAxisLock = document.querySelector('#lock-axes');
 const camAxisStatus = document.querySelector('#axis-status');
 const camStress = document.querySelector('#stress');
 const camVolume = document.querySelector('#volume');
+const camResponseStack = document.querySelector('#cam-response-stack');
+const camSpace = document.querySelector('#cam-space');
+const camAzimuth = document.querySelector('#cam-azimuth');
+const camElevation = document.querySelector('#cam-elevation');
+const camView2D = document.querySelector('#cam-view-2d');
+const camView3D = document.querySelector('#cam-view-3d');
 const camResponseCharts = [
   { id: 'deviator-stress', yLabel: 'q (kPa)', value: state => state.q, unit: 10, digits: 1 },
   { id: 'volumetric-strain', test: 'drained', yLabel: 'εᵥ (%)', value: state => 100 * state.volumetricStrain, unit: 0.5, digits: 2 },
@@ -27,11 +33,13 @@ const camBoundaries = {
 let camRun;
 let camFrame;
 let camLockedAxes;
+let camShowSpace = false;
 
-function camGrid(f, { xMin, xMax, yMin, yMax, xLabel, yLabel, xTicks, log, square, yDigits }) {
+function camGrid(f, { xMin, xMax, yMin, yMax, xLabel, yLabel, xTicks, log, square, yDigits, compact = false, yTicks }) {
   const availableWidth = f.w - 45 - 19;
-  const top = 28;
-  const availableHeight = f.h - top - 45;
+  const top = compact ? 23 : 28;
+  const bottomMargin = xLabel ? compact ? 35 : 45 : 10;
+  const availableHeight = f.h - top - bottomMargin;
   const side = Math.min(availableWidth, availableHeight);
   const width = square ? side : availableWidth;
   const height = square ? side : availableHeight;
@@ -43,11 +51,10 @@ function camGrid(f, { xMin, xMax, yMin, yMax, xLabel, yLabel, xTicks, log, squar
   const y = value => bottom - (value - yMin) / (yMax - yMin) * (bottom - top);
   for (const value of xTicks) {
     f.line([[x(value), top], [x(value), bottom]], '#dfe5dc', 1);
-    f.label(x(value), bottom + 17, camNumber.format(value), '#52645e', 'center');
+    if (xLabel) f.label(x(value), bottom + (compact ? 14 : 17), camNumber.format(value), '#52645e', 'center');
   }
   const decimals = yDigits ?? (yMax - yMin < 1 ? 2 : 0);
-  for (let i = 0; i <= 4; i += 1) {
-    const value = yMin + i / 4 * (yMax - yMin);
+  for (const value of yTicks ?? punkter(4, t => yMin + t * (yMax - yMin))) {
     f.line([[left, y(value)], [right, y(value)]], '#dfe5dc', 1);
     const tick = yDigits === undefined ? value.toFixed(decimals) : String(Number(value.toFixed(decimals)));
     f.label(left - 7, y(value) + 4, tick, '#52645e', 'right');
@@ -55,7 +62,7 @@ function camGrid(f, { xMin, xMax, yMin, yMax, xLabel, yLabel, xTicks, log, squar
   if (yMin < 0 && yMax > 0) f.line([[left, y(0)], [right, y(0)]], '#61736e', 1, [3, 4]);
   f.line([[left, top], [left, bottom], [right, bottom]], '#61736e', 1);
   f.label(left, 17, yLabel);
-  f.label(right, bottom + 37, xLabel, '#213d37', 'right');
+  if (xLabel) f.label(right, bottom + (compact ? 27 : 37), xLabel, '#213d37', 'right');
   return {
     point: (a, b) => [x(a), y(b)],
     contains: (a, b) => a >= xMin && a <= xMax && b >= yMin && b <= yMax,
@@ -77,12 +84,14 @@ function camMarkLimit(chart, point, limit) {
   chart.dot(...position, '#fffef9', 2.9);
 }
 
-function camDrawResponse({ id, yLabel, value, digits }, { response, responseXMax }, states, traced, state) {
+function camDrawResponse({ id, test, yLabel, value, digits, unit }, { response, responseXMax }, states, traced, state) {
   const chart = figur(document.getElementById(id));
-  const { min, max } = response[id];
+  const constant = test && test !== camRun.params.test;
+  const { min, max } = constant ? { min: -unit, max: unit } : response[id];
   const plot = camGrid(chart, {
     xMin: 0, xMax: responseXMax, yMin: min, yMax: max,
-    xLabel: 'ε₁ (%)', yLabel, xTicks: punkter(4, t => t * responseXMax), yDigits: digits,
+    xLabel: !test || constant ? 'ε₁ (%)' : '', yLabel, xTicks: punkter(4, t => t * responseXMax), yDigits: digits,
+    compact: constant, yTicks: constant ? [0] : undefined,
   });
   const point = sample => plot.point(100 * sample.axialStrain, value(sample));
   plot.clip(() => {
@@ -98,6 +107,11 @@ function camDrawResponse({ id, yLabel, value, digits }, { response, responseXMax
 function camDraw(state, traced) {
   const { params, model, states } = camRun;
   const axes = camLockedAxes ?? camRun.axes;
+  if (camShowSpace) {
+    camDrawSpace(figur(camSpace), axes, params, model, states, traced, state,
+      camAzimuth.valueAsNumber, camElevation.valueAsNumber, camColours, camNumber);
+    return;
+  }
   const { m } = params;
   const stressChart = figur(camStress);
   const stressPlot = camGrid(stressChart, {
@@ -141,16 +155,17 @@ function camDraw(state, traced) {
     volumeChart.dot(...volumePoint(state), '#fff', 6.3);
     volumeChart.dot(...volumePoint(state), camColours.current, 4.2);
   }
-  camRun.responseCharts.forEach(definition =>
+  if (model.limit) camResponseCharts.forEach(definition =>
     camDrawResponse(definition, axes, states, traced, state));
 }
 
 function camUpdateAxisStatus() {
   const axes = camLockedAxes;
-  const clipped = axes && (camRun.largestPc > axes.stressMax || camRun.largestQ > axes.stressMax ||
-    camRun.referenceStates.some(({ p, v }) =>
-      p < axes.volumeXMin || p > axes.volumeXMax || v < axes.volumeYMin || v > axes.volumeYMax) ||
-    (camRun.responseCharts.length && (camRun.axes.responseXMax > axes.responseXMax ||
+  const clipped = axes && (camRun.referenceStates.some(({ p, q, v }) =>
+    p < axes.volumeXMin || p > axes.volumeXMax || v < axes.volumeYMin || v > axes.volumeYMax ||
+      (camShowSpace && q > axes.spaceQMax)) ||
+    (!camShowSpace && (camRun.largestPc > axes.stressMax || camRun.largestQ > axes.stressMax)) ||
+    (!camShowSpace && camRun.responseCharts.length && (camRun.axes.responseXMax > axes.responseXMax ||
       camRun.responseCharts.some(({ id, value }) => {
         const { min, max } = axes.response[id];
         return camRun.states.some(state => value(state) < min || value(state) > max);
@@ -185,6 +200,7 @@ function camUpdateSetup() {
   const ceil = (value, step) => Math.ceil(value / step) * step;
   const axes = {
     stressMax: ceil(Math.max(largestPc * 1.05, largestQ * 1.15), 40),
+    spaceQMax: Math.max(20, ceil(1.12 * Math.max(...referenceStates.map(state => state.q)), 20)),
     volumeXMin: pLow,
     volumeXMax: pHigh,
     volumeYMin: Math.floor((Math.min(...volumes) - 0.012) / 0.02) * 0.02,
@@ -201,15 +217,18 @@ function camUpdateSetup() {
       const max = ceil(Math.max(min < 0 ? unit : 4 * unit, ...values.map(y => y * 1.08)), unit);
       return [id, { min, max }];
     }));
-    // A newly visible chart takes its initial y limits from the current run.
+    // The first run where a response varies sets its locked y limits.
     if (camLockedAxes) {
       camLockedAxes.responseXMax ??= axes.responseXMax;
       camLockedAxes.response = { ...axes.response, ...camLockedAxes.response };
     }
   }
-  camResponseCharts.forEach(chart => {
-    document.getElementById(chart.id + '-figure').hidden = !responseCharts.includes(chart);
-  });
+  document.querySelector('#deviator-stress-figure').hidden = !model.limit;
+  document.querySelector('#cam-response-figure').hidden = !model.limit;
+  if (model.limit) {
+    const upper = document.getElementById(responseCharts.find(chart => chart.test).id);
+    if (camResponseStack.firstElementChild !== upper) camResponseStack.prepend(upper);
+  }
   const followsAxialStrain = model.limit && !model.axialStrainReverses;
   document.querySelector('#progress-label').textContent = followsAxialStrain ? 'Axial strain' : 'Test progress';
   const progressNote = model.limit
@@ -284,6 +303,24 @@ camPlay.addEventListener('click', () => {
 });
 
 camProgress.addEventListener('input', () => { camStop(); camRender(); });
+function camSelectView(showSpace) {
+  camShowSpace = showSpace;
+  camView2D.setAttribute('aria-pressed', String(!showSpace));
+  camView3D.setAttribute('aria-pressed', String(showSpace));
+  document.querySelector('#cam-plots-2d').hidden = showSpace;
+  document.querySelector('#cam-plots-3d').hidden = !showSpace;
+  document.querySelectorAll('[data-cam-view="2d"]').forEach(item => { item.hidden = showSpace; });
+  camUpdateAxisStatus();
+  camRender();
+}
+camView2D.addEventListener('click', () => camSelectView(false));
+camView3D.addEventListener('click', () => camSelectView(true));
+for (const slider of [camAzimuth, camElevation]) {
+  slider.addEventListener('input', () => {
+    document.getElementById(slider.id + '-value').value = slider.value + '°';
+    camRender();
+  });
+}
 camAxisLock.addEventListener('change', () => {
   camLockedAxes = camAxisLock.checked ? camRun.axes : undefined;
   camUpdateAxisStatus();
@@ -305,4 +342,6 @@ camForm.addEventListener('reset', () => {
 
 camUpdateSetup();
 if (camAxisLock.checked) camLockedAxes = camRun.axes;
-new ResizeObserver(camRender).observe(camStress);
+const camResize = new ResizeObserver(camRender);
+camResize.observe(camStress);
+camResize.observe(camSpace);

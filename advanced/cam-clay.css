@@ -20,11 +20,19 @@
 .cam-axis-lock { display: inline-flex; align-items: center; gap: .35rem; margin-top: .75rem; font-size: .9rem; font-weight: 650; }
 .cam-axis-lock input { accent-color: var(--green); }
 #axis-status:empty { margin: 0; }
-.cam-plots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; margin-top: 1rem; }
+.cam-view-picker { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .75rem; }
+.cam-view-picker button { font-size: .88rem; }
+.cam-view-picker [aria-pressed="true"] { background: var(--green); color: #fff; }
+.cam-plots { --cam-plot-height: clamp(260px, 30vw, 370px); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; margin-top: 1rem; }
 .cam-plots figure { min-width: 0; margin: 0; }
 .cam-plots h3 { font-size: 1.1rem; margin-bottom: .4rem; }
-.cam-plots canvas { height: clamp(260px, 30vw, 370px); border: 1px solid var(--line); }
-.cam-plots figcaption { font-size: .82rem; color: var(--muted); margin-top: .35rem; }
+.cam-plots canvas { height: var(--cam-plot-height); border: 1px solid var(--line); }
+.cam-response-stack { display: grid; grid-template-rows: minmax(0, 2fr) minmax(0, 1fr); gap: .4rem; height: var(--cam-plot-height); }
+.cam-response-stack canvas { height: 100%; }
+.cam-space { margin: 1rem 0 0; }
+.cam-space canvas { height: clamp(300px, 43vw, 460px); border: 1px solid var(--line); }
+.cam-view-angles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.cam-plots figcaption, .cam-space figcaption { font-size: .82rem; color: var(--muted); margin-top: .35rem; }
 .cam-key { display: flex; flex-wrap: wrap; gap: .3rem 1rem; list-style: none; padding: 0; font-size: .77rem; color: var(--muted); }
 .cam-key li { display: flex; align-items: center; gap: .35rem; }
 .cam-key li::before { content: ""; width: 1.35rem; border-top: 2px solid var(--key-colour); }
@@ -48,5 +56,5 @@
 }
 @media (max-width: 680px) {
   .cam-clay .workspace { grid-template-columns: 1fr; }
-  .cam-plots canvas { height: clamp(255px, 80vw, 370px); }
+  .cam-plots { --cam-plot-height: clamp(255px, 80vw, 370px); }
 }

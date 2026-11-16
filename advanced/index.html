@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Modified Cam Clay · Advanced Geotechnics</title>
 <link rel="stylesheet" href="../assets/style.css?v=5">
-<link rel="stylesheet" href="cam-clay.css?v=2">
+<link rel="stylesheet" href="cam-clay.css?v=3">
 <script defer src="../assets/figurer.js?v=17"></script>
 <script defer src="cam-clay-model.js?v=4"></script>
-<script defer src="cam-clay.js?v=6"></script>
+<script defer src="cam-clay-3d.js?v=1"></script>
+<script defer src="cam-clay.js?v=7"></script>
 </head>
 <body class="cam-clay">
 <a class="skip" href="#content">Skip to content</a>
@@ -77,7 +78,11 @@
     <p id="progress-note" class="hint"></p>
     <label class="cam-axis-lock"><input id="lock-axes" type="checkbox"> Lock chart axis limits</label>
     <p id="axis-status" class="hint" role="status"></p>
-    <div class="cam-plots">
+    <div class="cam-view-picker" role="group" aria-label="Plot view">
+      <button type="button" id="cam-view-2d" aria-pressed="true">2D plots</button>
+      <button type="button" id="cam-view-3d" aria-pressed="false">3D stress path</button>
+    </div>
+    <div class="cam-plots" id="cam-plots-2d">
       <figure>
         <h3>Effective stress path</h3>
         <canvas id="stress" role="img" aria-label="Effective stress path and the evolving yield surface" aria-describedby="stress-caption"></canvas>
@@ -93,22 +98,34 @@
         <canvas id="deviator-stress" role="img" aria-label="Deviator stress versus axial strain" aria-describedby="deviator-stress-caption"></canvas>
         <figcaption id="deviator-stress-caption"><i>q</i> is the difference between axial and radial effective stresses. <i>ε</i><sub>1</sub> is axial compression strain.</figcaption>
       </figure>
-      <figure id="volumetric-strain-figure" hidden>
-        <h3>Volumetric strain</h3>
-        <canvas id="volumetric-strain" role="img" aria-label="Volumetric strain versus axial strain" aria-describedby="volumetric-strain-caption"></canvas>
-        <figcaption id="volumetric-strain-caption"><i>ε</i><sub>v</sub> is positive for volume reduction and negative for expansion. <i>ε</i><sub>1</sub> is axial compression strain.</figcaption>
-      </figure>
-      <figure id="pore-pressure-figure" hidden>
-        <h3>Excess pore pressure</h3>
-        <canvas id="pore-pressure" role="img" aria-label="Excess pore pressure versus axial strain" aria-describedby="pore-pressure-caption"></canvas>
-        <figcaption id="pore-pressure-caption">Δ<i>u</i> is the change in pore pressure from the start of the test. <i>ε</i><sub>1</sub> is axial compression strain.</figcaption>
+      <figure id="cam-response-figure" hidden>
+        <h3>Volume and pore pressure</h3>
+        <div class="cam-response-stack" id="cam-response-stack">
+          <canvas id="volumetric-strain" role="img" aria-label="Volumetric strain versus axial strain" aria-describedby="cam-response-caption"></canvas>
+          <canvas id="pore-pressure" role="img" aria-label="Excess pore pressure versus axial strain" aria-describedby="cam-response-caption"></canvas>
+        </div>
+        <figcaption id="cam-response-caption"><i>ε</i><sub>v</sub> is positive for compression. Δ<i>u</i> is the change in pore pressure. Both plots use axial strain <i>ε</i><sub>1</sub>.</figcaption>
       </figure>
     </div>
+    <figure id="cam-plots-3d" class="cam-space" hidden>
+      <div class="cam-view-angles">
+        <div class="control">
+          <label for="cam-azimuth">Azimuth <output id="cam-azimuth-value" for="cam-azimuth">35°</output></label>
+          <input id="cam-azimuth" type="range" min="15" max="75" value="35">
+        </div>
+        <div class="control">
+          <label for="cam-elevation">Elevation <output id="cam-elevation-value" for="cam-elevation">25°</output></label>
+          <input id="cam-elevation" type="range" min="12" max="65" value="25">
+        </div>
+      </div>
+      <canvas id="cam-space" role="img" aria-label="Three-dimensional stress path in mean effective stress, deviator stress and specific volume" aria-describedby="cam-space-caption"></canvas>
+      <figcaption id="cam-space-caption"><i>p</i>′ is mean effective stress, <i>q</i> is deviator stress, and <i>v</i> is specific volume. The marker follows the current test state.</figcaption>
+    </figure>
     <ul class="cam-key" aria-label="Figure legend">
       <li class="key-state">Current state and path traced</li>
       <li class="key-path">Full test path</li>
-      <li class="key-initial">Initial yield ellipse</li>
-      <li class="key-yield">Current yield ellipse</li>
+      <li class="key-initial" data-cam-view="2d">Initial yield ellipse</li>
+      <li class="key-yield" data-cam-view="2d">Current yield ellipse</li>
       <li class="key-critical">Critical state line (open circle marks the theoretical limit in triaxial tests)</li>
       <li class="key-normal">Normal compression line</li>
     </ul>
