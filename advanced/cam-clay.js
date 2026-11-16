@@ -5,6 +5,10 @@ const camAxisLock = document.querySelector('#lock-axes');
 const camAxisStatus = document.querySelector('#axis-status');
 const camStress = document.querySelector('#stress');
 const camVolume = document.querySelector('#volume');
+const camResponseCharts = [
+  { id: 'volumetric-strain', yLabel: 'εᵥ (%)', value: state => 100 * state.volumetricStrain, unit: 0.5, digits: 2 },
+  { id: 'pore-pressure', yLabel: 'Δu (kPa)', value: state => state.u, unit: 10, digits: 1 },
+];
 const camOptions = ['ocr', 'p0', 'm', 'lambda', 'kappa'];
 const camColours = Object.fromEntries(
   ['current', 'path', 'initial', 'yield', 'critical', 'normal'].map(name =>
@@ -23,7 +27,7 @@ let camRun;
 let camFrame;
 let camLockedAxes;
 
-function camGrid(f, { xMin, xMax, yMin, yMax, xLabel, yLabel, xTicks, log, square }) {
+function camGrid(f, { xMin, xMax, yMin, yMax, xLabel, yLabel, xTicks, log, square, yDigits }) {
   const availableWidth = f.w - 45 - 19;
   const top = 28;
   const availableHeight = f.h - top - 45;
@@ -40,12 +44,14 @@ function camGrid(f, { xMin, xMax, yMin, yMax, xLabel, yLabel, xTicks, log, squar
     f.line([[x(value), top], [x(value), bottom]], '#dfe5dc', 1);
     f.label(x(value), bottom + 17, camNumber.format(value), '#52645e', 'center');
   }
-  const decimals = yMax - yMin < 1 ? 2 : 0;
+  const decimals = yDigits ?? (yMax - yMin < 1 ? 2 : 0);
   for (let i = 0; i <= 4; i += 1) {
     const value = yMin + i / 4 * (yMax - yMin);
     f.line([[left, y(value)], [right, y(value)]], '#dfe5dc', 1);
-    f.label(left - 7, y(value) + 4, value.toFixed(decimals), '#52645e', 'right');
+    const tick = yDigits === undefined ? value.toFixed(decimals) : String(Number(value.toFixed(decimals)));
+    f.label(left - 7, y(value) + 4, tick, '#52645e', 'right');
   }
+  if (yMin < 0 && yMax > 0) f.line([[left, y(0)], [right, y(0)]], '#61736e', 1, [3, 4]);
   f.line([[left, top], [left, bottom], [right, bottom]], '#61736e', 1);
   f.label(left, 17, yLabel);
   f.label(right, bottom + 37, xLabel, '#213d37', 'right');
@@ -61,6 +67,31 @@ function camEllipse(pc, m, plot) {
     const angle = Math.PI * (1 - t);
     return plot.point(pc / 2 * (1 + Math.cos(angle)), m * pc / 2 * Math.sin(angle));
   });
+}
+
+function camMarkLimit(chart, point, limit) {
+  if (!limit) return;
+  const position = point(limit);
+  chart.dot(...position, camColours.critical, 4.7);
+  chart.dot(...position, '#fffef9', 2.9);
+}
+
+function camDrawResponse({ id, yLabel, value, digits }, bounds, states, traced, state) {
+  const chart = figur(document.getElementById(id));
+  const maximum = 100 * camClayMaxAxialStrain;
+  const plot = camGrid(chart, {
+    xMin: 0, xMax: maximum, yMin: bounds.min, yMax: bounds.max,
+    xLabel: 'ε₁ (%)', yLabel, xTicks: punkter(4, t => t * maximum), yDigits: digits,
+  });
+  const point = sample => plot.point(100 * sample.axialStrain, value(sample));
+  plot.clip(() => {
+    chart.line(states.map(point), camColours.path, 1.7);
+    chart.line(traced.map(point), camColours.current, 2.7);
+  });
+  if (plot.contains(100 * state.axialStrain, value(state))) {
+    chart.dot(...point(state), '#fff', 6.3);
+    chart.dot(...point(state), camColours.current, 4.2);
+  }
 }
 
 function camDraw(state, traced) {
@@ -81,6 +112,7 @@ function camDraw(state, traced) {
     stressChart.line(camEllipse(model.pc0, m, stressPlot), camColours.initial, 1.3, [4, 4]);
     stressChart.line(states.map(stressPoint), camColours.path, 1.7);
     stressChart.line(traced.map(stressPoint), camColours.current, 2.7);
+    camMarkLimit(stressChart, stressPoint, model.limit);
   });
   if (stressPlot.contains(state.p, state.q)) {
     stressChart.dot(...stressPoint(state), '#fff', 6.3);
@@ -102,18 +134,27 @@ function camDraw(state, traced) {
     volumeChart.line(reference.map(p => volumePlot.point(p, critical(p))), camColours.critical, 1.6, [6, 4]);
     volumeChart.line(states.map(volumePoint), camColours.path, 1.7);
     volumeChart.line(traced.map(volumePoint), camColours.current, 2.7);
+    camMarkLimit(volumeChart, volumePoint, model.limit);
   });
   if (volumePlot.contains(state.p, state.v)) {
     volumeChart.dot(...volumePoint(state), '#fff', 6.3);
     volumeChart.dot(...volumePoint(state), camColours.current, 4.2);
+  }
+  if (model.limit) {
+    camResponseCharts.forEach(definition =>
+      camDrawResponse(definition, axes.response[definition.id], states, traced, state));
   }
 }
 
 function camUpdateAxisStatus() {
   const axes = camLockedAxes;
   const clipped = axes && (camRun.largestPc > axes.stressMax || camRun.largestQ > axes.stressMax ||
-    camRun.states.some(({ p, v }) =>
-      p < axes.volumeXMin || p > axes.volumeXMax || v < axes.volumeYMin || v > axes.volumeYMax));
+    camRun.referenceStates.some(({ p, v }) =>
+      p < axes.volumeXMin || p > axes.volumeXMax || v < axes.volumeYMin || v > axes.volumeYMax) ||
+    (camRun.model.limit && camResponseCharts.some(({ id, value }) => {
+      const { min, max } = axes.response[id];
+      return camRun.states.some(state => value(state) < min || value(state) > max);
+    })));
   const message = clipped ? 'Some curves extend beyond the locked limits. Unlock the axes to see the full test.' : '';
   if (message !== camAxisStatus.textContent) camAxisStatus.textContent = message;
 }
@@ -131,14 +172,15 @@ function camUpdateSetup() {
   const model = camClayTest(params);
   const positions = [...new Set([...punkter(180, t => t), ...model.checkpoints])].sort((a, b) => a - b);
   const states = positions.map(model.at);
-  const largestPc = Math.max(...states.map(state => state.pc));
-  const largestQ = Math.max(...states.map(state => state.q), params.m * largestPc / 2);
-  const pressures = states.map(state => state.p);
+  const referenceStates = model.limit ? [...states, model.limit] : states;
+  const largestPc = Math.max(...referenceStates.map(state => state.pc));
+  const largestQ = Math.max(...referenceStates.map(state => state.q), params.m * largestPc / 2);
+  const pressures = referenceStates.map(state => state.p);
   const pLow = Math.min(...pressures) * 0.74;
   const pHigh = Math.max(...pressures) * 1.32;
   const vLow = camClayVolume(pHigh, 2 * pHigh, params.lambda, params.kappa);
   const vHigh = camClayVolume(pLow, pLow, params.lambda, params.kappa);
-  const volumes = [...states.map(state => state.v), vLow, vHigh];
+  const volumes = [...referenceStates.map(state => state.v), vLow, vHigh];
   const ceil = (value, step) => Math.ceil(value / step) * step;
   const axes = {
     stressMax: ceil(Math.max(largestPc * 1.05, largestQ * 1.15), 40),
@@ -148,7 +190,24 @@ function camUpdateSetup() {
     volumeYMax: ceil(Math.max(...volumes) + 0.012, 0.02),
     volumeTicks: punkter(3, t => pLow * (pHigh / pLow) ** t),
   };
-  camRun = { params, model, positions, states, axes, largestPc, largestQ };
+  if (model.limit) {
+    axes.response = Object.fromEntries(camResponseCharts.map(({ id, value, unit }) => {
+      const values = states.map(value);
+      const min = Math.floor(Math.min(0, ...values) * 1.08 / unit) * unit;
+      const max = ceil(Math.max(min < 0 ? unit : 4 * unit, ...values.map(y => y * 1.08)), unit);
+      return [id, { min, max }];
+    }));
+    // If the lock was set during an isotropic test, these charts had no visible axes yet.
+    if (camLockedAxes && !camLockedAxes.response) camLockedAxes.response = axes.response;
+  }
+  camResponseCharts.forEach(({ id }) => {
+    document.getElementById(id + '-figure').hidden = !model.limit;
+  });
+  document.querySelector('#progress-label').textContent = model.limit ? 'Axial strain' : 'Test progress';
+  document.querySelector('#progress-note').textContent = model.limit
+    ? 'The triaxial test runs to 20% axial strain. The open circle marks the theoretical critical state.'
+    : 'The slider follows the isotropic loading and unloading sequence.';
+  camRun = { params, model, positions, states, referenceStates, axes, largestPc, largestQ };
   camUpdateAxisStatus();
   camRender();
 }
@@ -160,7 +219,9 @@ function camRender() {
   const traced = states.filter((_, i) => positions[i] < progress);
   traced.push(state);
   camDraw(state, traced);
-  document.querySelector('#progress-value').value = camProgress.value + '%';
+  const progressLabel = camNumber.format(model.limit ? 100 * state.axialStrain : 100 * progress) + '%';
+  document.querySelector('#progress-value').value = progressLabel;
+  camProgress.setAttribute('aria-valuetext', progressLabel);
   document.querySelector('#mean-value').textContent = camPressure(state.p);
   document.querySelector('#deviator-value').textContent = camPressure(state.q);
   document.querySelector('#yield-value').textContent = camPressure(state.pc);
@@ -170,10 +231,12 @@ function camRender() {
   const messages = {
     initial: ['Initial isotropic state', 'The axial and radial effective stresses are equal.'],
     elastic: ['Elastic loading', 'The stress state is inside the initial yield ellipse. Its size stays constant.'],
+    yield: ['First yield', 'The stress path reaches the initial yield ellipse. Continued loading produces plastic strain.'],
     hardening: ['Plastic compression and hardening', 'The stress point lies on the yield ellipse. Plastic compression raises the yield pressure and expands the ellipse.'],
     softening: ['Plastic dilation and softening', 'The stress point lies on the yield ellipse. Plastic dilation lowers the yield pressure and shrinks the ellipse.'],
     unloading: ['Elastic unloading', 'The specimen swells as mean effective stress falls. The yield ellipse retains the size reached at peak pressure.'],
     critical: ['Critical state', 'At the limiting state q = Mp′, plastic shear can continue at constant stress and constant specific volume.'],
+    'near-critical': ['Near critical state', 'The stress ratio q/p′ is within 0.1% of M. Further shear brings the specimen closer to constant stress and constant specific volume.'],
   };
   const [phase, description] = messages[state.phase];
   document.querySelector('#phase').textContent = phase;
