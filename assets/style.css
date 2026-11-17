@@ -15,3 +15,24 @@
 .lab-results div{margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
 .lab-results dt{font-weight:650}.lab-results dd{margin:2px 0 0;color:var(--muted)}
 @media(max-width:680px){.lab-controls,.lab-plots{grid-template-columns:1fr}}
+
+.site-footer .wrap {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 1rem 1.5rem;
+  padding-block: 20px;
+}
+
+.site-footer-logo {
+  display: block;
+  width: 150px;
+  max-width: 100%;
+  height: auto;
+}
+
+.site-footer-credit p { margin: 0; }
+.site-footer-author { color: var(--ink); }
+
+@media (max-width: 560px) {
+  .site-footer .wrap { grid-template-columns: minmax(0, 1fr); }
+}

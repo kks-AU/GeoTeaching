@@ -17,8 +17,9 @@
 .playback { display: flex; gap: 1rem; align-items: center; }
 .playback .control { flex: 1; margin: 0; }
 .playback button { min-width: 6rem; }
-.cam-axis-lock { display: inline-flex; align-items: center; gap: .35rem; margin-top: .75rem; font-size: .9rem; font-weight: 650; }
-.cam-axis-lock input { accent-color: var(--green); }
+.cam-axis-options { display: flex; flex-wrap: wrap; gap: .35rem 1rem; margin-top: .75rem; }
+.cam-axis-options label { display: inline-flex; align-items: baseline; gap: .35rem; font-size: .9rem; font-weight: 650; }
+.cam-axis-options input { accent-color: var(--green); }
 #axis-status:empty { margin: 0; }
 .cam-view-picker { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .75rem; }
 .cam-view-picker button { font-size: .88rem; }

@@ -5,6 +5,10 @@ function camClayVolume(p, pc, { n, lambda, kappa }) {
   return n - lambda * Math.log(pc / camClayReferencePressure) + kappa * Math.log(pc / p);
 }
 
+function camClayEquivalentPressure(v, { n, lambda }) {
+  return camClayReferencePressure * Math.exp((n - v) / lambda);
+}
+
 function camClayTest(params) {
   const { test, p0, ocr, m, lambda, kappa, g } = params;
   const pc0 = ocr * p0;

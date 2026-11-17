@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="author" content="Kenny K. Sørensen">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Modified Cam Clay · Advanced Geotechnics</title>
-<link rel="stylesheet" href="../assets/style.css?v=5">
-<link rel="stylesheet" href="cam-clay.css?v=3">
+<link rel="stylesheet" href="../assets/style.css?v=6">
+<link rel="stylesheet" href="cam-clay.css?v=4">
 <script defer src="../assets/figurer.js?v=17"></script>
-<script defer src="cam-clay-model.js?v=4"></script>
+<script defer src="cam-clay-model.js?v=5"></script>
 <script defer src="cam-clay-3d.js?v=1"></script>
-<script defer src="cam-clay.js?v=7"></script>
+<script defer src="cam-clay.js?v=8"></script>
 </head>
 <body class="cam-clay">
 <a class="skip" href="#content">Skip to content</a>
@@ -76,22 +77,26 @@
       <button id="play" type="button">Play</button>
     </div>
     <p id="progress-note" class="hint"></p>
-    <label class="cam-axis-lock"><input id="lock-axes" type="checkbox"> Lock chart axis limits</label>
-    <p id="axis-status" class="hint" role="status"></p>
     <div class="cam-view-picker" role="group" aria-label="Plot view">
       <button type="button" id="cam-view-2d" aria-pressed="true">2D plots</button>
       <button type="button" id="cam-view-3d" aria-pressed="false">3D stress path</button>
     </div>
+    <div class="cam-axis-options">
+      <label><input id="lock-axes" type="checkbox"> Lock chart axis limits</label>
+      <label id="cam-normalisation-control"><input id="cam-normalisation" type="checkbox" aria-describedby="cam-normalisation-note"> Normalise stresses by <span><i>p</i>′<sub>e</sub></span></label>
+    </div>
+    <p id="cam-normalisation-note" class="hint" data-cam-scale="normalised" hidden>Each point uses the Hvorslev equivalent pressure <i>p</i>′<sub>e</sub> at its current specific volume. It stays constant in undrained shearing and increases as the specimen contracts.</p>
+    <p id="axis-status" class="hint" role="status"></p>
     <div class="cam-plots" id="cam-plots-2d">
       <figure>
         <h3>Effective stress path</h3>
-        <canvas id="stress" role="img" aria-label="Effective stress path and the evolving yield surface" aria-describedby="stress-caption"></canvas>
-        <figcaption id="stress-caption"><i>p</i>′ is mean effective stress and <i>q</i> is deviator stress. The axes use the same kPa scale.</figcaption>
+        <canvas id="stress" role="img" aria-label="Effective stress path with yield and critical state references" aria-describedby="stress-caption"></canvas>
+        <figcaption id="stress-caption"><i>p</i>′ is mean effective stress and <i>q</i> is deviator stress. The axes use equal scales. <span data-cam-scale="normalised" hidden>The state boundary traces states on yield, including the critical state point.</span></figcaption>
       </figure>
       <figure>
         <h3>Compression and swelling</h3>
-        <canvas id="volume" role="img" aria-label="Specific volume against mean effective stress on a logarithmic scale" aria-describedby="volume-caption"></canvas>
-        <figcaption id="volume-caption"><i>v</i> = 1 + <i>e</i>, where <i>e</i> is the void ratio. The stress axis is logarithmic.</figcaption>
+        <canvas id="volume" role="img" aria-label="Specific volume against mean effective stress" aria-describedby="volume-caption"></canvas>
+        <figcaption id="volume-caption"><i>v</i> = 1 + <i>e</i>, where <i>e</i> is the void ratio. <span data-cam-scale="physical">The stress axis is logarithmic.</span><span data-cam-scale="normalised" hidden>Normal compression and critical state each occur at a fixed <i>p</i>′/<i>p</i>′<sub>e</sub>.</span></figcaption>
       </figure>
       <figure id="deviator-stress-figure" hidden>
         <h3>Deviator stress</h3>
@@ -124,8 +129,9 @@
     <ul class="cam-key" aria-label="Figure legend">
       <li class="key-state">Current state and path traced</li>
       <li class="key-path">Full test path</li>
-      <li class="key-initial" data-cam-view="2d">Initial yield ellipse</li>
-      <li class="key-yield" data-cam-view="2d">Current yield ellipse</li>
+      <li class="key-initial" data-cam-scale="physical">Initial yield ellipse</li>
+      <li class="key-yield" data-cam-scale="physical">Current yield ellipse</li>
+      <li class="key-yield" data-cam-scale="normalised" hidden>Normalised state boundary</li>
       <li class="key-critical">Critical state line (open circle marks the theoretical limit in triaxial tests)</li>
       <li class="key-normal">Normal compression line</li>
     </ul>
@@ -137,6 +143,7 @@
         <div><dt>Deviator stress <i>q</i></dt><dd id="deviator-value"></dd></div>
         <div><dt>Stress ratio <i>q</i>/<i>p</i>′</dt><dd id="stress-ratio-value"></dd></div>
         <div><dt>Yield pressure <i>p</i>′<sub>c</sub></dt><dd id="yield-value"></dd></div>
+        <div><dt>Equivalent pressure <i>p</i>′<sub>e</sub></dt><dd id="equivalent-value"></dd></div>
         <div><dt>Excess pore pressure Δ<i>u</i></dt><dd id="pore-value"></dd></div>
         <div><dt>Specific volume <i>v</i></dt><dd id="volume-value"></dd></div>
       </dl>
@@ -154,6 +161,9 @@
     </div>
     <div class="equation"><p>Specific volume on the swelling line through the current yield pressure</p>
       <math display="block"><mi>v</mi><mo>=</mo><mi>N</mi><mo>−</mo><mi>λ</mi><mi mathvariant="normal">ln</mi><mfrac><msubsup><mi>p</mi><mi>c</mi><mo>′</mo></msubsup><msubsup><mi>p</mi><mtext>ref</mtext><mo>′</mo></msubsup></mfrac><mo>+</mo><mi>κ</mi><mi mathvariant="normal">ln</mi><mfrac><msubsup><mi>p</mi><mi>c</mi><mo>′</mo></msubsup><msup><mi>p</mi><mo>′</mo></msup></mfrac></math>
+    </div>
+    <div class="equation"><p>Hvorslev equivalent pressure on the normal compression line at the current specific volume <i>v</i></p>
+      <math display="block"><msubsup><mi>p</mi><mi>e</mi><mo>′</mo></msubsup><mo>=</mo><msubsup><mi>p</mi><mtext>ref</mtext><mo>′</mo></msubsup><mi mathvariant="normal">exp</mi><mo>(</mo><mfrac><mrow><mi>N</mi><mo>−</mo><mi>v</mi></mrow><mi>λ</mi></mfrac><mo>)</mo></math>
     </div>
     <div class="equation"><p>Initial yield pressure and triaxial excess pore pressure</p>
       <math display="block"><msubsup><mi>p</mi><mrow><mi>c</mi><mn>0</mn></mrow><mo>′</mo></msubsup><mo>=</mo><mtext>OCR</mtext><msubsup><mi>p</mi><mn>0</mn><mo>′</mo></msubsup><mo>,</mo><mspace width="1em"/><mi>Δ</mi><mi>u</mi><mo>=</mo><msubsup><mi>p</mi><mn>0</mn><mo>′</mo></msubsup><mo>+</mo><mfrac><mi>q</mi><mn>3</mn></mfrac><mo>−</mo><msup><mi>p</mi><mo>′</mo></msup></math>
@@ -175,16 +185,31 @@
       <li>Run a normally consolidated specimen in drained and undrained compression. Which way does <i>p</i>′ move after yielding, and what happens to <i>v</i>?</li>
       <li>Set OCR to 3 in the undrained test. Follow the path past first yield. Does <i>p</i>′<sub>c</sub> grow or shrink?</li>
       <li>Run isotropic compression and unloading with OCR above 1. Compare the swelling and normal compression slopes. Does the specimen recover its initial volume when it returns to <i>p</i>′<sub>0</sub>?</li>
+      <li>Normalise the 2D plots and compare undrained tests at OCR = 1 and OCR = 3. Where do the paths first meet the state boundary, and where do they end?</li>
     </ol>
     <details><summary>Check your reasoning</summary>
       <p>In the drained normally consolidated test, <i>p</i>′ increases and <i>v</i> decreases. In the undrained normally consolidated test, <i>v</i> stays constant and <i>p</i>′ falls as excess pore pressure builds.</p>
       <p>At OCR = 3 the undrained path reaches yield above the critical state line and the ellipse shrinks as the specimen approaches critical state. Isotropic unloading follows the flatter swelling line, leaving a permanent volume reduction.</p>
+      <p>At OCR = 1 the normalised path starts at <i>p</i>′/<i>p</i>′<sub>e</sub> = 1 with zero deviator stress. At OCR = 3 it first reaches the state boundary above the critical state line. With the same material parameters both paths end at the same normalised critical state point.</p>
     </details>
     <h3>Further reading</h3>
     <p>Roscoe, K. H. and Burland, J. B. (1968), <cite>On the generalised stress-strain behaviour of ‘wet’ clay</cite>, in <cite>Engineering Plasticity</cite>, pp. 535–609. <a href="https://www.researchgate.net/publication/303225549_On_the_generalized_stress-strain_behaviour_of_wet_clay_MHEYMAN_J_LECKIE_F_P_eds">Original publication</a></p>
+    <p>Burland, J. B. (1965), <cite>The yielding and dilation of clay</cite>, Géotechnique 15(2), pp. 211–214. <a href="https://doi.org/10.1680/geot.1965.15.2.211">Equivalent pressure, Eq. (7)</a></p>
   </section>
 </div>
 </main>
-<footer><div class="wrap"><span>Advanced Geotechnics</span><a href="../index.html">All exercises</a></div></footer>
+<footer class="site-footer">
+  <div class="wrap">
+    <img src="../assets/aulogo_uk_var2_black.png" alt="Aarhus University" width="506" height="107" class="site-footer-logo">
+    <div class="site-footer-credit">
+      <p class="site-footer-author">Author: <strong>Kenny K. Sørensen</strong></p>
+      <p><a href="mailto:kks@cae.au.dk">kks@cae.au.dk</a></p>
+      <p>Advanced Geotechnics</p>
+      <p><a href="../LICENSE">MIT for code</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0 for original teaching material</a></p>
+      <p>The AU logo and photographs are subject to separate rights.</p>
+    </div>
+    <a href="../index.html">All exercises</a>
+  </div>
+</footer>
 </body>
 </html>

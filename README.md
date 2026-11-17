@@ -11,3 +11,15 @@ Læg `index.html`, `eksempler/`, `assets/` og `.nojekyll` i roden af GitHub-repo
 ## Kapitelhenvisninger
 
 Hver øvelse henviser til relevante kapitler, afsnit og sider i *Geoteknik*, 3. udgave.
+
+## Kreditering
+
+Undervisningseksemplerne er udviklet af Kenny K. Sørensen. Kontakt: [kks@cae.au.dk](mailto:kks@cae.au.dk).
+
+## Licens og genbrug
+
+© 2026 Kenny K. Sørensen.
+
+- Kildekoden (HTML-markup, CSS og JavaScript) er udgivet under [MIT-licensen](LICENSE). Bevar ophavsrets- og licensteksten ved videredistribution.
+- De oprindelige undervisningstekster, øvelser og figurer er udgivet under [Creative Commons Kreditering 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/deed.da). Kreditér Kenny K. Sørensen og GeoTeaching, link til licensen og angiv eventuelle ændringer.
+- Aarhus Universitet ejer AU-logoet. Logoet og billederne i `assets/fotos/` er undtaget fra projektets licenser. Genbrug af logoet følger [AU's retningslinjer](https://medarbejdere.au.dk/administration/kommunikation/omdesignet/logo/). Tredjepartsmateriale følger de respektive rettighedshaveres vilkår.
