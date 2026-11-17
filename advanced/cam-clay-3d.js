@@ -28,11 +28,15 @@ function camDrawSpace(chart, axes, params, model, states, traced, state, azimuth
   const vMax = axes.volumeYMax;
   const az = azimuth * Math.PI / 180;
   const el = elevation * Math.PI / 180;
+  const sinAz = Math.sin(az);
+  const cosAz = Math.cos(az);
+  const sinEl = Math.sin(el);
+  const cosEl = Math.cos(el);
 
   function flatten([x, y, z]) {
     return [
-      Math.cos(az) * x - Math.sin(az) * y,
-      Math.sin(el) * (Math.sin(az) * x + Math.cos(az) * y) - Math.cos(el) * z,
+      cosAz * x - sinAz * y,
+      -sinEl * (sinAz * x + cosAz * y) - cosEl * z,
     ];
   }
 
@@ -66,23 +70,36 @@ function camDrawSpace(chart, axes, params, model, states, traced, state, azimuth
   }
   for (const i of [1, 3, 4]) segment(corners[0], corners[i], '#647770', 1.5);
 
-  const ticks = chart.w < 420 ? [0.5, 1] : [0.25, 0.5, 0.75, 1];
   const tickColour = '#52645e';
   const labelColour = '#213d37';
-  for (const t of ticks) {
-    const [px, py] = project([t, 0, 0]);
-    const [qx, qy] = project([0, t, 0]);
-    const [vx, vy] = project([0, 0, t]);
-    chart.label(px + 7, py + 14, number.format(pMin + t * (pMax - pMin)), tickColour);
-    chart.label(qx - 7, qy + 14, number.format(t * qMax), tickColour, 'right');
-    chart.label(vx - 8, vy + 4, (vMin + t * (vMax - vMin)).toFixed(2), tickColour, 'right');
+  const [originX, originY] = project(corners[0]);
+  const visibleAxes = [
+    { end: corners[1], title: 'p′ (kPa)', tick: t => number.format(pMin + t * (pMax - pMin)) },
+    { end: corners[3], title: 'q (kPa)', tick: t => number.format(t * qMax) },
+    { end: corners[4], title: 'v', tick: t => (vMin + t * (vMax - vMin)).toFixed(2) },
+  ].map(axis => {
+    const [x, y] = project(axis.end);
+    const dx = x - originX;
+    const dy = y - originY;
+    return { ...axis, x, y, dx, dy, length: Math.hypot(dx, dy) };
+  }).filter(axis => axis.length >= 32);
+
+  for (const { title, tick, x, y, dx, dy, length } of visibleAxes) {
+    const ticks = length < 80 ? [1] : length < 160 ? [0.5, 1] : [0.25, 0.5, 0.75, 1];
+    if (Math.abs(dx) >= Math.abs(dy)) {
+      for (const t of ticks) chart.label(originX + t * dx, originY + t * dy + 14, tick(t), tickColour, 'center');
+      chart.label(x, y + 32, title, labelColour, 'center');
+    } else {
+      // At a side-on angle a stress axis and v can share the same screen edge.
+      const sharesEdge = title === 'v' && visibleAxes.some(axis =>
+        axis.title !== 'v' && Math.abs(axis.dx) < Math.min(30, Math.abs(axis.dy)));
+      const outside = originX > chart.w / 2 ? 1 : -1;
+      const offset = (sharesEdge ? -outside : outside) * 8;
+      const align = offset > 0 ? 'left' : 'right';
+      for (const t of ticks) chart.label(originX + t * dx + offset, originY + t * dy + 4, tick(t), tickColour, align);
+      chart.label(x + offset, y - 12, title, labelColour, align);
+    }
   }
-  const [px, py] = project(corners[1]);
-  const [qx, qy] = project(corners[3]);
-  const [vx, vy] = project(corners[4]);
-  chart.label(Math.min(px + 7, chart.w - 52), py + 32, 'p′ (kPa)', labelColour);
-  chart.label(Math.max(qx - 7, 50), qy + 32, 'q (kPa)', labelColour, 'right');
-  chart.label(vx - 8, vy - 12, 'v', labelColour, 'right');
 
   function drawPath(samples, colour, width, dash = []) {
     const points = samples.map(normalize);

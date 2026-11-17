@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="cam-clay.css?v=4">
 <script defer src="../assets/figurer.js?v=17"></script>
 <script defer src="cam-clay-model.js?v=5"></script>
-<script defer src="cam-clay-3d.js?v=1"></script>
+<script defer src="cam-clay-3d.js?v=2"></script>
 <script defer src="cam-clay.js?v=8"></script>
 </head>
 <body class="cam-clay">
@@ -116,15 +116,19 @@
       <div class="cam-view-angles">
         <div class="control">
           <label for="cam-azimuth">Azimuth <output id="cam-azimuth-value" for="cam-azimuth">35°</output></label>
-          <input id="cam-azimuth" type="range" min="15" max="75" value="35">
+          <input id="cam-azimuth" type="range" min="0" max="90" value="35">
         </div>
         <div class="control">
           <label for="cam-elevation">Elevation <output id="cam-elevation-value" for="cam-elevation">25°</output></label>
-          <input id="cam-elevation" type="range" min="12" max="65" value="25">
+          <input id="cam-elevation" type="range" min="0" max="90" value="25">
         </div>
       </div>
       <canvas id="cam-space" role="img" aria-label="Three-dimensional stress path in mean effective stress, deviator stress and specific volume" aria-describedby="cam-space-caption"></canvas>
-      <figcaption id="cam-space-caption"><i>p</i>′ is mean effective stress, <i>q</i> is deviator stress, and <i>v</i> is specific volume. The marker follows the current test state.</figcaption>
+      <figcaption id="cam-space-caption">
+        <i>p</i>′ is mean effective stress, <i>q</i> is deviator stress, and <i>v</i> is specific volume.
+        At 0° azimuth, set elevation to 0° for <i>v</i> against <i>p</i>′ or 90° for <i>q</i> against <i>p</i>′.
+        Set azimuth to 90° and elevation to 0° for <i>v</i> against <i>q</i>.
+      </figcaption>
     </figure>
     <ul class="cam-key" aria-label="Figure legend">
       <li class="key-state">Current state and path traced</li>
