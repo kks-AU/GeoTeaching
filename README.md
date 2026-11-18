@@ -15,7 +15,7 @@ Forsiden samler fire emneområder med hver sin oversigt:
 
 Eksisterende øvelser beholder deres adresser under `eksempler/`. Hver øvelse har brødkrummer til sit primære emneområde; relaterede emner linker til den samme øvelse. Planlagte emner er ikke klikbare øvelser. Advanced Geotechnics ligger fortsat under `advanced/`.
 
-De fire illustrationer under `assets/emner/` er skematiske SVG-tegninger, ikke fotos af faktiske prøver eller forsøgsresultater.
+Billederne af jordprøver og havnekonstruktion under `assets/emner/` er fotorealistiske AI-illustrationer, ikke fotos af faktiske prøver eller projekter. Spændingsdiagrammet og strømnettet er SVG-figurer. Prompter og figurforudsætninger findes i `assets/emner/IMAGE-SOURCES.md`.
 
 ## Udgivelse med GitHub Pages
 

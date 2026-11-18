@@ -44,6 +44,7 @@
 @media(max-width:850px){.exercise-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.topic-head{grid-template-columns:1fr}.topic-head img{max-width:520px}}
 @media(max-width:680px){.topic-cards,.exercise-cards{grid-template-columns:1fr}.topic-cards{gap:18px}.home-intro{padding-top:28px}.topic-card-body{padding:18px}.all-exercises ul{columns:1}}
 .site-footer-author { color: var(--ink); }
+.topic-visual{margin:0;min-width:0}.topic-visual figcaption{margin-top:8px;color:var(--muted);font-size:.8rem;line-height:1.45}.topic-head--diagram{grid-template-columns:1fr}.topic-head--diagram .topic-visual{max-width:960px}.topic-head--diagram .topic-visual img{max-width:none}
 
 @media (max-width: 560px) {
   .site-footer .wrap { grid-template-columns: minmax(0, 1fr); }
