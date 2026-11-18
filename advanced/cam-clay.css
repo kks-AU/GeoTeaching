@@ -1,0 +1,61 @@
+.cam-clay {
+  --cam-current: #124b3d;
+  --cam-path: #819d91;
+  --cam-initial: #776e5e;
+  --cam-yield: #176c9c;
+  --cam-critical: #a94729;
+  --cam-normal: #63518c;
+}
+.cam-clay .workspace { grid-template-columns: minmax(255px, 300px) minmax(0, 1fr); }
+.cam-clay .exercise-head p { margin-bottom: .35em; }
+.cam-clay #experiment > label { display: block; font-weight: 650; }
+.cam-clay #test { width: 100%; margin-top: .25rem; font-size: .9rem; }
+.cam-clay .control label { align-items: baseline; }
+.cam-clay output { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--green); }
+.presets { display: flex; flex-wrap: wrap; gap: .4rem; margin: .9rem 0; }
+.presets button { font-size: .82rem; }
+.playback { display: flex; gap: 1rem; align-items: center; }
+.playback .control { flex: 1; margin: 0; }
+.playback button { min-width: 6rem; }
+.cam-axis-options { display: flex; flex-wrap: wrap; gap: .35rem 1rem; margin-top: .75rem; }
+.cam-axis-options label { display: inline-flex; align-items: baseline; gap: .35rem; font-size: .9rem; font-weight: 650; }
+.cam-axis-options input { accent-color: var(--green); }
+#axis-status:empty { margin: 0; }
+.cam-view-picker { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .75rem; }
+.cam-view-picker button { font-size: .88rem; }
+.cam-view-picker [aria-pressed="true"] { background: var(--green); color: #fff; }
+.cam-plots { --cam-plot-height: clamp(260px, 30vw, 370px); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; margin-top: 1rem; }
+.cam-plots figure { min-width: 0; margin: 0; }
+.cam-plots h3 { font-size: 1.1rem; margin-bottom: .4rem; }
+.cam-plots canvas { height: var(--cam-plot-height); border: 1px solid var(--line); }
+.cam-response-stack { display: grid; grid-template-rows: minmax(0, 2fr) minmax(0, 1fr); gap: .4rem; height: var(--cam-plot-height); }
+.cam-response-stack canvas { height: 100%; }
+.cam-space { margin: 1rem 0 0; }
+.cam-space canvas { height: clamp(300px, 43vw, 460px); border: 1px solid var(--line); }
+.cam-view-angles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.cam-plots figcaption, .cam-space figcaption { font-size: .82rem; color: var(--muted); margin-top: .35rem; }
+.cam-key { display: flex; flex-wrap: wrap; gap: .3rem 1rem; list-style: none; padding: 0; font-size: .77rem; color: var(--muted); }
+.cam-key li { display: flex; align-items: center; gap: .35rem; }
+.cam-key li::before { content: ""; width: 1.35rem; border-top: 2px solid var(--key-colour); }
+.key-state { --key-colour: var(--cam-current); }
+.key-path { --key-colour: var(--cam-path); }
+.key-initial { --key-colour: var(--cam-initial); }
+.key-yield { --key-colour: var(--cam-yield); }
+.key-critical { --key-colour: var(--cam-critical); }
+.key-normal { --key-colour: var(--cam-normal); }
+.cam-key .key-initial::before, .cam-key .key-critical::before, .cam-key .key-normal::before { border-top-style: dashed; }
+.cam-state { border-top: 1px solid var(--line); padding-top: .8rem; }
+.cam-state p { font-size: .9rem; margin: .25rem 0 .75rem; }
+.cam-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: .45rem; margin: 0; }
+.cam-metrics > div { padding: .55rem; background: #eaf0e6; border-radius: 8px; }
+.cam-metrics dt { font-size: .75rem; color: var(--muted); }
+.cam-metrics dd { margin: 0; font-weight: 700; font-size: 1.03rem; font-variant-numeric: tabular-nums; }
+.cam-notes ol { padding-left: 1.25rem; }
+.cam-notes li { margin: .4rem 0; }
+@media (max-width: 960px) {
+  .cam-plots { grid-template-columns: 1fr; }
+}
+@media (max-width: 680px) {
+  .cam-clay .workspace { grid-template-columns: 1fr; }
+  .cam-plots { --cam-plot-height: clamp(255px, 80vw, 370px); }
+}
