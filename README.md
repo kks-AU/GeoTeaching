@@ -17,9 +17,13 @@ Eksisterende øvelser beholder deres adresser under `eksempler/`. Hver øvelse h
 
 Billederne af laboratorieforsøg og havnekonstruktion under `assets/emner/` er fotorealistiske AI-illustrationer, ikke fotos af faktiske prøver eller projekter. Spændingsdiagrammet og strømnettet er SVG-figurer. Prompter og figurforudsætninger findes i `assets/emner/IMAGE-SOURCES.md`.
 
+## GEORG-plugins
+
+Forsiden indeholder beskrivelser, installationstrin og ZIP-downloads til GEORG Quiz (0.11.2) og GEORG_V2 (0.20.2). De originale pluginpakker ligger uændret i `downloads/plugins/`. Ved en opdatering udskiftes ZIP-filen, og versionsnummeret på forsiden opdateres. Installationsvejledningen linker til OpenAI's dokumentation; upload kræver de relevante kontorettigheder.
+
 ## Udgivelse med GitHub Pages
 
-Læg `index.html`, `emner/`, `eksempler/`, `advanced/`, `assets/` og `.nojekyll` i roden af GitHub-repositoriet. Vælg **Settings → Pages → Deploy from a branch** og vælg den branch og rodmappe, der indeholder filerne. [GitHubs vejledning til udgivelseskilder](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
+Læg `index.html`, `emner/`, `eksempler/`, `advanced/`, `assets/`, `downloads/` og `.nojekyll` i roden af GitHub-repositoriet. Vælg **Settings → Pages → Deploy from a branch** og vælg den branch og rodmappe, der indeholder filerne. [GitHubs vejledning til udgivelseskilder](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 
 ## Kapitelhenvisninger
 

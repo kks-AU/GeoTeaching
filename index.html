@@ -5,7 +5,7 @@
 <meta name="author" content="Kenny K. Sørensen">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Geoteknik i praksis · Geoteknik</title>
-<link rel="stylesheet" href="assets/style.css?v=8">
+<link rel="stylesheet" href="assets/style.css?v=9">
 </head>
 <body>
 <a class="skip" href="#indhold">Gå til indhold</a>
@@ -18,6 +18,39 @@
 <a class="topic-card" href="emner/grundvand.html"><img src="assets/emner/grundvand-havn.svg" alt="Strømnet og potentialkurver under en tynd havnespuns med højt grundvand til venstre og lavere havnevand over havbunden til højre" width="640" height="280"><div class="topic-card-body"><p class="tag">Emneområde C · Planlagte emner og relaterede øvelser</p><h3>Grundvandsstrømning</h3><p>Undersøg vandets strømning og betydning for jordens stabilitet.</p><span class="card-action">Udforsk emnet →</span></div></a>
 <a class="topic-card" href="emner/konstruktioner.html"><img src="assets/emner/havnekonstruktion-fotorealistisk.png" alt="Fotorealistisk AI-illustration af havnekaj med spunsvæg, pæle og funderingsarbejde" width="640" height="280"><div class="topic-card-body"><p class="tag">Emneområde D · 3 øvelser</p><h3>Geotekniske konstruktioner</h3><p>Anvend jordens egenskaber til at undersøge bæreevne, sætninger og stabilitet.</p><span class="card-action">Udforsk emnet →</span></div></a>
 </div></section>
+<section class="catalog plugins" aria-labelledby="plugins">
+  <p class="tag">AI-støtte til din læring</p>
+  <h2 id="plugins">Lær geoteknik med GEORG</h2>
+  <p>Tag en quiz, eller få hjælp til at forstå teorien. De to plugins bruges i ChatGPT og tager udgangspunkt i GeoTeaching med <em>Geoteknik, 3. udgave</em> som fagligt grundlag.</p>
+  <div class="plugin-cards">
+    <article class="panel plugin-card" aria-labelledby="georg-quiz">
+      <p class="tag">Test din forståelse</p>
+      <h3 id="georg-quiz">GEORG Quiz</h3>
+      <p>Øv geoteknik med multiple choice, åbne spørgsmål eller en blanding. Vælg emner, niveau og antal spørgsmål, og få feedback efter hvert svar samt forslag til repetition efter quizzen.</p>
+      <p class="plugin-prompt"><strong>Prøv:</strong> Skriv <q>Start Quiz</q>, når du har valgt pluginet.</p>
+      <a class="button plugin-download" href="downloads/plugins/georg-quiz.zip" download>Download GEORG Quiz (ZIP)</a>
+      <p class="hint">Version 0.11.2</p>
+    </article>
+    <article class="panel plugin-card" aria-labelledby="georg-v2">
+      <p class="tag">Forstå teori og beregninger</p>
+      <h3 id="georg-v2">GEORG_V2</h3>
+      <p>En tutor i grundlæggende geoteknik, der forklarer teori trin for trin. Arbejd med beregningseksempler, mellemregninger og enheder, og prøv selv en lignende øvelse med feedback på din fremgangsmåde.</p>
+      <p class="plugin-prompt"><strong>Prøv:</strong> <q>Forklar effektivspænding trin for trin.</q></p>
+      <a class="button plugin-download" href="downloads/plugins/georg-v2.zip" download>Download GEORG_V2 (ZIP)</a>
+      <p class="hint">Version 0.20.2</p>
+    </article>
+  </div>
+  <div class="panel plugin-install" aria-labelledby="plugin-install">
+    <h3 id="plugin-install">Sådan installerer du dem</h3>
+    <ol>
+      <li><strong>Download</strong> den ønskede ZIP-fil ovenfor. Behold filen som ZIP.</li>
+      <li><strong>Upload pluginet i ChatGPT på web.</strong> Det kræver adgang til plugin-upload. For workspace-ejere og administratorer med denne adgang: Åbn <a href="https://admin.openai.com/">Admin console</a>, vælg dit ChatGPT-workspace, og gå til <strong>Plugins → Add → Upload plugin</strong>. Vælg ZIP-filen.</li>
+      <li><strong>Installér pluginet.</strong> Når det er tilgængeligt for dig, åbn det i ChatGPTs <strong>Plugins</strong>-oversigt og vælg <strong>Install plugin</strong>, hvis knappen vises. Gentag for det andet plugin, hvis du ønsker begge.</li>
+      <li><strong>Start en ny chat.</strong> Skriv <strong>@</strong>, søg efter <strong>GEORG Quiz</strong> eller <strong>GEORG_V2</strong>, og vælg pluginet i menuen. Send derefter et af forslagene ovenfor.</li>
+    </ol>
+    <p class="hint">Mangler du uploadmuligheden? Bed din workspace-administrator om at gøre pluginet tilgængeligt. Adgangen afhænger af din konto og dit workspaces indstillinger. Se <a href="https://help.openai.com/en/articles/20001256-plugins-in-chatgpt">OpenAI's vejledning til upload og installation</a>.</p>
+  </div>
+</section>
 <section class="panel" aria-labelledby="advanced" lang="en"><h2 id="advanced">Advanced Geotechnics</h2><p>Explore clay yielding and critical state behaviour in a virtual laboratory.</p><a href="advanced/index.html">Open the Modified Cam Clay simulator →</a></section>
 <section class="catalog all-exercises" aria-labelledby="ovelser"><h2 id="ovelser">Alle øvelser</h2><p>Gå direkte til en af de eksisterende øvelser.</p><ul><li><a href="eksempler/deformation.html">Endimensional deformation</a></li><li><a href="eksempler/konsolideringsforsog.html">1D-konsolideringsforsøg</a></li><li><a href="eksempler/konsolidering.html">1D-konsolidering og deformation over tid</a></li><li><a href="eksempler/styrke.html">Jords forskydningsstyrke</a></li><li><a href="eksempler/spaendinger.html">Spændinger med dybden</a></li><li><a href="eksempler/rankine.html">Rankine-jordtryk</a></li><li><a href="eksempler/baereevne.html">Fundamenters bæreevne</a></li><li><a href="eksempler/saetninger.html">Fundamenters sætninger</a></li><li><a href="eksempler/paele.html">Enkeltpæles bæreevne</a></li></ul></section></main><footer class="site-footer">
   <div class="wrap">
