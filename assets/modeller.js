@@ -293,6 +293,25 @@ paele:{
   }
 },
 styrke:{
+  extraFigure:'spaendingssti',
+  drawExtra(f,result){
+    if(!result.stressPath){
+      f.label(16,30,'Justér skæreboksmålingerne for at vise spændingsstien.');
+      return;
+    }
+    const {phi,c,s3,s,t,fail}=result.stressPath;
+    const sf=s3+fail/2, tf=fail/2;
+    const xMax=Math.ceil(Math.max(100,sf*1.15)/50)*50;
+    const yMax=Math.ceil(Math.max(50,tf*1.2,c*Math.cos(phi)*1.2)/50)*50;
+    const g=diagram(f,{xMax,yMax,equal:true,clip:true,
+      xLabel:'s′ (kPa)',yLabel:'t (kPa)'});
+    g.plot([[0,c*Math.cos(phi)],[xMax,xMax*Math.sin(phi)+c*Math.cos(phi)]],farve.orange);
+    g.plot([[s3,0],[sf,tf]],farve.gray,[5,5]);
+    g.plot([[s3,0],[s,t]],farve.green);
+    g.dot(sf,tf,farve.orange);
+    g.dot(s3,0,farve.gray);
+    g.dot(s,t,farve.blue);
+  },
   controls:[
     {id:'plotScale',label:'Visning af spændingsdiagram',value:0,options:['Nærbillede','Hele spændingsområdet']},
     input('tau1','Skæreboks · τf ved σ′ₙ = 50 kPa',38,5,110,1,kpa),
@@ -309,7 +328,9 @@ styrke:{
     const fail=2*(v.s3*sin+c*Math.cos(phi))/(1-sin);
     const hi=v.s3+fail*v.load/100;
     mohr(f,{phi,c,hi,lo:v.s3,points:[[50,v.tau1],[150,v.tau2]],xMax:v.plotScale?1500:360,yMax:v.plotScale?750:180,clip:true});
-    return {metrics:[['Effektiv kohæsion c′',c,kpa],['Friktionsvinkel φ′',phi*180/Math.PI,'°'],['Deviator ved brud',fail,kpa],['Aktuel σ′₁',hi,kpa]],
+    const s=(hi+v.s3)/2, t=(hi-v.s3)/2;
+    return {stressPath:{phi,c,s3:v.s3,s,t,fail},
+      metrics:[['Effektiv kohæsion c′',c,kpa],['Friktionsvinkel φ′',phi*180/Math.PI,'°'],['Deviator ved brud',fail,kpa],['Aktuel σ′₁',hi,kpa],['Aktuel s′',s,kpa],['Aktuel t',t,kpa]],
       legend:[['Skæreboksens brudpunkter',farve.blue],['Triaksialprøvens Mohr-cirkel',farve.green],['Fælles brudlinje',farve.orange]],
       caption:'De blå punkter viser τf ved henholdsvis σ′ₙ = 50 og 150 kPa på den vandrette akse. De fastlægger brudlinjen. Vælg hele spændingsområdet, hvis cirklen fortsætter uden for udsnittet. Sæt deviatorandelen til 100 % for at se triaksialcirklen tangere linjen.'};
   }

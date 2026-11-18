@@ -22,7 +22,7 @@ if(!topic){
   function render(){
     if(!canvas.clientWidth) return;
     const result=model.draw(figur(canvas),values,mode);
-    if(model.extraFigure) model.drawTime(figur(find(model.extraFigure)),result);
+    if(model.extraFigure) (model.drawExtra??model.drawTime)(figur(find(model.extraFigure)),result);
     find('skitsetekst').textContent=skitser[topic](figur(sketch),values,mode,result);
     find('figurtekst').textContent=result.caption;
     find('resultater').innerHTML=result.metrics.map(([label,value,unit,digits])=>
