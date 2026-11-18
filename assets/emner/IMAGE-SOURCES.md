@@ -2,6 +2,24 @@
 
 Created with the built-in image_gen tool. Photorealistic images are synthetic illustrations, not documentary photographs.
 
+## laboratorieforsog-reference-v3.png
+
+Current banner. Built-in image_gen edit of v2 removing the triaxial LVDT cable while retaining the sensor.
+
+Final prompt:
+
+Make one precise localized edit to this photograph: REMOVE the BLACK ELECTRICAL CABLE connected to the LVDT displacement sensor above the central GDS triaxial cell. It is the thin curved black wire that leaves the small vertical silver LVDT near the upper loading rod, arcs LEFT above the cell lid, and then hangs down along the left/front side of the transparent cell toward the front control panel. Remove that entire cable, including its descending continuation. Restore the wall and instrument surfaces behind it naturally. KEEP the silver LVDT sensor itself, its black mounting clamp, the central loading rod, all rigid metallic tie rods and the transparent cell intact. Preserve all other equipment, hydraulic tubing to the pressure controllers on the right, sieve stack, fall-cone apparatus, Danish wall sockets, existing labels, lighting, photographic texture, composition and dimensions exactly. Do not add any cables or change anything else.
+
+
+## laboratorieforsog-reference-v2.png
+
+Current banner. Edited with built-in image_gen from laboratorieforsog-reference.png to remove the fall-cone cable, wall plumbing/fittings and rear drainage tubing, and replace the wall sockets with Danish Type K sockets.
+
+Final edit prompt:
+
+Precisely edit this laboratory photograph with ONLY these requested changes. 1. REMOVE the black wire/cable running across the benchtop behind and towards the fall-cone apparatus (second instrument from left). The fall-cone apparatus must have NO external cable attached or leading to it. Restore the clean bench behind it naturally. 2. REMOVE the wall-mounted regulator/gauge and metal valve fittings on the wall between the fall-cone and the triaxial frame, including their brackets. Restore plain smooth pale wall at those locations. 3. REMOVE all the associated pale drainage/air tubing looping from the rear of the triaxial area up to these wall fittings, including the large pale hanging loop behind the left upright of the triaxial frame. There must be no plumbing lines leading back to the wall. Keep the functional local hoses connecting the triaxial cell to the two pressure controllers on the RIGHT and the triaxial cell's own sensor cable. 4. CHANGE all visible electrical wall outlets on the horizontal white service trunking to realistic Danish Type K sockets: white Danish-style socket plates with two round live/neutral holes side by side and one lower semicircular/D-shaped earth opening, triangular arrangement. No British rectangular three-pin outlets. Keep the horizontal white trunking. Preserve EVERYTHING else: sieve stack, fall-cone instrument geometry, sample cup, GDS triaxial frame and cell, pressure controllers, bench, window, natural light, camera framing and image dimensions. Photorealistic subtle localized retouch, no redesign of equipment, no new objects, no text overlays.
+
+
 ## laboratorieforsog-reference.png
 
 Current laboratory banner, replacing the generic laboratory illustration. Built-in image_gen generation using the user's two supplied laboratory photographs as equipment references. The sieve stack is generated. This remains a synthetic illustration, not an unedited photograph.
