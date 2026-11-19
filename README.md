@@ -21,6 +21,8 @@ Billederne af laboratorieforsøg og havnekonstruktion under `assets/emner/` er f
 
 Forsiden indeholder beskrivelser, installationstrin og ZIP-downloads til GEORG Quiz (0.11.2) og GEORG_V2 (0.20.2). De originale pluginpakker ligger uændret i `downloads/plugins/`. Ved en opdatering udskiftes ZIP-filen, og versionsnummeret på forsiden opdateres. Installationsvejledningen linker til OpenAI's dokumentation; upload kræver de relevante kontorettigheder.
 
+Privatlivspolitik og brugsvilkår findes i `georg-quiz-privacy.html`, `georg-quiz-terms.html`, `georg-v2-privacy.html` og `georg-v2-terms.html`. GEORG Quiz bruger den leverede engelske ordlyd; GEORG_V2 er tilpasset tutorens funktioner. Begge er linket fra pluginsektionen og forsidens footer. Medtag de fire HTML-filer ved udgivelse. Datoen på siderne angiver seneste tekstændring.
+
 ## Udgivelse med GitHub Pages
 
 Læg `index.html`, `emner/`, `eksempler/`, `advanced/`, `assets/`, `downloads/` og `.nojekyll` i roden af GitHub-repositoriet. Vælg **Settings → Pages → Deploy from a branch** og vælg den branch og rodmappe, der indeholder filerne. [GitHubs vejledning til udgivelseskilder](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).

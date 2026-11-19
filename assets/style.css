@@ -54,3 +54,5 @@
 .plugin-card{display:flex;flex-direction:column;align-items:flex-start;padding:22px}.plugin-card .tag{margin-top:0}.plugin-card h3{font-size:1.65rem}.plugin-card>p:not(.tag):not(.hint){margin-top:0}.plugin-prompt{background:#eaf0e6;border-radius:8px;padding:12px;width:100%}
 .plugin-download{display:inline-block;margin-top:auto;text-decoration:none;overflow-wrap:anywhere}.plugin-download:hover{background:#e0ecd9}.plugin-install{padding:22px}.plugin-install li{margin:12px 0}.plugin-install ol{padding-left:24px}
 @media(max-width:680px){.plugin-cards{grid-template-columns:1fr;gap:18px}.plugin-card,.plugin-install{padding:18px}}
+
+.policy-page{max-width:900px;padding-bottom:40px}.policy-page h1{font-size:clamp(2rem,5vw,3.4rem);overflow-wrap:anywhere}.policy-page h2{font-size:1.5rem;margin-top:1.6em}.policy-page article>p{max-width:75ch}
